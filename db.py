@@ -23,6 +23,7 @@ CATEGORY_PREFIXES = {
     "Data": "DAT",
     "DI / Signal": "DI",
     "Coaxial": "COX",
+    "PA Systems": "PA",
 }
 
 
