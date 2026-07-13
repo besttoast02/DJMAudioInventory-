@@ -19,10 +19,16 @@ def get_display_category(item: dict) -> str:
     if "truss" in name and "clamp" not in name:
         return "Truss"
 
+    # Wireless: only show the main system mic, everything else is bundled
+    if cat == "Wireless":
+        if "system" in name:
+            return "Microphones"
+        else:
+            return "Add-ons"  # receivers, antennas, bodypacks, rack mounts
+
     mapping = {
         "PA Systems": "Speakers",
         "Microphones": "Microphones",
-        "Wireless": "Microphones",
         "Mixers": "Mixers",
         "Lighting": "Lighting / DMX",
     }
