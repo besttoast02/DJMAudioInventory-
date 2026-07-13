@@ -10,6 +10,18 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── Branding & Styles ────────────────────────────────────────
+st.logo("https://djmaudio.com/wp-content/uploads/2025/02/DJM-Logo-copy-300x300.png", link="https://djmaudio.com")
+
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
+html, body, [class*="st-"] {
+    font-family: 'DM Sans', sans-serif;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ── Check Supabase connection ────────────────────────────────
 if not db.is_connected():
     st.title(":material/speaker: DJMAudio Inventory")
