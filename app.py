@@ -62,12 +62,12 @@ with st.sidebar:
 
 # ── Navigation ───────────────────────────────────────────────
 public_pages = [
-    st.Page("app_pages/browse.py", title="Browse gear", icon=":material/search:", default=True),
+    st.Page("app_pages/browse.py", title="Browse gear", icon=":material/search:"),
     st.Page("app_pages/request.py", title="Request rental", icon=":material/send:"),
 ]
 
 admin_pages = [
-    st.Page("app_pages/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True),
+    st.Page("app_pages/dashboard.py", title="Dashboard", icon=":material/dashboard:"),
     st.Page("app_pages/inventory.py", title="Inventory", icon=":material/inventory_2:"),
     st.Page("app_pages/rentals.py", title="Rentals", icon=":material/event:"),
     st.Page("app_pages/barcodes.py", title="Barcodes", icon=":material/qr_code_2:"),
