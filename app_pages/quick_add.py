@@ -25,7 +25,23 @@ raw = st.text_area(
     placeholder="3x 25ft xlr neutrik\n2 sm57\nboom stand\nbeta58a wireless",
 )
 
-storage = st.text_input("Storage case (applied to all)", placeholder="Blue Makita Bag 1")
+STORAGE_CASES = [
+    "",
+    "Blue Makita Bag 1",
+    "Makita Bag 2",
+    "Black Box Yellow Cap A",
+    "Black Box Yellow Cap B",
+    "Black Box Yellow Cap C",
+    "Light Case",
+    "LightJoy Rolling Case A",
+    "LightJoy Rolling Case B",
+    "Microphone Case A",
+    "Microphone Case B",
+    "Microphone Bag Gator A",
+    "Microphone Bag Gator B",
+]
+
+storage = st.selectbox("Storage case (applied to all)", STORAGE_CASES, index=0)
 
 if st.button("Parse items", icon=":material/auto_fix_high:", type="primary") and raw:
     items = parse_text(raw)
