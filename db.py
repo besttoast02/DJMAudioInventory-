@@ -26,6 +26,13 @@ CATEGORY_PREFIXES = {
     "PA Systems": "PA",
 }
 
+# Categories that are add-on only (not publicly rentable)
+ADDON_CATEGORIES = {
+    "XLR Cables", "DMX Cables", "TRS Cables", "Power",
+    "Adapters", "Hardware", "Stands", "Data",
+    "DI / Signal", "Coaxial",
+}
+
 
 def get_prefix(category: str) -> str:
     return CATEGORY_PREFIXES.get(category, "GEN")
@@ -80,8 +87,12 @@ def get_item_count() -> dict:
 
 def add_item(barcode: str, name: str, brand: str, category: str, storage_case: str,
              notes: str = "", purchase_price: float = 0, current_value: float = 0,
-             rate_half_day: float = 0, rate_daily: float = 0, rate_weekend: float = 0) -> dict:
+             rate_half_day: float = 0, rate_daily: float = 0, rate_weekend: float = 0,
+             rentable: bool | None = None) -> dict:
     sb = get_client()
+    # Auto-determine rentable from category if not explicitly set
+    if rentable is None:
+        rentable = category not in ADDON_CATEGORIES
     data = {
         "barcode": barcode,
         "name": name,
@@ -95,6 +106,7 @@ def add_item(barcode: str, name: str, brand: str, category: str, storage_case: s
         "rate_half_day": rate_half_day,
         "rate_daily": rate_daily,
         "rate_weekend": rate_weekend,
+        "rentable": rentable,
     }
     res = sb.table("items").insert(data).execute()
     return res.data

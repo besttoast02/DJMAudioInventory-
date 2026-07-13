@@ -5,6 +5,18 @@ from datetime import date, timedelta
 st.title(":material/send: Request a rental")
 st.markdown("Fill out the form below and we'll get back to you with availability and a quote.")
 
+# ── Fetch available add-ons for the checklist ────────────────
+all_items = db.get_available_items()
+addons = [i for i in all_items if not i.get("rentable", True)]
+
+# Group add-ons by category
+addon_grouped = {}
+for i in addons:
+    key = f"{i['category']}|{i['name']}"
+    if key not in addon_grouped:
+        addon_grouped[key] = {"name": i["name"], "category": i["category"], "qty": 0}
+    addon_grouped[key]["qty"] += 1
+
 with st.form("public_rental_request", border=True):
     st.subheader("Your info")
     rc1, rc2 = st.columns(2)
@@ -28,6 +40,26 @@ with st.form("public_rental_request", border=True):
         height=120,
     )
 
+    # ── Optional add-ons ─────────────────────────────────────
+    if addon_grouped:
+        st.space("small")
+        st.subheader(":material/extension: Optional add-ons")
+        st.caption("Select any cables, stands, or accessories you'd like included.")
+
+        addon_by_cat = {}
+        for key, info in addon_grouped.items():
+            cat = info["category"]
+            if cat not in addon_by_cat:
+                addon_by_cat[cat] = []
+            addon_by_cat[cat].append(info)
+
+        selected_addons = []
+        for cat in sorted(addon_by_cat.keys()):
+            items_in_cat = sorted(addon_by_cat[cat], key=lambda x: x["name"])
+            options = [f"{info['name']} ({info['qty']} avail)" for info in items_in_cat]
+            chosen = st.multiselect(cat, options, key=f"addon_{cat}")
+            selected_addons.extend(chosen)
+
     st.space("small")
     submitted = st.form_submit_button("Submit request", icon=":material/send:", type="primary")
 
@@ -35,6 +67,12 @@ with st.form("public_rental_request", border=True):
         if not client_name or not event_name:
             st.error("Please fill in your name and event name.", icon=":material/error:")
         else:
+            # Append selected add-ons to notes
+            full_notes = notes
+            if selected_addons:
+                addon_text = "\n\nRequested add-ons:\n" + "\n".join(f"• {a}" for a in selected_addons)
+                full_notes = notes + addon_text
+
             db.create_rental(
                 event_name=event_name,
                 client_name=client_name,
@@ -42,7 +80,7 @@ with st.form("public_rental_request", border=True):
                 event_date=str(event_date),
                 return_date=str(return_date),
                 venue=venue,
-                notes=notes,
+                notes=full_notes,
             )
             st.success(
                 "Request submitted! We'll review it and get back to you soon.",
