@@ -15,8 +15,8 @@ def get_display_category(item: dict) -> str:
     cat = item.get("category", "")
     name = item.get("name", "").lower()
 
-    # Truss check first (hardware items with "truss" in name)
-    if "truss" in name:
+    # Truss segments (not clamps — those are add-ons)
+    if "truss" in name and "clamp" not in name:
         return "Truss"
 
     mapping = {
