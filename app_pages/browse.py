@@ -35,7 +35,61 @@ def get_display_category(item: dict) -> str:
     return mapping.get(cat, "Add-ons")
 
 
-DISPLAY_ORDER = ["Speakers", "Microphones", "Mixers", "Lighting / DMX", "Truss", "Add-ons"]
+DISPLAY_ORDER = ["Speakers", "Mixers", "Microphones", "Lighting / DMX", "Truss", "Add-ons"]
+
+# Popularity rank — lower number = more popular (shown first)
+# Based on typical DJ/audio rental demand
+POPULARITY = {
+    # Speakers
+    "evolve 50": 1,
+    "column pa": 1,
+    # Mixers / Controllers
+    "xdj-xz": 2,
+    "sq-5": 3,
+    "ddj": 4,
+    "djm": 4,
+    # Wireless systems
+    "wireless": 5,
+    "ksm8": 5,
+    "beta 58a wireless": 6,
+    "bodypack": 7,
+    # Lighting
+    "moving head": 8,
+    "fog": 9,
+    "hex": 10,
+    "par": 11,
+    "dotz": 12,
+    # Vocal mics
+    "beta 58a": 13,
+    "ksm8 dual": 14,
+    "e935": 15,
+    "e945": 15,
+    "sm58": 16,
+    # Instrument / drum mics
+    "sm57": 17,
+    "e906": 18,
+    "e904": 19,
+    "i5": 20,
+    "i6": 21,
+    "pga52": 22,
+    "pga56": 23,
+    "pga57": 24,
+    "pga81": 25,
+    # DI
+    "direct box": 30,
+    "di": 30,
+    # Truss
+    "truss": 35,
+}
+
+
+def get_popularity(name: str) -> int:
+    """Return a popularity score for sorting. Lower = more popular."""
+    name_lower = name.lower()
+    for keyword, score in sorted(POPULARITY.items(), key=lambda x: -len(x[0])):
+        if keyword in name_lower:
+            return score
+    return 50  # unknown items last
 
 # Tag every item with its display category
 for i in items:
@@ -86,7 +140,7 @@ for key, info in hero_items.items():
 for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
     st.subheader(cat)
     cols = st.columns(3)
-    for idx, info in enumerate(sorted(by_cat[cat], key=lambda x: x["name"])):
+    for idx, info in enumerate(sorted(by_cat[cat], key=lambda x: get_popularity(x["name"]))):
         with cols[idx % 3]:
             with st.container(border=True):
                 st.markdown(f"**{info['brand']}** {info['name']}")
