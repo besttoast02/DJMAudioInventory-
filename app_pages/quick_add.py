@@ -61,7 +61,7 @@ if "parsed_items" in st.session_state and st.session_state["parsed_items"]:
 
     edited = st.data_editor(
         df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         column_config={
             "qty": st.column_config.NumberColumn("Qty", min_value=1, max_value=100, width="small"),

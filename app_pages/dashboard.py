@@ -71,4 +71,4 @@ if items:
          "Damaged": v["damaged"], "Lost": v["lost"]}
         for cat, v in sorted(cat_data.items())
     ])
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)

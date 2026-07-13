@@ -60,7 +60,7 @@ if view == "Table":
             "Notes": i.get("notes") or "",
         } for i in filtered])
 
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width="stretch", hide_index=True)
 
         # Summary row
         total_purchase = sum(float(i.get("purchase_price") or 0) for i in filtered)
@@ -92,7 +92,7 @@ elif view == "Edit mode":
 
     edited = st.data_editor(
         df,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         num_rows="fixed",
         disabled=["id", "barcode"],
