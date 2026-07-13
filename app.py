@@ -1,5 +1,6 @@
 import streamlit as st
 import db
+import pyotp
 
 # ── Page config ──────────────────────────────────────────────
 st.set_page_config(
@@ -45,11 +46,23 @@ with st.sidebar:
     if not st.session_state.is_admin:
         with st.popover("Admin login", icon=":material/lock:"):
             pw = st.text_input("Password", type="password", key="admin_pw")
+            totp_code = st.text_input("2FA Code (Google Authenticator)", type="password", key="admin_2fa")
+            
             if st.button("Log in", icon=":material/login:"):
                 try:
                     if pw == st.secrets["ADMIN_PASSWORD"]:
-                        st.session_state.is_admin = True
-                        st.rerun()
+                        admin_2fa_secret = st.secrets.get("ADMIN_2FA_SECRET")
+                        if admin_2fa_secret:
+                            totp = pyotp.TOTP(admin_2fa_secret)
+                            if totp.verify(totp_code):
+                                st.session_state.is_admin = True
+                                st.rerun()
+                            else:
+                                st.error("Invalid 2FA code")
+                        else:
+                            # Fallback if no 2FA secret is configured
+                            st.session_state.is_admin = True
+                            st.rerun()
                     else:
                         st.error("Wrong password")
                 except KeyError:

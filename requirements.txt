@@ -2,3 +2,5 @@ streamlit
 supabase
 python-barcode[images]
 Pillow
+pyotp
+qrcode[pil]
