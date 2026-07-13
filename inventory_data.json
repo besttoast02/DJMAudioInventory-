@@ -141,6 +141,13 @@
       ]
     },
     {
+      "name": "Pioneer DJ XDJ-XZ Case",
+      "icon": "equalizer",
+      "items": [
+        {"name": "XDJ-XZ All-In-One DJ System (White)", "brand": "Pioneer DJ", "qty": 1, "qty_out": 0, "category": "Mixers", "purchase_price": 2599, "current_value": 1800, "rate_half_day": 150, "rate_daily": 250, "rate_weekend": 400, "notes": "White limited edition — 4-channel standalone DJ controller with dual USB players"}
+      ]
+    },
+    {
       "name": "Allen & Heath Mixer Case",
       "icon": "equalizer",
       "items": [
