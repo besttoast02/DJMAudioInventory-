@@ -1,0 +1,190 @@
+{
+  "cases": [
+    {
+      "name": "Blue Makita Bag 1",
+      "icon": "handyman",
+      "items": [
+        {"name": "3' XLR cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "XLR Cables", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "5' XLR cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "XLR Cables", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "15' XLR cable", "brand": "Jumperz", "qty": 7, "qty_out": 0, "category": "XLR Cables", "purchase_price": 25, "current_value": 15, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 7},
+        {"name": "25' XLR cable", "brand": "Neutrik", "qty": 4, "qty_out": 0, "category": "XLR Cables", "purchase_price": 30, "current_value": 18, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "25' XLR cable", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "XLR Cables", "purchase_price": 35, "current_value": 20, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "25' XLR cable", "brand": "Rean Silver", "qty": 4, "qty_out": 0, "category": "XLR Cables", "purchase_price": 22, "current_value": 12, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 7},
+        {"name": "25' XLR cable", "brand": "Roland", "qty": 2, "qty_out": 0, "category": "XLR Cables", "purchase_price": 28, "current_value": 16, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "25' XLR cable", "brand": "Warm Audio", "qty": 1, "qty_out": 0, "category": "XLR Cables", "purchase_price": 30, "current_value": 18, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "25' XLR cable", "brand": "NCMS Neutrik", "qty": 1, "qty_out": 0, "category": "XLR Cables", "purchase_price": 28, "current_value": 16, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "25' XLR low noise mic cable", "brand": "Professional", "qty": 2, "qty_out": 0, "category": "XLR Cables", "purchase_price": 25, "current_value": 14, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 7},
+        {"name": "50' XLR cable", "brand": "NCMS Neutrik", "qty": 1, "qty_out": 0, "category": "XLR Cables", "purchase_price": 45, "current_value": 28, "rate_half_day": 4, "rate_daily": 7, "rate_weekend": 12},
+        {"name": "5' 1/4\" TRS to Female XLR", "brand": "Rean Silver", "qty": 1, "qty_out": 0, "category": "Adapters", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "10' 1/4\" TRS cable", "brand": "Neutrik", "qty": 1, "qty_out": 0, "category": "TRS Cables", "purchase_price": 18, "current_value": 10, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "25' 1/4\" TRS cable", "brand": "Neutrik", "qty": 1, "qty_out": 0, "category": "TRS Cables", "purchase_price": 25, "current_value": 14, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "20' 1/4\" TRS to Male XLR", "brand": "Cable Matters", "qty": 2, "qty_out": 0, "category": "Adapters", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "3-way power splitter", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Power", "notes": "Yellow one's middle socket is burned", "purchase_price": 12, "current_value": 5, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "Ingenia power cable", "brand": "dB Technologies", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 25, "current_value": 15, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "Ingenia power extension cable", "brand": "dB Technologies", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 30, "current_value": 18, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "JBL sub power cable (black/yellow tip)", "brand": "JBL", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 20, "current_value": 12, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 6},
+        {"name": "Regular power cable", "brand": "Generic", "qty": 6, "qty_out": 0, "category": "Power", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "Ingenia speaker clip", "brand": "dB Technologies", "qty": 4, "qty_out": 0, "category": "Hardware", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "15' Ethernet cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Data", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "Rigid 5-way power strip", "brand": "Rigid", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 35, "current_value": 20, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "Rigid 6-way power strip w/ USB + USB-C", "brand": "Rigid", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 45, "current_value": 28, "rate_half_day": 4, "rate_daily": 7, "rate_weekend": 10},
+        {"name": "Powercon Neutrik sub power cable", "brand": "Neutrik", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 28, "current_value": 16, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8}
+      ]
+    },
+    {
+      "name": "Blue Makita Bag 2",
+      "icon": "handyman",
+      "items": [
+        {"name": "Chauvet 8-power strip", "brand": "Chauvet", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 55, "current_value": 30, "rate_half_day": 5, "rate_daily": 8, "rate_weekend": 12},
+        {"name": "20' black extension cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "Furman 6-power strip", "brand": "Furman", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 65, "current_value": 35, "rate_half_day": 5, "rate_daily": 10, "rate_weekend": 15},
+        {"name": "Silver clamp", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "Black plastic clamp", "brand": "Generic", "qty": 4, "qty_out": 0, "category": "Hardware", "purchase_price": 5, "current_value": 2, "rate_half_day": 1, "rate_daily": 1, "rate_weekend": 2},
+        {"name": "10' DMX cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "DMX Cables", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4},
+        {"name": "6' DMX cable", "brand": "Generic", "qty": 24, "qty_out": 0, "category": "DMX Cables", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "3' DMX cable", "brand": "Generic", "qty": 4, "qty_out": 0, "category": "DMX Cables", "purchase_price": 6, "current_value": 3, "rate_half_day": 1, "rate_daily": 1, "rate_weekend": 2},
+        {"name": "3' Powercon cable", "brand": "Seetronic", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 18, "current_value": 10, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "2' Powercon cable", "brand": "Seetronic", "qty": 3, "qty_out": 0, "category": "Power", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5}
+      ]
+    },
+    {
+      "name": "Mic Bags",
+      "icon": "mic",
+      "items": [
+        {"name": "Beta 58A microphone", "brand": "Shure", "qty": 6, "qty_out": 0, "category": "Microphones", "purchase_price": 159, "current_value": 100, "rate_half_day": 15, "rate_daily": 25, "rate_weekend": 50},
+        {"name": "SM57 microphone", "brand": "Shure", "qty": 7, "qty_out": 0, "category": "Microphones", "purchase_price": 99, "current_value": 65, "rate_half_day": 10, "rate_daily": 20, "rate_weekend": 40},
+        {"name": "i5 microphone", "brand": "Audix", "qty": 1, "qty_out": 0, "category": "Microphones", "purchase_price": 99, "current_value": 60, "rate_half_day": 10, "rate_daily": 18, "rate_weekend": 35},
+        {"name": "e904 drum mic", "brand": "Sennheiser", "qty": 3, "qty_out": 0, "category": "Microphones", "purchase_price": 179, "current_value": 120, "rate_half_day": 15, "rate_daily": 25, "rate_weekend": 50},
+        {"name": "e906 instrument mic", "brand": "Sennheiser", "qty": 2, "qty_out": 0, "category": "Microphones", "purchase_price": 189, "current_value": 130, "rate_half_day": 15, "rate_daily": 28, "rate_weekend": 55},
+        {"name": "Female 1/4\" TRS to Male XLR converter", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Adapters", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "XLR head (spare)", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 5, "current_value": 2, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0},
+        {"name": "Snare mic clip pack", "brand": "Audix", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 20, "current_value": 10, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "Small mic clips", "brand": "Audix", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "5' blue Ethernet cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Data", "purchase_price": 5, "current_value": 2, "rate_half_day": 1, "rate_daily": 1, "rate_weekend": 2},
+        {"name": "10' 1/8\" TRS cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "TRS Cables", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "1/8\" TRS to USB-C converter", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Adapters", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "1/8\" TRS to 1/4\" TRS converter", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Adapters", "purchase_price": 6, "current_value": 3, "rate_half_day": 1, "rate_daily": 1, "rate_weekend": 2},
+        {"name": "Dual DI box", "brand": "Radial", "qty": 2, "qty_out": 0, "category": "DI / Signal", "purchase_price": 200, "current_value": 140, "rate_half_day": 12, "rate_daily": 22, "rate_weekend": 40},
+        {"name": "RCA female to 1/4\" TRS male converter", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Adapters", "purchase_price": 6, "current_value": 3, "rate_half_day": 1, "rate_daily": 1, "rate_weekend": 2},
+        {"name": "e904 plastic clip-on", "brand": "Sennheiser", "qty": 3, "qty_out": 0, "category": "Hardware", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5}
+      ]
+    },
+    {
+      "name": "Beta 58A Wireless Kit",
+      "icon": "settings_input_antenna",
+      "items": [
+        {"name": "Beta 58A wireless mic", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Wireless", "purchase_price": 599, "current_value": 400, "rate_half_day": 35, "rate_daily": 65, "rate_weekend": 120},
+        {"name": "Wireless receiver", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Wireless", "purchase_price": 0, "current_value": 0, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0, "notes": "Included with wireless mic kit"},
+        {"name": "Receiver power cable", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 0, "current_value": 0, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0},
+        {"name": "Antenna", "brand": "Shure", "qty": 2, "qty_out": 0, "category": "Wireless", "purchase_price": 25, "current_value": 15, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0, "notes": "Part of wireless kit"},
+        {"name": "5' antenna extension", "brand": "Shure", "qty": 2, "qty_out": 0, "category": "Wireless", "purchase_price": 35, "current_value": 20, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "Rack mount kit (no tools)", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 20, "current_value": 10, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0},
+        {"name": "3' XLR cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "XLR Cables", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "Big mic clip", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3}
+      ]
+    },
+    {
+      "name": "PGA Drum Mic Kit",
+      "icon": "music_note",
+      "items": [
+        {"name": "PGA56 drum mic", "brand": "Shure", "qty": 3, "qty_out": 0, "category": "Microphones", "purchase_price": 62, "current_value": 35, "rate_half_day": 8, "rate_daily": 15, "rate_weekend": 28},
+        {"name": "PGA81 condenser mic", "brand": "Shure", "qty": 2, "qty_out": 0, "category": "Microphones", "purchase_price": 110, "current_value": 70, "rate_half_day": 10, "rate_daily": 20, "rate_weekend": 38},
+        {"name": "PGA52 kick drum mic", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Microphones", "purchase_price": 120, "current_value": 75, "rate_half_day": 12, "rate_daily": 22, "rate_weekend": 42},
+        {"name": "PGA57 instrument mic", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Microphones", "purchase_price": 62, "current_value": 35, "rate_half_day": 8, "rate_daily": 15, "rate_weekend": 28},
+        {"name": "5/8\" male to 3/8\" female thread adapter", "brand": "Generic", "qty": 3, "qty_out": 0, "category": "Hardware", "purchase_price": 4, "current_value": 2, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0}
+      ]
+    },
+    {
+      "name": "KSM8 Wireless Kit",
+      "icon": "settings_input_antenna",
+      "items": [
+        {"name": "KSM8 wireless mic", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Wireless", "purchase_price": 799, "current_value": 550, "rate_half_day": 45, "rate_daily": 85, "rate_weekend": 150},
+        {"name": "Wireless receiver", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Wireless", "purchase_price": 0, "current_value": 0, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0, "notes": "Included with wireless mic kit"},
+        {"name": "Power cable (non-original)", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 8, "current_value": 4, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0},
+        {"name": "Antenna", "brand": "Shure", "qty": 2, "qty_out": 0, "category": "Wireless", "purchase_price": 25, "current_value": 15, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0, "notes": "Part of wireless kit"},
+        {"name": "Big mic clip", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3}
+      ]
+    },
+    {
+      "name": "Un-insulated Cables Box",
+      "icon": "cable",
+      "items": [
+        {"name": "50' coaxial antenna extension", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Coaxial", "purchase_price": 40, "current_value": 22, "rate_half_day": 4, "rate_daily": 7, "rate_weekend": 12},
+        {"name": "25' coaxial antenna extension", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Coaxial", "purchase_price": 28, "current_value": 15, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "15' coaxial antenna extension", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Coaxial", "purchase_price": 20, "current_value": 10, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 6},
+        {"name": "25' male 1/4\" TRS to XLR male", "brand": "Generic", "qty": 3, "qty_out": 0, "category": "TRS Cables", "purchase_price": 18, "current_value": 10, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 6},
+        {"name": "10' 1/4\" TRS cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "TRS Cables", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4},
+        {"name": "15' XLR cable", "brand": "Generic", "qty": 6, "qty_out": 0, "category": "XLR Cables", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "10' XLR cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "XLR Cables", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4},
+        {"name": "6' DMX cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "DMX Cables", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "10' DMX cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "DMX Cables", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4},
+        {"name": "25' DMX cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "DMX Cables", "purchase_price": 18, "current_value": 10, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 6},
+        {"name": "50' DMX cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "DMX Cables", "purchase_price": 30, "current_value": 16, "rate_half_day": 3, "rate_daily": 6, "rate_weekend": 10},
+        {"name": "Regular power cable", "brand": "Generic", "qty": 30, "qty_out": 0, "category": "Power", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3}
+      ]
+    },
+    {
+      "name": "Allen & Heath Case",
+      "icon": "equalizer",
+      "items": [
+        {"name": "SQ5 digital mixer", "brand": "Allen & Heath", "qty": 1, "qty_out": 0, "category": "Mixers", "purchase_price": 3499, "current_value": 2500, "rate_half_day": 125, "rate_daily": 225, "rate_weekend": 425},
+        {"name": "Ethernet cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Data", "purchase_price": 8, "current_value": 4, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "Original power cable", "brand": "Allen & Heath", "qty": 0, "qty_out": 0, "category": "Power", "notes": "Missing — using substitute", "purchase_price": 20, "current_value": 0, "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0}
+      ]
+    },
+    {
+      "name": "Extension Cables",
+      "icon": "power",
+      "items": [
+        {"name": "50' orange extension cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 35, "current_value": 18, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "50' yellow extension cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 35, "current_value": 18, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "25' green extension cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 22, "current_value": 12, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 6},
+        {"name": "20' red extension cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 18, "current_value": 10, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "20' yellow extension cable", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 18, "current_value": 10, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "White power strip", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 15, "current_value": 8, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5}
+      ]
+    },
+    {
+      "name": "Stand Bag A",
+      "icon": "straighten",
+      "items": [
+        {"name": "Low profile mic stand", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Stands", "purchase_price": 25, "current_value": 12, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "Boom mic stand", "brand": "On-Stage", "qty": 8, "qty_out": 0, "category": "Stands", "purchase_price": 35, "current_value": 18, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "Tiny mic clip", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 4, "current_value": 2, "rate_half_day": 0, "rate_daily": 1, "rate_weekend": 1},
+        {"name": "Small mic clip", "brand": "Shure", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 6, "current_value": 3, "rate_half_day": 0, "rate_daily": 1, "rate_weekend": 1}
+      ]
+    },
+    {
+      "name": "Stand Bag B",
+      "icon": "straighten",
+      "items": [
+        {"name": "Boom mic stand", "brand": "CLC", "qty": 5, "qty_out": 0, "category": "Stands", "purchase_price": 30, "current_value": 15, "rate_half_day": 3, "rate_daily": 5, "rate_weekend": 8},
+        {"name": "Mic stand (straight)", "brand": "Generic", "qty": 4, "qty_out": 0, "category": "Stands", "purchase_price": 22, "current_value": 10, "rate_half_day": 2, "rate_daily": 4, "rate_weekend": 7},
+        {"name": "Big mic clip", "brand": "Shure", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "Small mic clip", "brand": "Sennheiser", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 8, "current_value": 4, "rate_half_day": 0, "rate_daily": 1, "rate_weekend": 1},
+        {"name": "Small mic clip", "brand": "Shure", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 6, "current_value": 3, "rate_half_day": 0, "rate_daily": 1, "rate_weekend": 1}
+      ]
+    },
+    {
+      "name": "Moving Head Case A",
+      "icon": "flare",
+      "items": [
+        {"name": "Moving head light", "brand": "Joy First", "qty": 2, "qty_out": 0, "category": "Lighting", "purchase_price": 350, "current_value": 220, "rate_half_day": 30, "rate_daily": 55, "rate_weekend": 100},
+        {"name": "10' Powercon cable", "brand": "Seetronic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 22, "current_value": 12, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "5' Powercon cable", "brand": "Seetronic", "qty": 1, "qty_out": 0, "category": "Power", "purchase_price": 16, "current_value": 8, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4},
+        {"name": "Steel safety cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "10' DMX cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "DMX Cables", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4}
+      ]
+    },
+    {
+      "name": "Moving Head Case B",
+      "icon": "flare",
+      "items": [
+        {"name": "Moving head light", "brand": "Joy First", "qty": 2, "qty_out": 0, "category": "Lighting", "purchase_price": 350, "current_value": 220, "rate_half_day": 30, "rate_daily": 55, "rate_weekend": 100},
+        {"name": "10' Powercon cable", "brand": "Seetronic", "qty": 2, "qty_out": 0, "category": "Power", "purchase_price": 22, "current_value": 12, "rate_half_day": 2, "rate_daily": 3, "rate_weekend": 5},
+        {"name": "Steel safety cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 10, "current_value": 5, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 3},
+        {"name": "10' DMX cable", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "DMX Cables", "purchase_price": 12, "current_value": 6, "rate_half_day": 1, "rate_daily": 2, "rate_weekend": 4}
+      ]
+    }
+  ]
+}
