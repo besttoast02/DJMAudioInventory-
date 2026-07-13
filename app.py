@@ -62,8 +62,8 @@ with st.sidebar:
 
 # ── Navigation ───────────────────────────────────────────────
 public_pages = [
-    st.Page("app_pages/browse.py", title="Browse gear", icon=":material/search:"),
-    st.Page("app_pages/request.py", title="Request rental", icon=":material/send:"),
+    st.Page("app_pages/browse.py", title="Rental catalog", icon=":material/search:"),
+    st.Page("app_pages/request.py", title="Checkout", icon=":material/shopping_cart_checkout:"),
 ]
 
 admin_pages = [
