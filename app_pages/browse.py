@@ -10,23 +10,41 @@ if not items:
     st.info("No gear available right now. Check back soon!", icon=":material/info:")
     st.stop()
 
-# ── Split into rentable (hero items) vs add-ons ──────────────
-rentable = [i for i in items if i.get("rentable", True)]
-addons = [i for i in items if not i.get("rentable", True)]
+# ── Map internal categories to public display categories ─────
+def get_display_category(item: dict) -> str:
+    cat = item.get("category", "")
+    name = item.get("name", "").lower()
 
-if not rentable:
-    st.info("No gear available for rental right now.", icon=":material/info:")
-    st.stop()
+    # Truss check first (hardware items with "truss" in name)
+    if "truss" in name:
+        return "Truss"
+
+    mapping = {
+        "PA Systems": "Speakers",
+        "Microphones": "Microphones",
+        "Wireless": "Microphones",
+        "Mixers": "Mixers",
+        "Lighting": "Lighting / DMX",
+    }
+    return mapping.get(cat, "Add-ons")
+
+
+DISPLAY_ORDER = ["Speakers", "Microphones", "Mixers", "Lighting / DMX", "Truss", "Add-ons"]
+
+# Tag every item with its display category
+for i in items:
+    i["_display_cat"] = get_display_category(i)
 
 # ── Filters ──────────────────────────────────────────────────
-categories = sorted(set(i["category"] for i in rentable))
-filt_cat = st.pills("Filter", ["All"] + categories, default="All", key="browse_cat")
+# Only show categories that have items
+active_cats = sorted(set(i["_display_cat"] for i in items), key=lambda c: DISPLAY_ORDER.index(c) if c in DISPLAY_ORDER else 99)
+filt_cat = st.pills("Filter", ["All"] + active_cats, default="All", key="browse_cat")
 
-filtered = rentable
+filtered = items
 if filt_cat and filt_cat != "All":
-    filtered = [i for i in filtered if i["category"] == filt_cat]
+    filtered = [i for i in filtered if i["_display_cat"] == filt_cat]
 
-# ── Group by item type and show counts + rates ───────────────
+# ── Group by item type ───────────────────────────────────────
 grouped = {}
 for i in filtered:
     key = f"{i['brand']}|{i['name']}"
@@ -34,25 +52,32 @@ for i in filtered:
         grouped[key] = {
             "name": i["name"],
             "brand": i["brand"],
-            "category": i["category"],
+            "category": i["_display_cat"],
             "qty": 0,
             "rate_half_day": float(i.get("rate_half_day") or 0),
             "rate_daily": float(i.get("rate_daily") or 0),
             "rate_weekend": float(i.get("rate_weekend") or 0),
+            "rentable": i.get("rentable", True),
         }
     grouped[key]["qty"] += 1
 
-st.caption(f"{len(filtered)} items available ({len(grouped)} types)")
+# ── Separate hero items vs add-ons ───────────────────────────
+hero_items = {k: v for k, v in grouped.items() if v["category"] != "Add-ons"}
+addon_items = {k: v for k, v in grouped.items() if v["category"] == "Add-ons"}
 
-# Group by category for display
+# Only show count for hero items
+hero_count = sum(v["qty"] for v in hero_items.values())
+st.caption(f"{hero_count} rentable items available ({len(hero_items)} types)")
+
+# ── Display hero items by category ───────────────────────────
 by_cat = {}
-for key, info in grouped.items():
+for key, info in hero_items.items():
     cat = info["category"]
     if cat not in by_cat:
         by_cat[cat] = []
     by_cat[cat].append(info)
 
-for cat in sorted(by_cat.keys()):
+for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
     st.subheader(cat)
     cols = st.columns(3)
     for idx, info in enumerate(sorted(by_cat[cat], key=lambda x: x["name"])):
@@ -67,26 +92,30 @@ for cat in sorted(by_cat.keys()):
                         f"weekend ${info['rate_weekend']:.0f}"
                     )
 
-# ── Add-ons section ──────────────────────────────────────────
-if addons:
+# ── Add-ons section (collapsed) ──────────────────────────────
+if addon_items and (filt_cat in ("All", "Add-ons")):
     st.divider()
-    with st.expander(f":material/extension: **Optional add-ons** — cables, stands & accessories ({len(addons)} items available)"):
-        st.caption("These items can be included with your rental at no extra charge or for a small fee. Just mention what you need in your request!")
-        addon_grouped = {}
-        for i in addons:
-            key = f"{i['category']}|{i['brand']}|{i['name']}"
-            if key not in addon_grouped:
-                addon_grouped[key] = {"name": i["name"], "brand": i["brand"], "category": i["category"], "qty": 0}
-            addon_grouped[key]["qty"] += 1
+    with st.expander(f":material/extension: **Add-ons** — cables, stands & accessories ({sum(v['qty'] for v in addon_items.values())} items)"):
+        st.caption("These items can be included with your rental. Just mention what you need in your request!")
 
-        addon_by_cat = {}
-        for key, info in addon_grouped.items():
-            cat = info["category"]
-            if cat not in addon_by_cat:
-                addon_by_cat[cat] = []
-            addon_by_cat[cat].append(info)
+        addon_by_internal = {}
+        for key, info in addon_items.items():
+            # Use original internal category for sub-grouping
+            parts = key.split("|")
+            brand = parts[0]
+            name = parts[1] if len(parts) > 1 else ""
+            # Find the original item to get internal category
+            for orig in items:
+                if orig["brand"] == brand and orig["name"] == name:
+                    icat = orig["category"]
+                    break
+            else:
+                icat = "Other"
+            if icat not in addon_by_internal:
+                addon_by_internal[icat] = []
+            addon_by_internal[icat].append(info)
 
-        for cat in sorted(addon_by_cat.keys()):
+        for cat in sorted(addon_by_internal.keys()):
             st.markdown(f"**{cat}**")
-            for info in sorted(addon_by_cat[cat], key=lambda x: x["name"]):
-                st.caption(f"› {info['brand']} {info['name']} — {info['qty']} available")
+            for info in sorted(addon_by_internal[cat], key=lambda x: x["name"]):
+                st.caption(f"› {info['brand']} {info['name']} — {info['qty']} avail")
