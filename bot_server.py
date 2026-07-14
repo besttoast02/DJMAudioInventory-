@@ -107,10 +107,12 @@ async def process_with_llm(user_id: str, user_text: str):
     import json
     
     for MODEL_NAME in MODELS_TO_TRY:
+        # Use a temporary list for this model's attempt
+        temp_messages = list(messages)
         try:
             response = await client.chat.completions.create(
                 model=MODEL_NAME,
-                messages=messages,
+                messages=temp_messages,
                 tools=tools
             )
             
@@ -118,7 +120,7 @@ async def process_with_llm(user_id: str, user_text: str):
             
             # Check if model wants to call a tool
             if response_message.tool_calls:
-                messages.append(response_message.model_dump())
+                temp_messages.append(response_message.model_dump())
                 for tool_call in response_message.tool_calls:
                     if tool_call.function.name == "get_inventory":
                         # Call the actual DB
@@ -129,7 +131,7 @@ async def process_with_llm(user_id: str, user_text: str):
                         except Exception as e:
                             inv_str = f"Error fetching inventory: {str(e)}"
                         
-                        messages.append({
+                        temp_messages.append({
                             "tool_call_id": tool_call.id,
                             "role": "tool",
                             "name": "get_inventory",
@@ -139,7 +141,7 @@ async def process_with_llm(user_id: str, user_text: str):
                 # Get final response after tool call
                 second_response = await client.chat.completions.create(
                     model=MODEL_NAME,
-                    messages=messages
+                    messages=temp_messages
                 )
                 ai_reply = second_response.choices[0].message.content
             else:

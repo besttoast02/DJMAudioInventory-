@@ -78,7 +78,11 @@ if user_text:
         api_key=openrouter_key,
     )
     
-    MODEL_NAME = "meta-llama/llama-3.3-70b-instruct:free"
+    MODELS_TO_TRY = [
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "google/gemma-4-31b-it:free",
+        "nousresearch/hermes-3-llama-3.1-405b:free"
+    ]
     
     tools = [
         {
@@ -97,52 +101,72 @@ if user_text:
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            try:
-                # 1. Initial LLM Call
-                response = client.chat.completions.create(
-                    model=MODEL_NAME,
-                    messages=st.session_state.messages,
-                    tools=tools
-                )
+            success = False
+            last_error = None
+            
+            for MODEL_NAME in MODELS_TO_TRY:
+                # Use a temporary list for this model's attempt to avoid polluting history on failure
+                temp_messages = list(st.session_state.messages)
                 
-                response_message = response.choices[0].message
-                
-                # Check for tool calls
-                if response_message.tool_calls:
-                    # Append the assistant's tool call request to history as a dict
-                    st.session_state.messages.append(response_message.model_dump())
-                    
-                    for tool_call in response_message.tool_calls:
-                        if tool_call.function.name == "get_inventory":
-                            try:
-                                inventory = db.get_available_items()
-                                inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
-                            except Exception as e:
-                                inv_str = f"Error fetching inventory: {str(e)}"
-                            
-                            st.session_state.messages.append({
-                                "tool_call_id": tool_call.id,
-                                "role": "tool",
-                                "name": "get_inventory",
-                                "content": inv_str
-                            })
-                    
-                    # 2. Second LLM Call with tool results
-                    second_response = client.chat.completions.create(
+                try:
+                    # 1. Initial LLM Call
+                    response = client.chat.completions.create(
                         model=MODEL_NAME,
-                        messages=st.session_state.messages
+                        messages=temp_messages,
+                        tools=tools
                     )
-                    ai_reply = second_response.choices[0].message.content
-                else:
-                    ai_reply = response_message.content
+                    
+                    response_message = response.choices[0].message
+                    
+                    # Check for tool calls
+                    if response_message.tool_calls:
+                        # Append the assistant's tool call request to history as a dict
+                        temp_messages.append(response_message.model_dump())
+                        
+                        for tool_call in response_message.tool_calls:
+                            if tool_call.function.name == "get_inventory":
+                                try:
+                                    inventory = db.get_available_items()
+                                    inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
+                                except Exception as e:
+                                    inv_str = f"Error fetching inventory: {str(e)}"
+                                
+                                temp_messages.append({
+                                    "tool_call_id": tool_call.id,
+                                    "role": "tool",
+                                    "name": "get_inventory",
+                                    "content": inv_str
+                                })
+                        
+                        # 2. Second LLM Call with tool results
+                        second_response = client.chat.completions.create(
+                            model=MODEL_NAME,
+                            messages=temp_messages
+                        )
+                        ai_reply = second_response.choices[0].message.content
+                    else:
+                        ai_reply = response_message.content
 
-                # Show reply
-                st.markdown(ai_reply)
-                st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-                
-                # Set TTS Text so the component reads it out loud
-                st.session_state.tts_text = ai_reply
+                    # Show reply
+                    st.markdown(ai_reply)
+                    
+                    # Update real session state only on success
+                    st.session_state.messages = temp_messages
+                    st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                    
+                    # Set TTS Text so the component reads it out loud
+                    st.session_state.tts_text = ai_reply
+                    success = True
+                    break # Break the model loop on success
+
+                except Exception as e:
+                    last_error = str(e)
+                    if "429" in last_error or "rate-limit" in last_error.lower():
+                        continue # Try the next model
+                    else:
+                        break # Unrelated error, stop trying
+            
+            if success:
                 st.rerun()
-
-            except Exception as e:
-                st.error(f"Error communicating with AI: {e}")
+            else:
+                st.error(f"Error communicating with AI: {last_error}")
