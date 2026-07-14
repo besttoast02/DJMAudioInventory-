@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import httpx
-from fastapi import FastAPI, Request, HTTPException, Header
+from fastapi import FastAPI, Request, HTTPException, Header, BackgroundTasks
 import uvicorn
 from contextlib import asynccontextmanager
 import db  # Import DJMAudio existing database logic
@@ -150,7 +150,7 @@ async def process_with_llm(user_id: str, user_text: str):
 
 # 1. Telegram Webhook Endpoint
 @app.post("/api/telegram/webhook")
-async def telegram_webhook(request: Request, x_telegram_bot_api_secret_token: str = Header(None)):
+async def telegram_webhook(request: Request, background_tasks: BackgroundTasks, x_telegram_bot_api_secret_token: str = Header(None)):
     # Validate Secret
     if TELEGRAM_WEBHOOK_SECRET and x_telegram_bot_api_secret_token != TELEGRAM_WEBHOOK_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -164,14 +164,20 @@ async def telegram_webhook(request: Request, x_telegram_bot_api_secret_token: st
         return {"ok": True}
 
     if text in ["/start", "/help"]:
-        await send_telegram_message(chat_id, "Welcome to DJM Audio! I'm your AI assistant. Tell me what kind of event you're throwing, and I'll help you build an AV equipment cart.")
+        background_tasks.add_task(send_telegram_message, chat_id, "Welcome to DJM Audio! I'm your AI assistant. Tell me what kind of event you're throwing, and I'll help you build an AV equipment cart.")
         return {"ok": True}
 
-    # Pass to internal message pipeline
-    # (In NextJS we'd make a sub-fetch to /api/message, in FastAPI we can just await the function directly)
-    ai_reply = await process_with_llm(chat_id, text)
+    # Pass to internal message pipeline asynchronously to prevent Telegram timeouts
+    async def process_and_reply(cid, txt):
+        try:
+            ai_reply = await process_with_llm(cid, txt)
+            await send_telegram_message(cid, ai_reply)
+        except Exception as e:
+            print("Pipeline error:", e)
+            await send_telegram_message(cid, "Sorry, I'm experiencing high traffic right now and couldn't process your request.")
+
+    background_tasks.add_task(process_and_reply, chat_id, text)
     
-    await send_telegram_message(chat_id, ai_reply)
     return {"ok": True}
 
 
