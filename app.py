@@ -167,10 +167,10 @@ st.markdown("""
    GLASSMORPHISM SIDEBAR
    ═══════════════════════════════════════════════════════════ */
 section[data-testid="stSidebar"] {
-    background: rgba(12, 12, 20, 0.85) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-right: 1px solid rgba(197,78,233,0.1) !important;
+    background: rgba(12, 12, 20, 0.92) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border-right: 1px solid rgba(197,78,233,0.2) !important;
 }
 
 section[data-testid="stSidebar"] .stPageLink {
@@ -186,10 +186,11 @@ section[data-testid="stSidebar"] .stPageLink:hover {
    PREMIUM CARDS & CONTAINERS
    ═══════════════════════════════════════════════════════════ */
 div[data-testid="stVerticalBlock"] > div[data-testid="stContainer"] {
-    border: 1px solid rgba(197,78,233,0.1) !important;
+    border: 1px solid rgba(197,78,233,0.2) !important;
     border-radius: 12px !important;
-    background: rgba(18, 18, 26, 0.7) !important;
-    backdrop-filter: blur(8px);
+    background: rgba(18, 18, 26, 0.82) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -231,10 +232,12 @@ button[data-testid="stBaseButton-secondary"]:hover {
    METRICS (KPI cards)
    ═══════════════════════════════════════════════════════════ */
 div[data-testid="stMetric"] {
-    background: rgba(18, 18, 26, 0.6);
-    border: 1px solid rgba(197,78,233,0.1);
+    background: rgba(18, 18, 26, 0.75);
+    border: 1px solid rgba(197,78,233,0.2);
     border-radius: 12px;
     padding: 16px 20px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     transition: all 0.3s ease;
 }
 
@@ -262,10 +265,12 @@ input, textarea, select, div[data-baseweb="select"] {
 }
 
 div[data-testid="stForm"] {
-    border: 1px solid rgba(197,78,233,0.12) !important;
+    border: 1px solid rgba(197,78,233,0.25) !important;
     border-radius: 14px !important;
     padding: 24px !important;
-    background: rgba(18, 18, 26, 0.5) !important;
+    background: rgba(18, 18, 26, 0.75) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════
