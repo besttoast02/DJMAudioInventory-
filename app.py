@@ -247,6 +247,8 @@ button[data-testid="stBaseButton-headerNoPadding"],
 header[data-testid="stHeader"] button[kind="header"],
 div[data-testid="stToolbar"],
 div[data-testid="stDecoration"],
+.viewerBadge_container,
+.viewerBadge_link,
 footer,
 footer a {
     display: none !important;
