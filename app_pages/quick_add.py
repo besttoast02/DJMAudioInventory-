@@ -103,41 +103,88 @@ if st.button("Process", icon=":material/auto_fix_high:", type="primary") and raw
         import scraper
         
         url_previews = []
-        for ul in url_lines:
-            with st.spinner(f"Scraping {ul['url']}..."):
+        total_urls = len(url_lines)
+        
+        # 4 steps per URL: scrape, download image, remove bg, estimate pricing
+        total_steps = total_urls * 4
+        current_step = 0
+        
+        progress_bar = st.progress(0, text="Starting...")
+        
+        for i, ul in enumerate(url_lines):
+            short_url = ul["url"][:60] + ("..." if len(ul["url"]) > 60 else "")
+            
+            with st.status(f"Processing item {i+1}/{total_urls}: {short_url}", expanded=True) as status:
+                # Step 1: Scrape
+                st.write(f":material/language: Scraping product page...")
+                current_step += 1
+                progress_bar.progress(current_step / total_steps, text=f"Scraping page {i+1}/{total_urls}...")
                 try:
                     product = scraper.scrape_product(ul["url"])
+                    st.write(f"✅ Found: **{product['name']}**" + (f" by **{product['brand']}**" if product['brand'] else ""))
                 except Exception as e:
-                    st.error(f"Failed to scrape {ul['url']}: {e}")
+                    st.write(f"❌ Failed: {e}")
+                    current_step += 3  # skip remaining steps
+                    progress_bar.progress(current_step / total_steps, text=f"Skipped item {i+1}")
+                    status.update(label=f"❌ Failed: {short_url}", state="error")
                     continue
-            
-            # Use description as override name if provided
-            item_name = ul["description"] if ul["description"] else product["name"]
-            brand = product["brand"]
-            
-            # Download and process image
-            original_img = None
-            cleaned_img = None
-            if product["image_url"]:
-                with st.spinner("Processing image..."):
+                
+                # Use description as override name if provided
+                item_name = ul["description"] if ul["description"] else product["name"]
+                brand = product["brand"]
+                
+                # Step 2: Download image
+                original_img = None
+                cleaned_img = None
+                if product["image_url"]:
+                    st.write(f":material/download: Downloading product image...")
+                    current_step += 1
+                    progress_bar.progress(current_step / total_steps, text=f"Downloading image {i+1}/{total_urls}...")
                     original_img = scraper.download_image(product["image_url"])
                     if original_img:
+                        st.write(f"✅ Image downloaded ({original_img.size[0]}×{original_img.size[1]})")
+                    else:
+                        st.write("⚠️ Could not download image")
+                    
+                    # Step 3: Remove background
+                    if original_img:
+                        st.write(f":material/auto_fix: Removing background...")
+                        current_step += 1
+                        progress_bar.progress(current_step / total_steps, text=f"Removing background {i+1}/{total_urls}...")
                         cleaned_img = scraper.remove_background(original_img)
-            
-            # AI pricing
-            with st.spinner("Estimating pricing..."):
+                        st.write("✅ Background removed")
+                    else:
+                        current_step += 1
+                        progress_bar.progress(current_step / total_steps)
+                else:
+                    current_step += 2
+                    progress_bar.progress(current_step / total_steps)
+                    st.write("⚠️ No product image found on page")
+                
+                # Step 4: AI pricing
+                st.write(f":material/attach_money: Estimating rental pricing with AI...")
+                current_step += 1
+                progress_bar.progress(current_step / total_steps, text=f"Estimating pricing {i+1}/{total_urls}...")
                 pricing = scraper.estimate_pricing(item_name, brand, default_category)
-            
-            url_previews.append({
-                "name": item_name,
-                "brand": brand,
-                "category": default_category,
-                "qty": ul["qty"],
-                "original_img": original_img,
-                "cleaned_img": cleaned_img,
-                "pricing": pricing,
-                "source_url": ul["url"],
-            })
+                if pricing["purchase_price"] > 0:
+                    st.write(f"✅ Estimated: **${pricing['purchase_price']:.0f}** retail → **${pricing['rate_daily']:.0f}/day** rental")
+                else:
+                    st.write("⚠️ Could not estimate pricing — please set manually")
+                
+                url_previews.append({
+                    "name": item_name,
+                    "brand": brand,
+                    "category": default_category,
+                    "qty": ul["qty"],
+                    "original_img": original_img,
+                    "cleaned_img": cleaned_img,
+                    "pricing": pricing,
+                    "source_url": ul["url"],
+                })
+                
+                status.update(label=f"✅ {item_name} ({ul['qty']}x)", state="complete")
+        
+        progress_bar.progress(1.0, text="Done!")
         
         if url_previews:
             st.session_state["url_previews"] = url_previews
