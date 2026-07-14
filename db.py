@@ -843,3 +843,248 @@ def send_feedback_request_email(rental: dict):
         f"Feedback link: Share your app's feedback page with them."
     )
     send_email_notification(f"📝 Follow up: {event_name}", body)
+
+
+# ── Compliance Deadlines ─────────────────────────────────────
+
+def create_deadline(entity: str, title: str, category: str, due_date: str,
+                    recurrence_months: int = None, notes: str = ""):
+    sb = get_client()
+    sb.table("compliance_deadlines").insert({
+        "entity": entity,
+        "title": title,
+        "category": category,
+        "due_date": due_date,
+        "recurrence_months": recurrence_months,
+        "notes": notes,
+    }).execute()
+
+
+def get_deadlines(show_completed: bool = False) -> list:
+    sb = get_client()
+    q = sb.table("compliance_deadlines").select("*").order("due_date")
+    if not show_completed:
+        q = q.is_("completed_at", "null")
+    return q.execute().data
+
+
+def complete_deadline(deadline_id: str):
+    from datetime import datetime, timezone
+    sb = get_client()
+    sb.table("compliance_deadlines").update(
+        {"completed_at": datetime.now(timezone.utc).isoformat()}
+    ).eq("id", deadline_id).execute()
+
+    # Auto-create next occurrence if recurring
+    d = sb.table("compliance_deadlines").select("*").eq("id", deadline_id).execute().data
+    if d and d[0].get("recurrence_months"):
+        from dateutil.relativedelta import relativedelta
+        import dateutil  # noqa
+        old = d[0]
+        next_date = (datetime.fromisoformat(old["due_date"]) +
+                     relativedelta(months=old["recurrence_months"])).date()
+        create_deadline(
+            entity=old["entity"],
+            title=old["title"],
+            category=old["category"],
+            due_date=str(next_date),
+            recurrence_months=old["recurrence_months"],
+            notes=old.get("notes", ""),
+        )
+
+
+def delete_deadline(deadline_id: str):
+    sb = get_client()
+    sb.table("compliance_deadlines").delete().eq("id", deadline_id).execute()
+
+
+# ── Jurisdiction Tax Rates ───────────────────────────────────
+
+# California base rate + LA-area district taxes (verified from CDTFA)
+JURISDICTION_TAX_RATES = {
+    "Alhambra": 0.1025,       # 7.25% + 3.00% district
+    "Baldwin Park": 0.1025,   # 7.25% + 3.00% district
+    "LA City": 0.095,         # 7.25% + 2.25% district
+    "LA County Unincorp": 0.1025,
+    "Pasadena": 0.1025,
+    "Other": 0.0725,          # Base rate only — override manually
+}
+
+JURISDICTION_FLAGS = {
+    "Baldwin Park": ["⚠️ Business license required for out-of-city businesses performing work in Baldwin Park"],
+    "LA City": [],  # Tent flag added dynamically
+    "LA County Unincorp": [
+        "⚠️ Noise management plan required",
+        "⚠️ Traffic/parking plan required",
+        "⚠️ Emergency management plan required",
+    ],
+}
+
+
+def get_tax_rate(jurisdiction: str) -> float:
+    return JURISDICTION_TAX_RATES.get(jurisdiction, 0.0725)
+
+
+def get_jurisdiction_flags(jurisdiction: str, has_tent_over_450sqft: bool = False) -> list[str]:
+    flags = list(JURISDICTION_FLAGS.get(jurisdiction, []))
+    if jurisdiction == "LA City" and has_tent_over_450sqft:
+        flags.append("⚠️ LAFD approval required for tent >= 450 sq ft")
+    return flags
+
+
+# ── Contract PDF Generators ──────────────────────────────────
+
+def generate_dj_services_pdf(rental: dict) -> bytes:
+    """Generate DJ & Production Services Agreement PDF."""
+    from fpdf import FPDF
+    from datetime import datetime
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Header
+    pdf.set_fill_color(102, 126, 234)
+    pdf.rect(0, 0, 210, 35, "F")
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_y(8)
+    pdf.cell(0, 10, "DJ & PRODUCTION SERVICES AGREEMENT", ln=True, align="C")
+    pdf.set_font("Helvetica", "", 9)
+    pdf.cell(0, 6, "DJM Audio Productions LLC", ln=True, align="C")
+
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(45)
+
+    client = rental.get("client_name", "________________")
+    event = rental.get("event_name", "________________")
+    evt_date = rental.get("event_date", "____")
+    ret_date = rental.get("return_date", "____")
+    venue = rental.get("venue", "TBD")
+    cost = float(rental.get("final_cost") or rental.get("estimated_cost") or 0)
+
+    sections = f"""DJ & PRODUCTION SERVICES AGREEMENT
+
+This Agreement is between DJM Audio Productions LLC ("Company") and {client} ("Client").
+
+1. EVENT DETAILS
+Event: {event}
+Date: {evt_date}
+Venue: {venue}
+Services: DJ performance, MC services, sound reinforcement, lighting, and/or additional production services as described in the booking.
+
+2. PERFORMANCE STANDARDS
+Company will provide professional-quality DJ and production services, including appropriate transitions, volume levels, and crowd-appropriate selections. Client may provide reasonable requests and do-not-play lists.
+
+3. EQUIPMENT & TECHNICAL REQUIREMENTS
+Company will provide the equipment listed in the booking. Client is responsible for ensuring the venue provides suitable power, staging, access, and any required permits. Additional equipment or labor requested on-site may incur extra charges.
+
+4. MUSIC LICENSING
+Client understands that venues are generally responsible for obtaining public performance licenses. This allocation is negotiable - see booking notes for specifics.
+
+5. PAYMENT TERMS
+Total Fee: ${cost:,.2f}
+Deposit: Due upon booking (non-refundable after 48 hours before Event).
+Balance: Due by event date.
+Overtime: Billed at applicable hourly rate per hour or portion thereof.
+
+6. CANCELLATION & FORCE MAJEURE
+Cancellations less than 48 hours before the event may be subject to a fee of up to 50% of the total. Neither party is liable for failure to perform due to events beyond their control.
+
+7. CLIENT RESPONSIBILITIES
+Client will: (a) Provide accurate event details, (b) Ensure safe conditions, (c) Provide secure staging area and safe access routes, (d) Obtain necessary permits and insurance.
+
+8. LIMITATION OF LIABILITY
+Company's liability shall not exceed the total fees paid by Client. Client agrees to indemnify and hold harmless Company from claims arising from Client's conduct or venue conditions.
+
+9. GOVERNING LAW
+This Agreement is governed by the laws of the State of California.
+
+Generated: {datetime.now().strftime('%B %d, %Y')}"""
+
+    pdf.set_font("Helvetica", "", 10)
+    pdf.multi_cell(0, 5, sections)
+
+    pdf.ln(10)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(95, 8, f"Client: {client}")
+    pdf.cell(95, 8, f"Date: {datetime.now().strftime('%m/%d/%Y')}", ln=True)
+    pdf.ln(5)
+    pdf.cell(95, 8, "Client Signature: ________________________")
+    pdf.cell(95, 8, "DJM Audio Rep: ________________________", ln=True)
+
+    return pdf.output()
+
+
+def generate_studio_use_pdf(rental: dict) -> bytes:
+    """Generate Studio Use & Equipment Liability Agreement PDF (Danger Beats)."""
+    from fpdf import FPDF
+    from datetime import datetime
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Header
+    pdf.set_fill_color(45, 45, 45)
+    pdf.rect(0, 0, 210, 35, "F")
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_y(8)
+    pdf.cell(0, 10, "STUDIO USE & EQUIPMENT LIABILITY", ln=True, align="C")
+    pdf.set_font("Helvetica", "", 9)
+    pdf.cell(0, 6, "Danger Beats Music LLC", ln=True, align="C")
+
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(45)
+
+    client = rental.get("client_name", "________________")
+    event = rental.get("event_name", "________________")
+    evt_date = rental.get("event_date", "____")
+
+    sections = f"""STUDIO USE AND EQUIPMENT LIABILITY AGREEMENT
+
+This Agreement is between Danger Beats Music LLC ("Studio") and {client} ("Client").
+
+1. STUDIO USE GRANT
+Studio grants Client a limited, non-transferable license to use the recording studio for the agreed session date(s) and time(s) solely for audio recording, production, and related creative activities.
+
+2. SESSION SCHEDULE
+Session: {event}
+Date: {evt_date}
+Studio will conduct a check-in walkthrough at the start and check-out walkthrough at the end to document equipment condition.
+
+3. STUDIO RULES
+Client agrees to: (a) No smoking, vaping, or open flames inside the premises, (b) No illegal drug use on premises, (c) No tampering with building systems, (d) Reasonable noise control - doors and windows must remain closed during loud playback, (e) Maximum occupancy limits as specified by Studio.
+
+Studio may terminate the session immediately for serious violations, with no refund.
+
+4. EQUIPMENT INVENTORY & CONDITION
+Prior to each session, Studio will identify available equipment and document its condition. All equipment remains Studio property. Client access is limited to the session duration.
+
+5. DAMAGE AND REPLACEMENT COST
+Client is financially responsible for any loss, theft, or damage beyond reasonable wear and tear. Replacement cost will be based on current non-depreciated market price including tax, shipping, and installation costs.
+
+6. NO SUBLEASE OR TENANCY
+This Agreement grants a limited license only and does not create a lease, tenancy, or any real property rights. Client may not assign or sublet studio time without prior written consent.
+
+7. PAYMENT & CANCELLATION
+Session fees, deposits, and overtime rates per booking summary. Deposits are refundable if canceled with sufficient advance notice as specified in booking terms.
+
+8. INDEMNIFICATION
+Client agrees to indemnify and hold harmless Studio from any claims arising from Client's use of the premises. Studio's total liability shall not exceed total session fees paid.
+
+Generated: {datetime.now().strftime('%B %d, %Y')}"""
+
+    pdf.set_font("Helvetica", "", 10)
+    pdf.multi_cell(0, 5, sections)
+
+    pdf.ln(10)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(95, 8, f"Client: {client}")
+    pdf.cell(95, 8, f"Date: {datetime.now().strftime('%m/%d/%Y')}", ln=True)
+    pdf.ln(5)
+    pdf.cell(95, 8, "Client Signature: ________________________")
+    pdf.cell(95, 8, "Danger Beats Rep: ________________________", ln=True)
+
+    return pdf.output()

@@ -5,3 +5,4 @@ Pillow
 pyotp
 qrcode[pil]
 fpdf2
+python-dateutil

@@ -118,8 +118,8 @@ with st.form("checkout_form", border=True):
     client_phone = rc2.text_input("Phone number *", placeholder="(555) 123-4567", max_chars=20)
 
     rc3, rc4 = st.columns(2)
-    event_name = rc3.text_input("Event name *", placeholder="Wedding reception, corporate gala…", max_chars=200)
-    venue = rc4.text_input("Venue / location", placeholder="Hotel ballroom, outdoor venue…", max_chars=200)
+    event_name = rc3.text_input("Event name *", placeholder="Wedding reception, corporate gala...", max_chars=200)
+    venue = rc4.text_input("Venue / location", placeholder="Hotel ballroom, outdoor venue...", max_chars=200)
 
     rc5, rc6 = st.columns(2)
     default_event = st.session_state.get("event_date", date.today() + timedelta(days=7))
@@ -127,9 +127,21 @@ with st.form("checkout_form", border=True):
     event_date = rc5.date_input("Event date", value=default_event)
     return_date = rc6.date_input("Return date", value=default_return)
 
+    # ── Jurisdiction & entity (admin sees flags) ─────────
+    rc7, rc8 = st.columns(2)
+    jurisdictions = list(db.JURISDICTION_TAX_RATES.keys())
+    jurisdiction = rc7.selectbox("City / Jurisdiction", jurisdictions, index=0)
+    entity = rc8.selectbox("Service type", ["DJM Audio (DJ / Rentals)", "Danger Beats (Studio)"])
+    has_tent = st.checkbox("Event includes tent >= 450 sq ft")
+
+    # Show auto-flags
+    flags = db.get_jurisdiction_flags(jurisdiction, has_tent)
+    for flag in flags:
+        st.warning(flag)
+
     notes = st.text_area(
         "Additional notes",
-        placeholder="Any special requests, setup requirements, delivery details…",
+        placeholder="Any special requests, setup requirements, delivery details...",
         height=100,
         max_chars=1000,
     )
