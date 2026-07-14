@@ -13,40 +13,43 @@ with col1:
         st.markdown("""
         Expert live sound mixing for your audience.
         
-        **Services:**
+        **5-hour package includes:**
         - Full FOH mixing for bands and performers
-        - System tuning and optimization
-        - Monitor mixing from FOH
-        - Multi-channel recording capability
+        - Allen & Heath digital mixer & stagebox
+        - Laptop for optional recording *(additional fee)*
         - Soundcheck coordination
         
-        **Starting at $400 / event**
+        **Optional add-on:**
+        - Multi-track recording + post-production of live performance / album
+        
+        **Starting at $500**
         """)
         if st.button("Request quote", key="foh", type="primary", icon=":material/request_quote:", use_container_width=True):
             st.switch_page("app_pages/contact.py")
 
 with col2:
     with st.container(border=True):
-        st.markdown("### 🎧 Monitor Engineering")
+        st.markdown("### 💡 Lighting Package")
+        st.badge("Add-on", color="blue")
         st.markdown("""
-        Dedicated monitor mixes for performers on stage.
+        Professional lighting design and live operation.
         
-        **Services:**
-        - Individual monitor mixes per musician
-        - In-ear monitor (IEM) management
-        - Wedge monitor positioning
-        - Real-time adjustments during performance
-        - Stage patch and input management
+        **Includes:**
+        - Moving head fixtures
+        - Wash lights
+        - Uplighting
+        - Computer-programmed light show
+        - Live lighting engineer adjusting in real-time according to event schedule
         
-        **Starting at $350 / event**
+        **Starting at $500 / day**
         """)
-        if st.button("Request quote", key="mon", type="primary", icon=":material/request_quote:", use_container_width=True):
+        if st.button("Request quote", key="lighting", type="primary", icon=":material/request_quote:", use_container_width=True):
             st.switch_page("app_pages/contact.py")
 
 st.divider()
 
 with st.container(border=True):
-    st.markdown("### 🏟️ Full Production Package")
+    st.markdown("### 🏟️ Complete Live Audio Package")
     st.badge("Best Value", color="green")
     st.markdown("""
     Complete audio production for large events — we bring everything.
@@ -54,13 +57,16 @@ with st.container(border=True):
     **Includes:**
     - FOH engineer + dedicated monitor engineer
     - Full PA system (mains + subs + monitors)
-    - Digital mixing console (Allen & Heath SQ-5/SQ-6)
+    - Allen & Heath digital mixing console & stagebox
     - All microphones, DI boxes, and cabling
     - System tuning with measurement tools
     - Load-in, setup, soundcheck, teardown
-    - Multi-track recording of the event
     
-    **Starting at $2,500 / event**
+    **Optional add-on:**
+    - Multi-track recording + post-production of live performance / album
+    - Lighting package ($500/day)
+    
+    **$1,000 / day**
     """)
     if st.button("Request quote", key="full_prod", type="primary", icon=":material/request_quote:", use_container_width=True):
         st.switch_page("app_pages/contact.py")
@@ -70,10 +76,11 @@ st.subheader("Equipment we bring")
 st.markdown("""
 | Category | Equipment |
 |----------|-----------|
-| **Consoles** | Allen & Heath SQ-5, SQ-6 |
-| **PA Systems** | Electro-Voice Evolve 50, DAS Vantec subs |
+| **Consoles** | Allen & Heath SQ-5, SQ-6 + stagebox |
+| **PA Systems** | DbTech speakers, DAS Vantec subs |
 | **Microphones** | Shure SM57/58, Beta 58A, Sennheiser e935/e945 |
 | **Wireless** | Shure BLX systems |
 | **Processing** | dbx, Radial DI boxes |
 | **Monitoring** | Yamaha DBR15, custom IEM systems |
+| **Lighting** | ADJ moving heads, wash lights, uplights |
 """)
