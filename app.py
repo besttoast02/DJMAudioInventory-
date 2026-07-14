@@ -361,6 +361,7 @@ public_pages = [
     st.Page("app_pages/home.py", title="Home", icon=":material/home:"),
     st.Page("app_pages/browse.py", title="Rentals", icon=":material/search:"),
     st.Page("app_pages/request.py", title="Checkout", icon=":material/shopping_cart_checkout:"),
+    st.Page("app_pages/ai_assistant.py", title="AI Assistant", icon=":material/smart_toy:"),
     st.Page("app_pages/contact.py", title="Contact", icon=":material/mail:"),
 ]
 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: transparent; font-family: sans-serif; }
+        .mic-btn {
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #d946ef 0%, #3b82f6 100%);
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(217,70,239,0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .mic-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(217,70,239,0.6);
+        }
+        .recording {
+            animation: pulse 1.5s infinite;
+            background: #ef4444 !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8) !important;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <button id="mic-btn" class="mic-btn">🎙️</button>
+    <script>
+        function sendMessageToStreamlitClient(type, data) {
+            const outData = Object.assign({
+                isStreamlitMessage: true,
+                type: type,
+            }, data)
+            window.parent.postMessage(outData, "*")
+        }
+
+        const componentValue = { text: "", timestamp: 0 }
+        
+        function setComponentValue(value) {
+            sendMessageToStreamlitClient("setComponentValue", { value: value })
+        }
+
+        function init() {
+            sendMessageToStreamlitClient("streamlit:componentReady", {apiVersion: 1})
+            Streamlit.setFrameHeight(90)
+        }
+
+        const Streamlit = {
+            setFrameHeight: function(height) {
+                sendMessageToStreamlitClient("streamlit:setFrameHeight", {height: height})
+            }
+        }
+        
+        let lastTts = "";
+
+        window.addEventListener("message", function(event) {
+            if (event.data.type === "streamlit:render") {
+                Streamlit.setFrameHeight(90)
+                const args = event.data.args;
+                // If Python sent us text to speak out loud
+                if (args.tts_text && args.tts_text !== lastTts) {
+                    lastTts = args.tts_text;
+                    const utterance = new SpeechSynthesisUtterance(args.tts_text);
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+        })
+
+        // Web Speech API STT
+        let recognizing = false;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            const btn = document.getElementById("mic-btn");
+            btn.onclick = () => {
+                if (recognizing) {
+                    recognition.stop();
+                    return;
+                }
+                recognition.start();
+                btn.classList.add("recording");
+                window.speechSynthesis.cancel(); // Stop talking if we are talking
+            };
+            
+            recognition.onstart = () => { recognizing = true; };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                componentValue.text = transcript;
+                componentValue.timestamp = Date.now();
+                setComponentValue(componentValue);
+            };
+            recognition.onend = () => {
+                recognizing = false;
+                btn.classList.remove("recording");
+            };
+            recognition.onerror = () => {
+                recognizing = false;
+                btn.classList.remove("recording");
+            };
+        } else {
+            document.getElementById("mic-btn").innerText = "❌";
+            document.getElementById("mic-btn").title = "Speech API not supported in this browser.";
+        }
+        
+        init();
+    </script>
+</body>
+</html>
