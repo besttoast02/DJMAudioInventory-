@@ -6,6 +6,7 @@ Handles all database operations.
 import streamlit as st
 from supabase import create_client, Client
 import json
+import os
 
 # ── Category → barcode prefix mapping ────────────────────────
 CATEGORY_PREFIXES = {
@@ -55,12 +56,7 @@ def get_client() -> Client:
 
 
 def is_connected() -> bool:
-    try:
-        # Check Streamlit secrets
-        return bool(get_secret("SUPABASE_URL"))
-    except Exception:
-        # Check env vars
-        return bool(os.getenv("SUPABASE_URL"))
+    return bool(get_secret("SUPABASE_URL"))
 
 
 # ── Items ────────────────────────────────────────────────────
