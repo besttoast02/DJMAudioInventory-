@@ -49,6 +49,106 @@ def get_staff_cost(service_barcode: str, hours: float = 5.0) -> dict:
         "total_cost": rate * hours,
     }
 
+
+# ── Equipment Degradation / Depreciation (INTERNAL) ─────────
+# Estimated useful life in uses (rentals) before needing replacement.
+# purchase_price / useful_life = cost per use (depreciation per rental).
+CATEGORY_USEFUL_LIFE = {
+    "PA Systems": 200,       # Speakers/subs — very durable
+    "Mixers": 300,           # Digital mixers — long-lasting
+    "Microphones": 250,      # Mics — robust
+    "Wireless": 200,         # Wireless systems — moderate wear
+    "Lighting": 150,         # Moving heads, wash — motors wear
+    "DI / Signal": 400,      # DI boxes — nearly indestructible
+    "XLR Cables": 100,       # Cables — frequent wear/damage
+    "DMX Cables": 100,
+    "TRS Cables": 100,
+    "Power": 150,            # Power cables/strips
+    "Adapters": 300,         # Small adapters
+    "Hardware": 200,         # Clamps, rigging
+    "Stands": 200,           # Mic stands, truss
+    "Data": 150,             # Ethernet
+    "Coaxial": 150,          # Antenna cables
+    "Services": 0,           # No physical depreciation
+}
+
+
+def get_depreciation_per_use(item: dict) -> float:
+    """Calculate the depreciation cost each time this item is rented.
+    Uses purchase_price / estimated useful life (in # of rentals).
+    """
+    cat = item.get("category", "")
+    if cat == "Services":
+        return 0.0
+    purchase = float(item.get("purchase_price", 0) or 0)
+    if purchase <= 0:
+        return 0.0
+    useful_life = CATEGORY_USEFUL_LIFE.get(cat, 200)
+    return round(purchase / useful_life, 2)
+
+
+def calculate_rental_profit(rental_items: list[dict], service_items: list[dict],
+                            revenue: float, labor_hours: float = 5.0) -> dict:
+    """Full profit breakdown for a rental/event.
+    
+    Args:
+        rental_items: list of physical item dicts from the rental
+        service_items: list of service item dicts (with barcode) from the rental
+        revenue: total client-facing price charged
+        labor_hours: total hours worked by staff
+    
+    Returns dict with:
+        revenue, labor_cost, depreciation_cost, total_cost, profit, margin_pct
+        plus breakdowns of each component.
+    """
+    # Labor cost
+    labor_breakdown = []
+    total_labor = 0.0
+    roles_used = set()
+    for svc in service_items:
+        bc = svc.get("barcode", "")
+        cost_info = get_staff_cost(bc, labor_hours)
+        if cost_info and cost_info["role"] not in roles_used:
+            labor_breakdown.append(cost_info)
+            total_labor += cost_info["total_cost"]
+            roles_used.add(cost_info["role"])
+
+    # Equipment depreciation
+    depreciation_breakdown = []
+    total_depreciation = 0.0
+    for item in rental_items:
+        dep = get_depreciation_per_use(item)
+        qty = int(item.get("qty", 1))
+        item_dep = dep * qty
+        total_depreciation += item_dep
+        if dep > 0:
+            depreciation_breakdown.append({
+                "name": item.get("name", "Unknown"),
+                "category": item.get("category", ""),
+                "purchase_price": float(item.get("purchase_price", 0) or 0),
+                "per_use_cost": dep,
+                "qty": qty,
+                "total_depreciation": item_dep,
+            })
+
+    total_cost = total_labor + total_depreciation
+    profit = revenue - total_cost
+    margin = (profit / revenue * 100) if revenue > 0 else 0
+
+    return {
+        "revenue": revenue,
+        "labor_cost": total_labor,
+        "labor_breakdown": labor_breakdown,
+        "depreciation_cost": total_depreciation,
+        "depreciation_breakdown": sorted(depreciation_breakdown,
+                                         key=lambda x: x["total_depreciation"],
+                                         reverse=True),
+        "total_cost": total_cost,
+        "profit": profit,
+        "margin_pct": margin,
+    }
+
+
 # ── Barcode constants ────────────────────────────────────────
 # DJ Packages
 PKG_DJ_PARTY = "DJM-SVC-0001"
