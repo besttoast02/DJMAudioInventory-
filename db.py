@@ -776,7 +776,7 @@ def generate_waiver_pdf(rental: dict, signature_data: str = "") -> bytes:
     pdf.set_text_color(255, 255, 255)
     pdf.set_font("Helvetica", "B", 20)
     pdf.set_y(8)
-    pdf.cell(0, 10, "DJM AUDIO — LIABILITY WAIVER", ln=True, align="C")
+    pdf.cell(0, 10, "DJM AUDIO - LIABILITY WAIVER", ln=True, align="C")
     pdf.set_font("Helvetica", "", 9)
     pdf.cell(0, 6, "Equipment Rental Agreement & Liability Release", ln=True, align="C")
 
