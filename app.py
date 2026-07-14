@@ -11,7 +11,7 @@ st.set_page_config(
 )
 
 # ── Branding & Styles ────────────────────────────────────────
-st.logo("https://djmaudio.com/wp-content/uploads/2025/02/DJM-Logo-copy-300x300.png", link="https://djmaudio.com")
+st.logo("assets/logo.jpg", link="https://djmaudio.com")
 
 st.markdown("""
 <style>
