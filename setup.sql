@@ -132,3 +132,8 @@ CREATE POLICY "Allow all for service role" ON contractor_payments FOR ALL USING 
 -- but without physical inventory constraints.
 -- Barcodes: DJM-SVC-XXXX for services, DJM-LGT-XXXX for effects items
 
+
+-- ============================================================
+-- Phase 4: Hourly Rates for Services
+-- ============================================================
+ALTER TABLE items ADD COLUMN IF NOT EXISTS rate_hourly NUMERIC(10,2) DEFAULT 0;

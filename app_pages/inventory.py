@@ -56,6 +56,7 @@ if view == "Table":
                     "name": i["name"],
                     "brand": i["brand"],
                     "category": i["category"],
+                    "rate_hourly": float(i.get("rate_hourly") or 0),
                     "rate_half_day": float(i.get("rate_half_day") or 0),
                     "rate_daily": float(i.get("rate_daily") or 0),
                     "rate_weekend": float(i.get("rate_weekend") or 0),
@@ -75,6 +76,7 @@ if view == "Table":
                 "Category": info["category"],
                 "Qty": len(units),
                 "Available": avail,
+                "Hourly": f"${info['rate_hourly']:.0f}" if info["category"] == "Services" else "—",
                 "Daily": f"${info['rate_daily']:.0f}",
                 "Value": f"${total_val:,.0f}",
             })
@@ -125,12 +127,12 @@ if view == "Table":
                     bc1, bc2 = st.columns([1, 1])
                     if has_pdf:
                         with open(pdf_path, "rb") as f:
-                            bc1.download_button("⬇️ Download PDF Manual", data=f.read(), file_name=f"{m_key}.pdf", mime="application/pdf", key=f"dl_{m_key}")
+                            bc1.download_button("⬇️ Download PDF Manual", data=f.read(), file_name=f"{m_key}.pdf", mime="application/pdf", key=f"dl_{m_key}_{name}")
                     elif m_info.get("manual_ref"):
                         bc1.link_button("📄 View Manual / Product Page", m_info["manual_ref"], use_container_width=True)
                     
                     if m_info:
-                        if bc2.button("🔧 View Maintenance Plan", key=f"vm_{m_key}", use_container_width=True):
+                        if bc2.button("🔧 View Maintenance Plan", key=f"vm_{m_key}_{name}", use_container_width=True):
                             st.switch_page("app_pages/maintenance.py")
                     st.divider()
 
@@ -163,6 +165,7 @@ elif view == "Edit mode":
         "status": i["status"],
         "purchase_price": float(i.get("purchase_price") or 0),
         "current_value": float(i.get("current_value") or 0),
+        "rate_hourly": float(i.get("rate_hourly") or 0),
         "rate_half_day": float(i.get("rate_half_day") or 0),
         "rate_daily": float(i.get("rate_daily") or 0),
         "rate_weekend": float(i.get("rate_weekend") or 0),
@@ -186,6 +189,7 @@ elif view == "Edit mode":
             ),
             "purchase_price": st.column_config.NumberColumn("Purchased $", format="$%.2f", min_value=0),
             "current_value": st.column_config.NumberColumn("Value $", format="$%.2f", min_value=0),
+            "rate_hourly": st.column_config.NumberColumn("Hourly $", format="$%.2f", min_value=0),
             "rate_half_day": st.column_config.NumberColumn("½ Day $", format="$%.2f", min_value=0),
             "rate_daily": st.column_config.NumberColumn("Daily $", format="$%.2f", min_value=0),
             "rate_weekend": st.column_config.NumberColumn("Weekend $", format="$%.2f", min_value=0),
@@ -199,7 +203,7 @@ elif view == "Edit mode":
             orig = df.iloc[idx]
             updates = {}
             for col in ["name", "brand", "category", "storage_case", "status",
-                        "purchase_price", "current_value", "rate_half_day",
+                        "purchase_price", "current_value", "rate_hourly", "rate_half_day",
                         "rate_daily", "rate_weekend", "notes"]:
                 if row[col] != orig[col]:
                     updates[col] = row[col]
@@ -243,10 +247,11 @@ elif view == "Add new":
         pc1, pc2 = st.columns(2)
         new_purchase = pc1.number_input("Purchase $", min_value=0.0, step=1.0, format="%.2f")
         new_value = pc2.number_input("Current value $", min_value=0.0, step=1.0, format="%.2f")
-        pc3, pc4, pc5 = st.columns(3)
-        new_half = pc3.number_input("½ Day $", min_value=0.0, step=1.0, format="%.2f")
-        new_daily = pc4.number_input("Daily $", min_value=0.0, step=1.0, format="%.2f")
-        new_weekend = pc5.number_input("Wknd $", min_value=0.0, step=1.0, format="%.2f")
+        pc3, pc4, pc5, pc6 = st.columns(4)
+        new_hourly = pc3.number_input("Hourly $", min_value=0.0, step=1.0, format="%.2f")
+        new_half = pc4.number_input("½ Day $", min_value=0.0, step=1.0, format="%.2f")
+        new_daily = pc5.number_input("Daily $", min_value=0.0, step=1.0, format="%.2f")
+        new_weekend = pc6.number_input("Wknd $", min_value=0.0, step=1.0, format="%.2f")
 
         ac5, ac6 = st.columns(2)
         new_qty = ac5.number_input("Quantity to add", min_value=1, max_value=50, value=1,
@@ -261,7 +266,7 @@ elif view == "Add new":
                 for _ in range(new_qty):
                     bc = db.get_next_barcode(new_cat)
                     db.add_item(bc, new_name, new_brand or "Generic", new_cat, new_case,
-                                new_notes, new_purchase, new_value, new_half, new_daily, new_weekend)
+                                new_notes, new_purchase, new_value, new_hourly, new_half, new_daily, new_weekend)
                     added.append(bc)
                 st.success(f"Added {new_qty} item(s): {', '.join(added)}", icon=":material/check_circle:")
                 st.rerun()
@@ -301,12 +306,13 @@ elif view == "Bulk update":
         bp1, bp2 = st.columns(2)
         match_name = bp1.text_input("Item name contains", placeholder="XLR cable")
         match_brand = bp2.text_input("Brand contains (optional)")
-        bpc1, bpc2, bpc3, bpc4, bpc5 = st.columns(5)
+        bpc1, bpc2, bpc3, bpc4, bpc5, bpc6 = st.columns(6)
         bp_purchase = bpc1.number_input("Purchase $", min_value=0.0, step=1.0, format="%.2f", key="bp_p")
         bp_value = bpc2.number_input("Value $", min_value=0.0, step=1.0, format="%.2f", key="bp_v")
-        bp_half = bpc3.number_input("½ Day $", min_value=0.0, step=1.0, format="%.2f", key="bp_h")
-        bp_daily = bpc4.number_input("Daily $", min_value=0.0, step=1.0, format="%.2f", key="bp_d")
-        bp_weekend = bpc5.number_input("Weekend $", min_value=0.0, step=1.0, format="%.2f", key="bp_w")
+        bp_hourly = bpc3.number_input("Hourly $", min_value=0.0, step=1.0, format="%.2f", key="bp_ho")
+        bp_half = bpc4.number_input("½ Day $", min_value=0.0, step=1.0, format="%.2f", key="bp_h")
+        bp_daily = bpc5.number_input("Daily $", min_value=0.0, step=1.0, format="%.2f", key="bp_d")
+        bp_weekend = bpc6.number_input("Weekend $", min_value=0.0, step=1.0, format="%.2f", key="bp_w")
 
         if st.form_submit_button("Apply pricing", icon=":material/attach_money:"):
             if not match_name:
@@ -321,6 +327,7 @@ elif view == "Bulk update":
                     updates = {}
                     if bp_purchase > 0: updates["purchase_price"] = bp_purchase
                     if bp_value > 0: updates["current_value"] = bp_value
+                    if bp_hourly > 0: updates["rate_hourly"] = bp_hourly
                     if bp_half > 0: updates["rate_half_day"] = bp_half
                     if bp_daily > 0: updates["rate_daily"] = bp_daily
                     if bp_weekend > 0: updates["rate_weekend"] = bp_weekend

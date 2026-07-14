@@ -34,6 +34,7 @@ with col1:
                 "rate_half_day": 375, "rate_daily": 750, "rate_weekend": 1200,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 with col2:
@@ -68,6 +69,7 @@ with col2:
                     "barcode": bc, "qty": 1, "rate_half_day": 0, "rate_daily": 0,
                     "rate_weekend": 0, "max_qty": 1, "is_service": True, "included_free": True,
                 }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 with col3:
@@ -93,6 +95,7 @@ with col3:
                 "rate_half_day": 375, "rate_daily": 750, "rate_weekend": 1200,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 # ── Why DJMAudio ─────────────────────────────────────────────

@@ -461,6 +461,26 @@ with st.sidebar:
             st.query_params.pop("admin_token", None)
             st.rerun()
 
+    # ── Sidebar Cart (Visible to Public & Admin) ───────────────
+    st.divider()
+    cart = st.session_state.get("cart", {})
+    if cart:
+        st.subheader(f":material/shopping_cart: Cart ({len(cart)})")
+        cart_total_items = sum(item.get("qty", 1) for item in cart.values())
+        st.caption(f"{cart_total_items} item(s) added")
+        
+        for key, item in cart.items():
+            qty = item.get("qty", 1)
+            brand = f"{item['brand']} " if item.get('brand', '').lower() != 'generic' else ""
+            st.markdown(f"**{qty}x** {brand}{item['name']}")
+            
+        if st.button("Proceed to Checkout →", type="primary", use_container_width=True, key="sidebar_checkout_btn"):
+            st.switch_page("app_pages/request.py")
+    else:
+        st.subheader(":material/shopping_cart: Cart")
+        st.caption("Your cart is empty.")
+
+
 # ── Navigation ───────────────────────────────────────────────
 public_pages = [
     st.Page("app_pages/home.py", title="Home", icon=":material/home:"),

@@ -100,7 +100,7 @@ def get_item_count() -> dict:
 
 def add_item(barcode: str, name: str, brand: str, category: str, storage_case: str,
              notes: str = "", purchase_price: float = 0, current_value: float = 0,
-             rate_half_day: float = 0, rate_daily: float = 0, rate_weekend: float = 0,
+             rate_hourly: float = 0, rate_half_day: float = 0, rate_daily: float = 0, rate_weekend: float = 0,
              rentable: bool | None = None) -> dict:
     sb = get_client()
     # Auto-determine rentable from category if not explicitly set
@@ -116,6 +116,7 @@ def add_item(barcode: str, name: str, brand: str, category: str, storage_case: s
         "notes": notes,
         "purchase_price": purchase_price,
         "current_value": current_value,
+        "rate_hourly": rate_hourly,
         "rate_half_day": rate_half_day,
         "rate_daily": rate_daily,
         "rate_weekend": rate_weekend,
@@ -324,6 +325,7 @@ def seed_from_json(json_path: str) -> int:
                     notes=item.get("notes", ""),
                     purchase_price=item.get("purchase_price", 0),
                     current_value=item.get("current_value", 0),
+                    rate_hourly=item.get("rate_hourly", 0),
                     rate_half_day=item.get("rate_half_day", 0),
                     rate_daily=item.get("rate_daily", 0),
                     rate_weekend=item.get("rate_weekend", 0),

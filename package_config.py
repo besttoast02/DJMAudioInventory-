@@ -272,3 +272,20 @@ def get_effective_price(barcode: str, cart: dict) -> dict:
                 # Check if it's part of premium/ultimate (wedding package)
                 return {"rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0}
     return None  # Use normal pricing
+
+
+def calculate_service_rate(hourly_rate: float, hours: float) -> float:
+    """
+    Calculate the effective hourly rate based on the duration of the service.
+    - Minimum 5 hours is standard (1.0x multiplier)
+    - 3-4 hours: 1.25x multiplier
+    - 1-2 hours: 1.5x multiplier
+    """
+    if hours < 3:
+        multiplier = 1.5
+    elif hours < 5:
+        multiplier = 1.25
+    else:
+        multiplier = 1.0
+    
+    return hourly_rate * multiplier

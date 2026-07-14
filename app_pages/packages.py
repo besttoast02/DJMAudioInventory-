@@ -242,6 +242,7 @@ if active and active in pkg.PACKAGES:
 
         if submitted:
             add_package_to_cart(active, extras)
+            st.toast("🛒 Added to cart!", icon="✅")
 
             # Store event details in session for checkout
             st.session_state["pkg_event_type"] = event_type

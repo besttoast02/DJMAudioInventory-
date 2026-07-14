@@ -50,6 +50,7 @@ with col1:
                 "rate_half_day": 0, "rate_daily": 300, "rate_weekend": 300,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
         if r2.button("Add Album ($500)", key="live_rec_album", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
             st.session_state.cart[pkg.SVC_POST_ALBUM] = {
@@ -58,6 +59,7 @@ with col1:
                 "rate_half_day": 0, "rate_daily": 500, "rate_weekend": 500,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 with col2:
@@ -82,6 +84,7 @@ with col2:
                 "rate_half_day": 150, "rate_daily": 300, "rate_weekend": 300,
                 "max_qty": 2, "is_service": False,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 col3, col4 = st.columns(2)
@@ -108,6 +111,7 @@ with col3:
                 "rate_half_day": 0, "rate_daily": 600, "rate_weekend": 600,
                 "max_qty": 3, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 with col4:
@@ -132,6 +136,7 @@ with col4:
                 "rate_half_day": 175, "rate_daily": 350, "rate_weekend": 350,
                 "max_qty": 1, "is_service": False,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 st.divider()

@@ -173,6 +173,7 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
                             "rate_weekend": info["rate_weekend"],
                             "max_qty": max_avail,
                         }
+                        st.toast("🛒 Cart updated!", icon="✅")
                         st.rerun()
                     elif key in st.session_state.cart:
                         del st.session_state.cart[key]
@@ -284,6 +285,7 @@ if filt in ("All", "Mic Kits"):
                             "rate_weekend": kit_weekend,
                             "max_qty": 1,
                         }
+                        st.toast("🛒 Added to cart!", icon="✅")
                         st.rerun()
                 
                 # Optional SM57 snare bottom
@@ -307,6 +309,7 @@ if filt in ("All", "Mic Kits"):
                             "rate_weekend": sm57_wknd,
                             "max_qty": 1,
                         }
+                        st.toast("🛒 Added to cart!", icon="✅")
                         st.rerun()
 
 # ── Services section ─────────────────────────────────────────
@@ -385,6 +388,7 @@ if filt in ("All", "Services"):
                                 "max_qty": 5,
                                 "is_service": True,
                             }
+                            st.toast("🛒 Added to cart!", icon="✅")
                             st.rerun()
                         elif svc_key in st.session_state.cart:
                             del st.session_state.cart[svc_key]

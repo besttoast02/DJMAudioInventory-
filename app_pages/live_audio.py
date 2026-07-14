@@ -35,6 +35,7 @@ with col1:
                 "rate_half_day": 250, "rate_daily": 500, "rate_weekend": 800,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 with col2:
@@ -60,6 +61,7 @@ with col2:
                 "rate_half_day": 250, "rate_daily": 500, "rate_weekend": 800,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 st.divider()
@@ -88,6 +90,7 @@ with col3:
                 "rate_half_day": 175, "rate_daily": 350, "rate_weekend": 550,
                 "max_qty": 1, "is_service": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 with col4:
@@ -125,6 +128,7 @@ with col4:
                 "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0,
                 "max_qty": 1, "is_service": True, "included_free": True,
             }
+            st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
 st.divider()
