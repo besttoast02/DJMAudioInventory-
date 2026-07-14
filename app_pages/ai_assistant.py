@@ -65,7 +65,7 @@ if user_text:
     # Get Keys
     openrouter_key = ""
     try:
-        openrouter_key = st.secrets.get("OPENROUTER_API_KEY", "")
+        openrouter_key = db.get_secret("OPENROUTER_API_KEY", "")
     except:
         openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
         

@@ -298,7 +298,7 @@ if st.session_state.is_admin and st.session_state.get("admin_login_time"):
 # ── Secret admin gate ────────────────────────────────────────
 # Access admin login ONLY via: ?gate=<ADMIN_GATE_CODE>
 # No visible login button for public visitors.
-ADMIN_GATE_CODE = st.secrets.get("ADMIN_GATE_CODE", "3KcWvK9v_kGqEe5H1lwxtOspg7tChhuI")
+ADMIN_GATE_CODE = db.get_secret("ADMIN_GATE_CODE", "3KcWvK9v_kGqEe5H1lwxtOspg7tChhuI")
 query_gate = st.query_params.get("gate", "")
 
 # If gate code matches, flag the session so the login form appears
@@ -327,8 +327,8 @@ with st.sidebar:
             if st.button("Log in", icon=":material/login:", type="primary",
                          key="admin_login_btn"):
                 try:
-                    if pw == st.secrets["ADMIN_PASSWORD"]:
-                        admin_2fa_secret = st.secrets.get("ADMIN_2FA_SECRET")
+                    if pw == db.get_secret("ADMIN_PASSWORD"):
+                        admin_2fa_secret = db.get_secret("ADMIN_2FA_SECRET")
                         if admin_2fa_secret:
                             totp = pyotp.TOTP(admin_2fa_secret)
                             if totp.verify(totp_code):

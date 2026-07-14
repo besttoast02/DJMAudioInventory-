@@ -38,24 +38,26 @@ def get_prefix(category: str) -> str:
     return CATEGORY_PREFIXES.get(category, "GEN")
 
 
+def get_secret(key, default=None):
+    if key in os.environ:
+        return os.environ[key]
+    try:
+        return st.secrets.get(key, default)
+    except Exception:
+        return default
+
+
 @st.cache_resource
 def get_client() -> Client:
-    import os
-    try:
-        url = st.secrets["SUPABASE_URL"]
-        key = st.secrets["SUPABASE_KEY"]
-    except Exception:
-        url = os.getenv("SUPABASE_URL", "")
-        key = os.getenv("SUPABASE_KEY", "")
+    url = get_secret("SUPABASE_URL", "")
+    key = get_secret("SUPABASE_KEY", "")
     return create_client(url, key)
 
 
 def is_connected() -> bool:
-    import os
     try:
-        # Check Streamlit secrets first
-        _ = st.secrets["SUPABASE_URL"]
-        return True
+        # Check Streamlit secrets
+        return bool(get_secret("SUPABASE_URL"))
     except Exception:
         # Check env vars
         return bool(os.getenv("SUPABASE_URL"))
@@ -525,9 +527,9 @@ def send_email_notification(subject: str, body: str):
     from email.mime.multipart import MIMEMultipart
 
     try:
-        smtp_user = st.secrets.get("SMTP_USER")
-        smtp_pass = st.secrets.get("SMTP_APP_PASSWORD")
-        notify_to = st.secrets.get("NOTIFY_EMAIL")
+        smtp_user = get_secret("SMTP_USER")
+        smtp_pass = get_secret("SMTP_APP_PASSWORD")
+        notify_to = get_secret("NOTIFY_EMAIL")
 
         if not all([smtp_user, smtp_pass, notify_to]):
             return  # Silently skip if not configured
@@ -568,10 +570,10 @@ def send_email_notification(subject: str, body: str):
 def send_sms_notification(message: str):
     """Send SMS via Twilio if configured."""
     try:
-        account_sid = st.secrets.get("TWILIO_SID")
-        auth_token = st.secrets.get("TWILIO_TOKEN")
-        from_number = st.secrets.get("TWILIO_FROM")
-        to_number = st.secrets.get("NOTIFY_PHONE")
+        account_sid = get_secret("TWILIO_SID")
+        auth_token = get_secret("TWILIO_TOKEN")
+        from_number = get_secret("TWILIO_FROM")
+        to_number = get_secret("NOTIFY_PHONE")
 
         if not all([account_sid, auth_token, from_number, to_number]):
             return  # Silently skip if not configured
