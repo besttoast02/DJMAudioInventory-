@@ -49,11 +49,14 @@ if voice_res and isinstance(voice_res, dict):
 
 # ── Display Chat History ──────────────────────────────────────
 for msg in st.session_state.messages:
-    if msg["role"] != "system" and msg["role"] != "tool":
+    # Ensure msg is a dict (fallback for Pydantic objects)
+    msg_dict = msg if isinstance(msg, dict) else msg.model_dump()
+    
+    if msg_dict["role"] != "system" and msg_dict["role"] != "tool":
         # Don't show raw tool calls to the user
-        if not getattr(msg, "tool_calls", None) and msg.get("content"):
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
+        if not msg_dict.get("tool_calls") and msg_dict.get("content"):
+            with st.chat_message(msg_dict["role"]):
+                st.markdown(msg_dict["content"])
 
 # ── Process LLM ───────────────────────────────────────────────
 if user_text:
@@ -110,14 +113,14 @@ if user_text:
                 
                 # Check for tool calls
                 if response_message.tool_calls:
-                    # Append the assistant's tool call request to history
-                    st.session_state.messages.append(response_message)
+                    # Append the assistant's tool call request to history as a dict
+                    st.session_state.messages.append(response_message.model_dump())
                     
                     for tool_call in response_message.tool_calls:
                         if tool_call.function.name == "get_inventory":
                             try:
                                 inventory = db.get_available_items()
-                                inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i['price']} for i in inventory])
+                                inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
                             except Exception as e:
                                 inv_str = f"Error fetching inventory: {str(e)}"
                             
