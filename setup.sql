@@ -61,3 +61,66 @@ ALTER TABLE rental_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all for service role" ON items FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for service role" ON rentals FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for service role" ON rental_items FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================================
+-- Phase 2: Estimates, Employees, and Labor Tracking
+-- ============================================================
+
+-- Add cost tracking to rentals
+ALTER TABLE rentals ADD COLUMN IF NOT EXISTS estimated_cost NUMERIC(10,2) DEFAULT 0;
+ALTER TABLE rentals ADD COLUMN IF NOT EXISTS final_cost NUMERIC(10,2) DEFAULT 0;
+
+-- 5. Employees table
+CREATE TABLE employees (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  role TEXT DEFAULT 'contractor' CHECK (role IN ('admin', 'contractor')),
+  phone TEXT,
+  email TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 6. Rental Assignments (who is working which event)
+CREATE TABLE rental_assignments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  rental_id UUID REFERENCES rentals(id) ON DELETE CASCADE NOT NULL,
+  employee_id UUID REFERENCES employees(id) ON DELETE CASCADE NOT NULL,
+  role_for_event TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(rental_id, employee_id)
+);
+
+-- 7. Time Logs
+CREATE TABLE time_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  rental_id UUID REFERENCES rentals(id) ON DELETE CASCADE NOT NULL,
+  employee_id UUID REFERENCES employees(id) ON DELETE CASCADE NOT NULL,
+  hours NUMERIC(5,2) NOT NULL,
+  task_description TEXT,
+  logged_date DATE DEFAULT CURRENT_DATE,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 8. Contractor Payments
+CREATE TABLE contractor_payments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  rental_id UUID REFERENCES rentals(id) ON DELETE CASCADE NOT NULL,
+  employee_id UUID REFERENCES employees(id) ON DELETE CASCADE NOT NULL,
+  amount NUMERIC(10,2) NOT NULL,
+  payment_date DATE DEFAULT CURRENT_DATE,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Enable RLS
+ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rental_assignments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE time_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contractor_payments ENABLE ROW LEVEL SECURITY;
+
+-- Allow all for service role
+CREATE POLICY "Allow all for service role" ON employees FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for service role" ON rental_assignments FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for service role" ON time_logs FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for service role" ON contractor_payments FOR ALL USING (true) WITH CHECK (true);
+

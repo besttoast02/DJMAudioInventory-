@@ -1,5 +1,6 @@
 import streamlit as st
 import db
+from datetime import datetime
 
 st.title(":material/event: Rentals")
 
@@ -25,7 +26,8 @@ with tab_pending:
                     f":material/person: **{r['client_name']}** · "
                     f":material/phone: {r.get('client_phone', 'N/A')}  \n"
                     f":material/calendar_today: {r['event_date']} → {r.get('return_date', 'TBD')}  \n"
-                    f":material/location_on: {r.get('venue', 'TBD')}"
+                    f":material/location_on: {r.get('venue', 'TBD')}  \n"
+                    f":material/payments: Est. Cost: **${r.get('estimated_cost') or 0:.2f}**"
                 )
                 if r.get("notes"):
                     st.caption(f"Notes: {r['notes']}")
@@ -53,12 +55,16 @@ with tab_pending:
                                     ):
                                         selected_ids.append(item["id"])
 
+                        st.divider()
+                        final_cost = st.number_input("Final Approved Cost ($)", value=float(r.get("estimated_cost") or 0.0), key=f"cost_{r['id']}")
+
                         if st.button("Confirm approval", key=f"confirm_{r['id']}",
                                      type="primary", icon=":material/gavel:"):
                             if not selected_ids:
                                 st.error("Select at least one item")
                             else:
                                 db.approve_rental(r["id"], selected_ids)
+                                db.set_final_cost(r["id"], final_cost)
                                 st.success(f"Approved! {len(selected_ids)} items assigned.", icon=":material/check_circle:")
                                 st.rerun()
 
@@ -80,7 +86,8 @@ with tab_active:
                 st.markdown(
                     f":material/person: **{r['client_name']}**  \n"
                     f":material/calendar_today: {r['event_date']} → {r.get('return_date', 'TBD')}  \n"
-                    f":material/location_on: {r.get('venue', 'TBD')}"
+                    f":material/location_on: {r.get('venue', 'TBD')}  \n"
+                    f":material/payments: Final Cost: **${r.get('final_cost') or 0:.2f}**"
                 )
                 # Show assigned items
                 ri = db.get_rental_items(r["id"])
@@ -90,6 +97,41 @@ with tab_active:
                         item = entry.get("items", {})
                         if item:
                             st.caption(f"  · `{item['barcode']}` {item['brand']} {item['name']}")
+                            
+                with st.expander("Staffing & Labor", icon=":material/engineering:"):
+                    employees = db.get_employees()
+                    if not employees:
+                        st.info("No staff added yet. Add them in the Labor tab.")
+                    else:
+                        emp_options = {e["id"]: f"{e['name']} ({e['role']})" for e in employees}
+                        
+                        c_assign, c_time, c_pay = st.columns(3)
+                        with c_assign.popover("Assign", use_container_width=True):
+                            emp_sel = st.selectbox("Staff", options=emp_options.keys(), format_func=lambda x: emp_options[x], key=f"assign_emp_{r['id']}")
+                            role_val = st.text_input("Role", key=f"role_{r['id']}")
+                            if st.button("Assign", key=f"btn_assign_{r['id']}"):
+                                db.assign_employee(r["id"], emp_sel, role_val)
+                                st.rerun()
+                                
+                        with c_time.popover("Log Time", use_container_width=True):
+                            emp_sel2 = st.selectbox("Staff", options=emp_options.keys(), format_func=lambda x: emp_options[x], key=f"time_emp_{r['id']}")
+                            hours = st.number_input("Hours", min_value=0.25, step=0.25, key=f"hours_{r['id']}")
+                            task = st.text_input("Task", key=f"task_{r['id']}")
+                            if st.button("Log Time", key=f"btn_time_{r['id']}"):
+                                db.log_time(r["id"], emp_sel2, hours, task, str(datetime.now().date()))
+                                st.rerun()
+                                
+                        with c_pay.popover("Log Pay", use_container_width=True):
+                            emp_sel3 = st.selectbox("Staff", options=emp_options.keys(), format_func=lambda x: emp_options[x], key=f"pay_emp_{r['id']}")
+                            amount = st.number_input("Amount ($)", min_value=1.0, step=10.0, key=f"amt_{r['id']}")
+                            p_notes = st.text_input("Notes", key=f"pnotes_{r['id']}")
+                            if st.button("Log Payment", key=f"btn_pay_{r['id']}"):
+                                db.log_payment(r["id"], emp_sel3, amount, str(datetime.now().date()), p_notes)
+                                st.rerun()
+                                
+                        assignments = db.get_assignments_for_rental(r["id"])
+                        if assignments:
+                            st.caption("Assigned: " + ", ".join([f"{a['employees']['name']} ({a['role_for_event']})" for a in assignments]))
 
             with c2:
                 st.space("small")

@@ -149,6 +149,7 @@ with st.form("checkout_form", border=True):
             return_date=str(return_date),
             venue=venue,
             notes=full_notes,
+            estimated_cost=float(total_daily)
         )
 
         # Track submission for rate limiting

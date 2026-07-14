@@ -174,7 +174,8 @@ def get_rentals_by_status(status: str) -> list[dict]:
 
 
 def create_rental(event_name: str, client_name: str, client_phone: str,
-                  event_date: str, return_date: str, venue: str, notes: str) -> dict:
+                  event_date: str, return_date: str, venue: str, notes: str,
+                  estimated_cost: float = 0) -> dict:
     sb = get_client()
     data = {
         "event_name": event_name,
@@ -185,9 +186,11 @@ def create_rental(event_name: str, client_name: str, client_phone: str,
         "venue": venue,
         "status": "pending",
         "notes": notes,
+        "estimated_cost": estimated_cost,
     }
     res = sb.table("rentals").insert(data).execute()
     return res.data[0] if res.data else {}
+
 
 
 def update_rental_status(rental_id: str, status: str):
@@ -280,3 +283,80 @@ def seed_from_json(json_path: str) -> int:
                 count += 1
 
     return count
+
+
+# ── Phase 2: Estimates, Employees, and Labor Tracking ────────
+
+def set_final_cost(rental_id: str, final_cost: float):
+    sb = get_client()
+    sb.table("rentals").update({"final_cost": final_cost}).eq("id", rental_id).execute()
+
+
+# Employees
+def get_employees() -> list:
+    sb = get_client()
+    res = sb.table("employees").select("*").order("name").execute()
+    return res.data
+
+def add_employee(name: str, role: str, phone: str = "", email: str = ""):
+    sb = get_client()
+    sb.table("employees").insert({"name": name, "role": role, "phone": phone, "email": email}).execute()
+
+
+# Rental Assignments
+def assign_employee(rental_id: str, employee_id: str, role_for_event: str):
+    sb = get_client()
+    sb.table("rental_assignments").insert({
+        "rental_id": rental_id,
+        "employee_id": employee_id,
+        "role_for_event": role_for_event
+    }).execute()
+
+def get_assignments_for_rental(rental_id: str) -> list:
+    sb = get_client()
+    res = sb.table("rental_assignments").select("*, employees(*)").eq("rental_id", rental_id).execute()
+    return res.data
+
+
+# Time Logs
+def log_time(rental_id: str, employee_id: str, hours: float, task: str, logged_date: str):
+    sb = get_client()
+    sb.table("time_logs").insert({
+        "rental_id": rental_id,
+        "employee_id": employee_id,
+        "hours": hours,
+        "task_description": task,
+        "logged_date": logged_date
+    }).execute()
+
+def get_time_logs_for_rental(rental_id: str) -> list:
+    sb = get_client()
+    res = sb.table("time_logs").select("*, employees(*)").eq("rental_id", rental_id).execute()
+    return res.data
+
+def get_all_time_logs() -> list:
+    sb = get_client()
+    res = sb.table("time_logs").select("*, employees(*), rentals(event_name)").order("logged_date", desc=True).execute()
+    return res.data
+
+
+# Contractor Payments
+def log_payment(rental_id: str, employee_id: str, amount: float, payment_date: str, notes: str):
+    sb = get_client()
+    sb.table("contractor_payments").insert({
+        "rental_id": rental_id,
+        "employee_id": employee_id,
+        "amount": amount,
+        "payment_date": payment_date,
+        "notes": notes
+    }).execute()
+
+def get_payments_for_rental(rental_id: str) -> list:
+    sb = get_client()
+    res = sb.table("contractor_payments").select("*, employees(*)").eq("rental_id", rental_id).execute()
+    return res.data
+
+def get_all_payments() -> list:
+    sb = get_client()
+    res = sb.table("contractor_payments").select("*, employees(*), rentals(event_name)").order("payment_date", desc=True).execute()
+    return res.data
