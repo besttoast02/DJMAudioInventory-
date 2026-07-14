@@ -29,6 +29,16 @@ if not cart:
     st.stop()
 
 st.title(":material/shopping_cart_checkout: Checkout")
+
+# ── Progress Indicator ───────────────────────────────────────
+st.markdown("""
+<div style="display: flex; justify-content: space-between; margin-bottom: 2rem; color: rgba(224,224,232,0.6); font-size: 0.9rem;">
+    <div style="text-align: center; flex: 1;"><strong>✓ Step 1</strong><br/>Gear</div>
+    <div style="text-align: center; flex: 1; border-bottom: 2px solid #8b5cf6; color: white;"><strong>Step 2</strong><br/>Details</div>
+    <div style="text-align: center; flex: 1;"><strong>Step 3</strong><br/>Confirm</div>
+</div>
+""", unsafe_allow_html=True)
+
 st.markdown("Review your gear, fill in your details, and submit for a quote.")
 
 # ── Order summary ────────────────────────────────────────────
@@ -105,7 +115,6 @@ st.caption("*Final pricing confirmed after review. Rates may vary for multi-day 
 
 # ── Client info form ─────────────────────────────────────────
 st.divider()
-st.subheader("Your details")
 
 # Honeypot — invisible field to catch bots
 honeypot_css = """<div style="position:absolute;left:-9999px;"><input id="hp_field" /></div>"""
@@ -113,10 +122,12 @@ st.markdown(honeypot_css, unsafe_allow_html=True)
 hp_val = st.text_input("Company website", key="hp_website", label_visibility="collapsed")
 
 with st.form("checkout_form", border=True):
+    st.markdown("### Contact Details")
     rc1, rc2 = st.columns(2)
     client_name = rc1.text_input("Your name *", placeholder="John Doe", max_chars=100)
     client_phone = rc2.text_input("Phone number *", placeholder="(555) 123-4567", max_chars=20)
 
+    st.markdown("### Event Info")
     rc3, rc4 = st.columns(2)
     event_name = rc3.text_input("Event name *", placeholder="Wedding reception, corporate gala...", max_chars=200)
     venue = rc4.text_input("Venue / location", placeholder="Hotel ballroom, outdoor venue...", max_chars=200)
@@ -127,6 +138,7 @@ with st.form("checkout_form", border=True):
     event_date = rc5.date_input("Event date", value=default_event)
     return_date = rc6.date_input("Return date", value=default_return)
 
+    st.markdown("### Pickup / Delivery")
     # ── Jurisdiction & entity (admin sees flags) ─────────
     rc7, rc8 = st.columns(2)
     jurisdictions = list(db.JURISDICTION_TAX_RATES.keys())
@@ -140,13 +152,14 @@ with st.form("checkout_form", border=True):
         st.warning(flag)
 
     notes = st.text_area(
-        "Additional notes",
+        "Additional notes (Optional)",
         placeholder="Any special requests, setup requirements, delivery details...",
         height=100,
         max_chars=1000,
     )
 
-    submitted = st.form_submit_button("Submit rental request", icon=":material/send:", type="primary", use_container_width=True)
+    st.markdown("<br/>", unsafe_allow_html=True)
+    submitted = st.form_submit_button("Submit Rental Request", icon=":material/send:", type="primary", use_container_width=True)
 
     if submitted:
         # ── Honeypot check ───────────────────────────────────

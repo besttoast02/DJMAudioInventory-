@@ -118,18 +118,21 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
         with cols[idx % 3]:
             with st.container(border=True):
                 display_brand = "" if info['brand'].lower() == "generic" else f"**{info['brand']}** "
-                st.markdown(f"{display_brand}{info['name']}")
+                st.markdown(f"#### {display_brand}{info['name']}")
                 st.badge(f"{info['qty']} available", color="green")
 
                 if info["rate_daily"] > 0:
-                    st.caption(
-                        f"½ day ${info['rate_half_day']:.0f} · "
-                        f"daily ${info['rate_daily']:.0f} · "
-                        f"weekend ${info['rate_weekend']:.0f}"
+                    st.markdown(
+                        f"<div style='margin: 0.5rem 0 1rem; color: rgba(224,224,232,0.8);'>"
+                        f"½ day: <strong>${info['rate_half_day']:.0f}</strong> · "
+                        f"Daily: <strong>${info['rate_daily']:.0f}</strong> · "
+                        f"Wknd: <strong>${info['rate_weekend']:.0f}</strong>"
+                        f"</div>",
+                        unsafe_allow_html=True
                     )
                 
                 if info.get("specs_markdown"):
-                    with st.popover("View Specs & Coverage", use_container_width=True):
+                    with st.popover("View Specs & Details", use_container_width=True):
                         st.markdown(info["specs_markdown"])
 
 
@@ -137,12 +140,15 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
                 in_cart = st.session_state.cart.get(key, {}).get("qty", 0)
                 max_avail = info["qty"]
 
-                c1, c2 = st.columns([2, 1])
+                c1, c2 = st.columns([1, 2])
                 qty_sel = c1.number_input(
                     "Qty", min_value=0, max_value=max_avail,
                     value=in_cart, key=f"qty_{key}", label_visibility="collapsed"
                 )
-                if c2.button("🛒", key=f"add_{key}", use_container_width=True):
+                
+                # Dynamic button text
+                btn_text = "Update Cart" if in_cart > 0 else "Add to Rental"
+                if c2.button(btn_text, key=f"add_{key}", use_container_width=True, type="primary"):
                     if qty_sel > 0:
                         st.session_state.cart[key] = {
                             "name": info["name"],
@@ -160,7 +166,7 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
                         st.rerun()
 
                 if in_cart > 0:
-                    st.badge(f"{in_cart} in cart", color="blue")
+                    st.info(f"✅ {in_cart} added to request")
 
 # ── Drum Mic Kits ────────────────────────────────────────────
 if filt in ("All", "Mic Kits"):
