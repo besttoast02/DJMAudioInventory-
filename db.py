@@ -360,3 +360,65 @@ def get_all_payments() -> list:
     sb = get_client()
     res = sb.table("contractor_payments").select("*, employees(*), rentals(event_name)").order("payment_date", desc=True).execute()
     return res.data
+
+
+# ── Discount Codes ───────────────────────────────────────────
+
+def create_discount_code(code: str, percent_off: int, max_uses: int = 0, expires_at: str = None):
+    sb = get_client()
+    row = {
+        "code": code.strip().upper(),
+        "percent_off": percent_off,
+        "max_uses": max_uses,
+        "times_used": 0,
+        "active": True,
+    }
+    if expires_at:
+        row["expires_at"] = expires_at
+    sb.table("discount_codes").insert(row).execute()
+
+
+def get_all_discount_codes() -> list:
+    sb = get_client()
+    res = sb.table("discount_codes").select("*").order("created_at", desc=True).execute()
+    return res.data
+
+
+def validate_discount_code(code: str) -> dict | None:
+    """Returns the discount row if valid, else None."""
+    sb = get_client()
+    res = sb.table("discount_codes").select("*").eq("code", code.strip().upper()).eq("active", True).execute()
+    if not res.data:
+        return None
+    row = res.data[0]
+    # Check max uses (0 = unlimited)
+    if row["max_uses"] > 0 and row["times_used"] >= row["max_uses"]:
+        return None
+    # Check expiry
+    if row.get("expires_at"):
+        from datetime import datetime, timezone
+        try:
+            exp = datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) > exp:
+                return None
+        except Exception:
+            pass
+    return row
+
+
+def use_discount_code(code_id: str):
+    """Increment times_used by 1."""
+    sb = get_client()
+    row = sb.table("discount_codes").select("times_used").eq("id", code_id).execute().data[0]
+    sb.table("discount_codes").update({"times_used": row["times_used"] + 1}).eq("id", code_id).execute()
+
+
+def toggle_discount_code(code_id: str, active: bool):
+    sb = get_client()
+    sb.table("discount_codes").update({"active": active}).eq("id", code_id).execute()
+
+
+def delete_discount_code(code_id: str):
+    sb = get_client()
+    sb.table("discount_codes").delete().eq("id", code_id).execute()
+

@@ -31,7 +31,7 @@ def get_display_category(item: dict) -> str:
     }
     return mapping.get(cat, "_hidden")
 
-DISPLAY_ORDER = ["Speakers", "Mixers", "Microphones", "Lighting / DMX", "Truss"]
+DISPLAY_ORDER = ["Speakers", "Mic Kits", "Mixers", "Microphones", "Lighting / DMX", "Truss"]
 POPULARITY = {
     "evolve 50": 1, "column pa": 1,
     "xdj-xz": 2, "sq-5": 3, "ddj": 4, "djm": 4,
@@ -144,6 +144,134 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
 
                 if in_cart > 0:
                     st.badge(f"{in_cart} in cart", color="blue")
+
+# ── Drum Mic Kits ────────────────────────────────────────────
+if filt in ("All", "Mic Kits"):
+    st.subheader("Mic Kits")
+    st.caption("Pre-configured drum mic packages. One click to add the whole kit.")
+    
+    # Calculate kit prices from current DB rates
+    mic_rates = {}
+    for i in items:
+        if i["category"] == "Microphones":
+            name = i["name"]
+            if name not in mic_rates:
+                mic_rates[name] = {
+                    "rate_half_day": float(i.get("rate_half_day") or 0),
+                    "rate_daily": float(i.get("rate_daily") or 0),
+                    "rate_weekend": float(i.get("rate_weekend") or 0),
+                    "avail": 0,
+                }
+            mic_rates[name]["avail"] += 1
+    
+    # Check PGA81 availability for overhead fallback
+    pga81_avail = mic_rates.get("PGA81 Condenser Instrument Microphone", {}).get("avail", 0)
+    overhead_name = "PGA81 Condenser Instrument Microphone" if pga81_avail >= 2 else "SM57 Dynamic Instrument Microphone"
+    overhead_label = "Shure PGA81" if pga81_avail >= 2 else "Shure SM57 (alt)"
+    
+    def get_rate(mic_name, field):
+        return mic_rates.get(mic_name, {}).get(field, 0)
+    
+    KITS = [
+        {
+            "key": "kit_pga_drum",
+            "name": "PGA Drum Mic Kit",
+            "brand": "Shure",
+            "desc": "Budget-friendly 7-mic drum package",
+            "mics": [
+                ("Kick", "Shure PGA52", 1, "PGA52 Kick Drum Microphone"),
+                ("Snare", "Shure PGA57", 1, "PGA57 Dynamic Instrument Microphone"),
+                ("Toms ×3", "Shure PGA56", 3, "PGA56 Drum/Instrument Microphone"),
+                ("Overheads ×2", overhead_label, 2, overhead_name),
+            ],
+        },
+        {
+            "key": "kit_pro_drum",
+            "name": "Pro Drum Mic Kit",
+            "brand": "Sennheiser / Audix",
+            "desc": "Premium clip-on 7-mic drum package",
+            "mics": [
+                ("Kick", "Audix i6", 1, "i6 Kick Drum Microphone"),
+                ("Snare", "Audix i5", 1, "i5 Dynamic Instrument Microphone"),
+                ("Toms ×3", "Sennheiser e904", 3, "e904 Drum Microphone"),
+                ("Overheads ×2", overhead_label, 2, overhead_name),
+            ],
+        },
+    ]
+    
+    kc1, kc2 = st.columns(2)
+    for idx, kit in enumerate(KITS):
+        col = kc1 if idx == 0 else kc2
+        with col:
+            with st.container(border=True):
+                st.markdown(f"### 🥁 {kit['name']}")
+                st.caption(kit["desc"])
+                
+                kit_half = 0
+                kit_daily = 0
+                kit_weekend = 0
+                
+                for position, label, qty, db_name in kit["mics"]:
+                    r_d = get_rate(db_name, "rate_daily")
+                    r_h = get_rate(db_name, "rate_half_day")
+                    r_w = get_rate(db_name, "rate_weekend")
+                    kit_half += r_h * qty
+                    kit_daily += r_d * qty
+                    kit_weekend += r_w * qty
+                    st.markdown(f"- **{position}**: {label}")
+                
+                st.divider()
+                st.markdown(
+                    f"**½ day ${kit_half:.0f}** · "
+                    f"**daily ${kit_daily:.0f}** · "
+                    f"**weekend ${kit_weekend:.0f}**"
+                )
+                
+                # Add kit to cart
+                kit_key = kit["key"]
+                kit_in_cart = kit_key in st.session_state.cart
+                
+                if kit_in_cart:
+                    st.badge("In cart", color="blue")
+                    if st.button("Remove kit", key=f"rm_{kit_key}", use_container_width=True):
+                        del st.session_state.cart[kit_key]
+                        st.rerun()
+                else:
+                    if st.button(f"Add to cart", key=f"add_{kit_key}", type="primary", use_container_width=True, icon=":material/add_shopping_cart:"):
+                        st.session_state.cart[kit_key] = {
+                            "name": kit["name"],
+                            "brand": kit["brand"],
+                            "category": "Mic Kits",
+                            "qty": 1,
+                            "rate_half_day": kit_half,
+                            "rate_daily": kit_daily,
+                            "rate_weekend": kit_weekend,
+                            "max_qty": 1,
+                        }
+                        st.rerun()
+                
+                # Optional SM57 snare bottom
+                snare_key = f"{kit_key}_snare_bottom"
+                sm57_daily = get_rate("SM57 Dynamic Instrument Microphone", "rate_daily")
+                sm57_half = get_rate("SM57 Dynamic Instrument Microphone", "rate_half_day")
+                sm57_wknd = get_rate("SM57 Dynamic Instrument Microphone", "rate_weekend")
+                
+                snare_in_cart = snare_key in st.session_state.cart
+                if snare_in_cart:
+                    st.caption("✅ SM57 snare bottom added")
+                else:
+                    if st.button(f"+ SM57 snare bottom (+${sm57_daily:.0f}/day)", key=f"add_{snare_key}", use_container_width=True):
+                        st.session_state.cart[snare_key] = {
+                            "name": f"{kit['name']} — SM57 Snare Bottom",
+                            "brand": "Shure",
+                            "category": "Mic Kits",
+                            "qty": 1,
+                            "rate_half_day": sm57_half,
+                            "rate_daily": sm57_daily,
+                            "rate_weekend": sm57_wknd,
+                            "max_qty": 1,
+                        }
+                        st.rerun()
 
 # ── Add-ons section ──────────────────────────────────────────
 hidden = [i for i in items if i.get("_display_cat") == "_hidden"]

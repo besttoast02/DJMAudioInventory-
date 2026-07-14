@@ -104,6 +104,7 @@ admin_pages = [
     st.Page("app_pages/rentals.py", title="Rentals", icon=":material/event:"),
     st.Page("app_pages/calendar_view.py", title="Calendar", icon=":material/calendar_month:"),
     st.Page("app_pages/labor.py", title="Staff & Labor", icon=":material/engineering:"),
+    st.Page("app_pages/discounts.py", title="Discount Codes", icon=":material/sell:"),
     st.Page("app_pages/barcodes.py", title="Barcodes", icon=":material/qr_code_2:"),
 ]
 

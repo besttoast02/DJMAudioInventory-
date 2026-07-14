@@ -55,11 +55,51 @@ for key, item in cart.items():
 if selected_addons:
     st.caption("**Requested add-ons:** " + ", ".join(selected_addons))
 
+# ── Discount code ────────────────────────────────────────────
+st.divider()
+dc1, dc2 = st.columns([3, 1])
+discount_input = dc1.text_input("Have a discount code?", placeholder="Enter code", key="discount_code_input")
+discount_row = None
+discount_pct = 0
+
+if dc2.button("Apply", key="apply_discount", use_container_width=True):
+    if discount_input:
+        result = db.validate_discount_code(discount_input)
+        if result:
+            st.session_state["applied_discount"] = result
+            st.rerun()
+        else:
+            st.error("Invalid, expired, or fully used code.", icon=":material/error:")
+
+if "applied_discount" in st.session_state:
+    discount_row = st.session_state["applied_discount"]
+    discount_pct = discount_row["percent_off"]
+    st.success(f"Code **{discount_row['code']}** applied — {discount_pct}% off!", icon=":material/sell:")
+    if st.button("Remove code", key="remove_discount"):
+        del st.session_state["applied_discount"]
+        st.rerun()
+
+# Apply discount
+if discount_pct > 0:
+    multiplier = 1 - (discount_pct / 100)
+    final_half = total_half * multiplier
+    final_daily = total_daily * multiplier
+    final_weekend = total_weekend * multiplier
+else:
+    final_half = total_half
+    final_daily = total_daily
+    final_weekend = total_weekend
+
 st.divider()
 tc1, tc2, tc3 = st.columns(3)
-tc1.metric("½ day estimate", f"${total_half:.0f}")
-tc2.metric("Daily estimate", f"${total_daily:.0f}")
-tc3.metric("Weekend estimate", f"${total_weekend:.0f}")
+if discount_pct > 0:
+    tc1.metric("½ day estimate", f"${final_half:.0f}", delta=f"-${total_half - final_half:.0f}", delta_color="inverse")
+    tc2.metric("Daily estimate", f"${final_daily:.0f}", delta=f"-${total_daily - final_daily:.0f}", delta_color="inverse")
+    tc3.metric("Weekend estimate", f"${final_weekend:.0f}", delta=f"-${total_weekend - final_weekend:.0f}", delta_color="inverse")
+else:
+    tc1.metric("½ day estimate", f"${final_half:.0f}")
+    tc2.metric("Daily estimate", f"${final_daily:.0f}")
+    tc3.metric("Weekend estimate", f"${final_weekend:.0f}")
 
 st.caption("*Final pricing confirmed after review. Rates may vary for multi-day or custom packages.*")
 
@@ -135,7 +175,10 @@ with st.form("checkout_form", border=True):
             full_notes += "\n".join(f"• {a}" for a in selected_addons)
 
         full_notes += f"\n\n=== ESTIMATED PRICING ===\n"
-        full_notes += f"½ day: ${total_half:.0f} | Daily: ${total_daily:.0f} | Weekend: ${total_weekend:.0f}"
+        full_notes += f"½ day: ${final_half:.0f} | Daily: ${final_daily:.0f} | Weekend: ${final_weekend:.0f}"
+        if discount_pct > 0:
+            full_notes += f"\nDiscount: {discount_row['code']} ({discount_pct}% off)"
+            full_notes += f"\nOriginal daily: ${total_daily:.0f} → Discounted: ${final_daily:.0f}"
 
         if notes:
             full_notes += f"\n\n=== CLIENT NOTES ===\n{notes}"
@@ -149,8 +192,14 @@ with st.form("checkout_form", border=True):
             return_date=str(return_date),
             venue=venue,
             notes=full_notes,
-            estimated_cost=float(total_daily)
+            estimated_cost=float(final_daily)
         )
+
+        # Mark discount code as used
+        if discount_row:
+            db.use_discount_code(discount_row['id'])
+            if 'applied_discount' in st.session_state:
+                del st.session_state['applied_discount']
 
         # Track submission for rate limiting
         st.session_state.submit_timestamps.append(datetime.now().timestamp())
