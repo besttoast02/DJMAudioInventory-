@@ -450,6 +450,34 @@ img[data-testid="stLogo"] {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SIDEBAR HAMBURGER MENU OVERRIDE
+   ═══════════════════════════════════════════════════════════ */
+/* Hide the default SVG/span icons */
+button[data-testid="stExpandSidebarButton"] svg,
+button[data-testid="stExpandSidebarButton"] span {
+    display: none !important;
+}
+
+/* Insert a hamburger icon instead */
+button[data-testid="stExpandSidebarButton"]::before {
+    content: "\\e5d2"; /* Material icon code for 'menu' */
+    font-family: 'Material Symbols Rounded' !important;
+    font-size: 2.2rem !important;
+    color: #e0e0e8 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Increase tap target size for mobile */
+button[data-testid="stExpandSidebarButton"] {
+    width: 50px !important;
+    height: 50px !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
    HIDE DEPLOY BUTTON, MENU, AND FOOTER
    ═══════════════════════════════════════════════════════════ */
 .stDeployButton,
