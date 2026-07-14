@@ -3,6 +3,52 @@ Package definitions and inclusion rules for DJM Audio service packages.
 Maps package barcodes to their included services and questionnaire config.
 """
 
+# ── Owner / Staff (INTERNAL — never shown to customers) ──────
+OWNER_ID = "8d622daf-b12b-4d9a-91df-bedf342b16d5"  # Jair Davalos
+OWNER_NAME = "Jair Davalos"
+
+# Internal hourly cost rates (for profit tracking & assignment)
+STAFF_RATES = {
+    OWNER_ID: {
+        "name": OWNER_NAME,
+        "role": "owner",
+        "rates": {
+            "dj": 75.00,          # $/hr — DJ (no gear, just the person)
+            "foh_engineer": 50.00, # $/hr — Front of House mixing
+            "monitor_engineer": 35.00,  # $/hr — Monitor engineer
+        },
+    },
+}
+
+# Map service barcodes → staff role needed (for auto-assignment)
+SERVICE_ROLE_MAP = {
+    "DJM-SVC-0001": "dj",          # Party DJ
+    "DJM-SVC-0002": "dj",          # Wedding DJ
+    "DJM-SVC-0003": "dj",          # Corporate DJ
+    "DJM-SVC-0004": "foh_engineer", # FOH
+    "DJM-SVC-0005": "monitor_engineer",  # Monitor
+    "DJM-SVC-0008": "dj",          # Lighting (operated by Jair)
+}
+
+
+def get_staff_cost(service_barcode: str, hours: float = 5.0) -> dict:
+    """Calculate internal labor cost for a service.
+    Returns {'employee_id', 'employee_name', 'role', 'hourly_rate', 'hours', 'total_cost'}
+    """
+    role = SERVICE_ROLE_MAP.get(service_barcode)
+    if not role:
+        return None
+    staff = STAFF_RATES[OWNER_ID]
+    rate = staff["rates"].get(role, 0)
+    return {
+        "employee_id": OWNER_ID,
+        "employee_name": staff["name"],
+        "role": role,
+        "hourly_rate": rate,
+        "hours": hours,
+        "total_cost": rate * hours,
+    }
+
 # ── Barcode constants ────────────────────────────────────────
 # DJ Packages
 PKG_DJ_PARTY = "DJM-SVC-0001"
