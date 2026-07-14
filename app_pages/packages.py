@@ -41,7 +41,7 @@ with col2:
         - MC services (bilingual)
         - Event timeline planning
         
-        **$1,800**
+        **$1,500**
         """)
         if st.button("Book this package", key="pkg_premium", type="primary", use_container_width=True):
             st.switch_page("app_pages/contact.py")
@@ -60,11 +60,10 @@ with col3:
         - Dancing on the clouds
         - Spark machines
         - LED robot performance
-        - Live recording
         - Dedicated sound tech
         - Full MC + timeline + coordination
         
-        **$4,500**
+        **$2,500**
         """)
         if st.button("Book this package", key="pkg_ultimate", type="primary", use_container_width=True):
             st.switch_page("app_pages/contact.py")

@@ -14,14 +14,28 @@ with col1:
         st.markdown("""
         Capture your live performance forever.
         
+        **Pricing:**
+        - **5-song EP** — $300
+        - **Full performance album** (1 hour) — $500
+        - Scalable for longer sets — contact us
+        
         **What you get:**
         - Multi-track recording of your live event
         - Professional mixing and mastering in post
         - Delivered as a polished live album (digital)
         - Individual stems available on request
-        - Turnaround: 2–4 weeks
+        - Turnaround: **1 week**
+        """)
         
-        **Starting at $500**
+        st.divider()
+        st.markdown("##### 🏷️ Danger Beats Music — Label Services")
+        st.markdown("""
+        Through **Danger Beats Music LLC** we also offer:
+        - Album art design
+        - Digital distribution (Spotify, Apple Music, etc.)
+        - Promotion & placement in live events
+        
+        *Pricing varies — [contact us](app_pages/contact.py) to discuss your project.*
         """)
         if st.button("Request quote", key="live_rec", type="primary", icon=":material/request_quote:", use_container_width=True):
             st.switch_page("app_pages/contact.py")
@@ -56,7 +70,7 @@ with col3:
         - LED-lit robot performer(s)
         - Choreographed routines
         - CO2 blast effects
-        - 15–30 minute performance sets
+        - 45-minute to 1-hour performance sets
         - Perfect for: nightclub events, quinceañeras, corporate reveals
         
         **Starting at $600** (1 robot)
@@ -73,11 +87,11 @@ with col4:
         **What you get:**
         - Professional low-fog machine
         - Dense white clouds that stay on the ground
-        - No smoke smell, no residue
+        - 2 uses included (e.g., vals + first dance)
         - Operator included
-        - Perfect for: first dance, vals, special moments
+        - Perfect for: first dance, vals, grand entrance
         
-        **Starting at $250**
+        **$350** (includes 2 uses)
         """)
         if st.button("Request quote", key="clouds", type="primary", icon=":material/request_quote:", use_container_width=True):
             st.switch_page("app_pages/contact.py")
