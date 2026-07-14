@@ -312,36 +312,40 @@ with st.sidebar:
     if not st.session_state.is_admin:
         # Only show login if gate was unlocked via secret URL
         if st.session_state.get("gate_unlocked", False):
-            with st.popover("Admin login", icon=":material/lock:"):
-                pw = st.text_input("Password", type="password", key="admin_pw")
-                totp_code = st.text_input("2FA Code (Google Authenticator)", type="password", key="admin_2fa")
-                
-                if st.button("Log in", icon=":material/login:"):
-                    try:
-                        if pw == st.secrets["ADMIN_PASSWORD"]:
-                            admin_2fa_secret = st.secrets.get("ADMIN_2FA_SECRET")
-                            if admin_2fa_secret:
-                                totp = pyotp.TOTP(admin_2fa_secret)
-                                if totp.verify(totp_code):
-                                    st.session_state.is_admin = True
-                                    from datetime import datetime, timezone
-                                    st.session_state.admin_login_time = datetime.now(timezone.utc)
-                                    st.rerun()
-                                else:
-                                    st.error("Invalid 2FA code")
-                            else:
+            st.divider()
+            st.caption(":material/lock: Admin login")
+            pw = st.text_input("Password", type="password", key="admin_pw")
+            totp_code = st.text_input("2FA code", type="password", key="admin_2fa",
+                                      placeholder="Google Authenticator")
+
+            if st.button("Log in", icon=":material/login:", type="primary",
+                         key="admin_login_btn"):
+                try:
+                    if pw == st.secrets["ADMIN_PASSWORD"]:
+                        admin_2fa_secret = st.secrets.get("ADMIN_2FA_SECRET")
+                        if admin_2fa_secret:
+                            totp = pyotp.TOTP(admin_2fa_secret)
+                            if totp.verify(totp_code):
                                 st.session_state.is_admin = True
                                 from datetime import datetime, timezone
                                 st.session_state.admin_login_time = datetime.now(timezone.utc)
                                 st.rerun()
+                            else:
+                                st.error("Invalid 2FA code")
                         else:
-                            st.error("Wrong password")
-                    except KeyError:
-                        st.error("ADMIN_PASSWORD not set in secrets")
-        # else: no login visible — public visitors see nothing
+                            st.session_state.is_admin = True
+                            from datetime import datetime, timezone
+                            st.session_state.admin_login_time = datetime.now(timezone.utc)
+                            st.rerun()
+                    else:
+                        st.error("Wrong password")
+                except KeyError:
+                    st.error("ADMIN_PASSWORD not set in secrets")
+        # else: nothing visible — public sees only the title
     else:
+        st.divider()
         st.badge("Admin", icon=":material/verified_user:", color="green")
-        if st.button("Log out", icon=":material/logout:"):
+        if st.button("Log out", icon=":material/logout:", key="admin_logout_btn"):
             st.session_state.is_admin = False
             st.session_state["gate_unlocked"] = False
             st.rerun()
