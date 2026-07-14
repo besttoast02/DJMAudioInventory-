@@ -456,7 +456,8 @@ if st.session_state.is_admin and st.session_state.get("admin_login_time"):
 # ── Secret admin gate ────────────────────────────────────────
 # Access admin login ONLY via: ?gate=<ADMIN_GATE_CODE>
 # No visible login button for public visitors.
-ADMIN_GATE_CODE = db.get_secret("ADMIN_GATE_CODE", "3KcWvK9v_kGqEe5H1lwxtOspg7tChhuI")
+import uuid
+ADMIN_GATE_CODE = db.get_secret("ADMIN_GATE_CODE", str(uuid.uuid4()))
 query_gate = st.query_params.get("gate", "")
 
 # If gate code matches, flag the session so the login form appears

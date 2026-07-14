@@ -62,12 +62,14 @@ def is_connected() -> bool:
 
 # ── Items ────────────────────────────────────────────────────
 
+@st.cache_data(ttl=300)
 def get_all_items() -> list[dict]:
     sb = get_client()
     res = sb.table("items").select("*").order("barcode").execute()
     return res.data
 
 
+@st.cache_data(ttl=300)
 def get_items_by_status(status: str) -> list[dict]:
     sb = get_client()
     res = sb.table("items").select("*").eq("status", status).order("barcode").execute()
@@ -78,6 +80,7 @@ def get_available_items() -> list[dict]:
     return get_items_by_status("available")
 
 
+@st.cache_data(ttl=300)
 def get_services() -> list[dict]:
     """Get all service items (category = 'Services')."""
     sb = get_client()
@@ -123,28 +126,33 @@ def add_item(barcode: str, name: str, brand: str, category: str, storage_case: s
         "rentable": rentable,
     }
     res = sb.table("items").insert(data).execute()
+    st.cache_data.clear()
     return res.data
 
 
 def update_item(item_id: str, updates: dict) -> dict:
     sb = get_client()
     res = sb.table("items").update(updates).eq("id", item_id).execute()
+    st.cache_data.clear()
     return res.data
 
 
 def batch_update_items(updates: list[dict]):
-    """Update multiple items. Each dict must have 'id' plus fields to change."""
+    """Update multiple items. Uses bulk upsert for efficiency."""
+    if not updates:
+        return
     sb = get_client()
-    for u in updates:
-        item_id = u.pop("id")
-        if u:  # only update if there are fields to change
-            sb.table("items").update(u).eq("id", item_id).execute()
+    # PostgREST supports upserting an array of dicts if they include the primary key ('id')
+    sb.table("items").upsert(updates).execute()
+    st.cache_data.clear()
 
 
 def update_items_status(item_ids: list[str], status: str):
+    if not item_ids:
+        return
     sb = get_client()
-    for iid in item_ids:
-        sb.table("items").update({"status": status}).eq("id", iid).execute()
+    sb.table("items").update({"status": status}).in_("id", item_ids).execute()
+    st.cache_data.clear()
 
 
 def get_next_barcode(category: str) -> str:
@@ -165,12 +173,15 @@ def get_next_barcode(category: str) -> str:
 def delete_item(item_id: str):
     sb = get_client()
     sb.table("items").delete().eq("id", item_id).execute()
+    st.cache_data.clear()
 
 
 def delete_items(item_ids: list[str]):
+    if not item_ids:
+        return
     sb = get_client()
-    for iid in item_ids:
-        sb.table("items").delete().eq("id", iid).execute()
+    sb.table("items").delete().in_("id", item_ids).execute()
+    st.cache_data.clear()
 
 
 # ── Double-booking prevention ────────────────────────────────
@@ -220,6 +231,22 @@ def get_rentals_by_status(status: str) -> list[dict]:
     sb = get_client()
     res = sb.table("rentals").select("*").eq("status", status).order("event_date").execute()
     return res.data
+
+
+def check_recent_requests(client_phone: str, max_requests: int = 5, hours: int = 1) -> bool:
+    """
+    Returns True if the client has NOT exceeded the max_requests limit
+    within the specified hours.
+    """
+    sb = get_client()
+    from datetime import datetime, timedelta
+    cutoff = (datetime.utcnow() - timedelta(hours=hours)).isoformat()
+    
+    # Query how many rentals this phone number created since the cutoff
+    res = sb.table("rentals").select("id", count="exact").eq("client_phone", client_phone).gte("created_at", cutoff).execute()
+    count = res.count if res.count is not None else len(res.data)
+    
+    return count < max_requests
 
 
 def create_rental(event_name: str, client_name: str, client_phone: str,

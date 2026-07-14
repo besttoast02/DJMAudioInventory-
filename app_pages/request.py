@@ -325,7 +325,11 @@ elif st.session_state.checkout_step == 5:
                 st.stop()
                 
             if not check_rate_limit():
-                st.error("Too many requests. Please wait before submitting again.", icon=":material/block:")
+                st.error("Too many requests from this device. Please wait before submitting again.", icon=":material/block:")
+                st.stop()
+                
+            if not db.check_recent_requests(client_phone, max_requests=3, hours=1):
+                st.error("Too many requests from this phone number. Please wait before submitting again.", icon=":material/block:")
                 st.stop()
                 
             # Compile full notes
