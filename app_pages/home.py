@@ -255,6 +255,6 @@ st.markdown("""
     <p style="font-size: 2.2rem; margin-top: 0.5rem; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">(626) 506-3824</p>
     <p style="font-size: 1.4rem; color: #b182ff; font-weight: 600;">djmaudio.com</p>
     <br/>
-    <span style="opacity: 0.5; font-size: 0.9rem;">Los Angeles, CA · © 2025 DJM Audio Productions LLC</span>
+    <span style="opacity: 0.5; font-size: 0.9rem;">Los Angeles, CA · © 2026 DJM Audio Productions LLC</span>
 </div>
 """, unsafe_allow_html=True)
