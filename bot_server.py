@@ -99,7 +99,8 @@ async def process_with_llm(user_id: str, user_text: str):
     # We loop through a list of models to gracefully handle rate limits on the free tier
     MODELS_TO_TRY = [
         "meta-llama/llama-3.3-70b-instruct:free",
-        "google/gemma-4-31b-it:free",
+        "qwen/qwen3-next-80b-a3b-instruct:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
         "nousresearch/hermes-3-llama-3.1-405b:free"
     ]
     
@@ -158,10 +159,7 @@ async def process_with_llm(user_id: str, user_text: str):
             
         except Exception as e:
             last_error = str(e)
-            if "429" in last_error or "rate-limit" in last_error.lower():
-                continue
-            else:
-                break
+            continue
                 
     return "Sorry, I am currently experiencing high traffic and my servers are rate-limited. Please try again in 30 seconds."
 

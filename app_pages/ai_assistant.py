@@ -80,7 +80,8 @@ if user_text:
     
     MODELS_TO_TRY = [
         "meta-llama/llama-3.3-70b-instruct:free",
-        "google/gemma-4-31b-it:free",
+        "qwen/qwen3-next-80b-a3b-instruct:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
         "nousresearch/hermes-3-llama-3.1-405b:free"
     ]
     
@@ -161,10 +162,7 @@ if user_text:
 
                 except Exception as e:
                     last_error = str(e)
-                    if "429" in last_error or "rate-limit" in last_error.lower():
-                        continue # Try the next model
-                    else:
-                        break # Unrelated error, stop trying
+                    continue # Try the next model regardless of the error
             
             if success:
                 st.rerun()
