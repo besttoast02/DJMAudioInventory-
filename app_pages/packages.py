@@ -310,37 +310,6 @@ with q2:
             }
             st.rerun()
 
-# ── MC & Event Planning ──────────────────────────────────────
-st.divider()
-st.subheader(":material/event_note: MC & Event Planning")
-
-with st.container(border=True):
-    st.markdown("### 🎤 Wedding / Quinceañera MC Planning")
-    st.markdown("""
-    We work with you to create a detailed event timeline and MC script so everything runs smoothly.
-    
-    **Planning includes:**
-    
-    | Phase | Details |
-    |-------|---------|
-    | **Pre-event consultation** | Meet to discuss flow, music preferences, special moments |
-    | **Timeline creation** | Minute-by-minute schedule for the entire event |
-    | **MC script** | Introductions, announcements, transitions |
-    | **Vendor coordination** | Sync with photographer, videographer, caterer |
-    | **Ceremony support** | Music cues for processional, recessional |
-    | **Reception flow** | Grand entrance → first dance → dinner → toasts → open dance → last dance |
-    | **Special moments** | Bouquet toss, garter, dollar dance, cake cutting, sparkler exit |
-    
-    *Included with Premium and Ultimate packages. Available standalone for **$200**.*
-    """)
-    if st.button("Add to Cart — $200", key="planning_add", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
-        st.session_state.cart[pkg.SVC_PLANNING] = {
-            "name": "Event Planning & MC Coordination", "brand": "DJM Audio",
-            "category": "Services", "barcode": pkg.SVC_PLANNING, "qty": 1,
-            "rate_half_day": 0, "rate_daily": 200, "rate_weekend": 200,
-            "max_qty": 1, "is_service": True,
-        }
-        st.rerun()
 
 # ── Event Gallery ────────────────────────────────────────────
 st.divider()
