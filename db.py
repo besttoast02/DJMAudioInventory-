@@ -40,18 +40,25 @@ def get_prefix(category: str) -> str:
 
 @st.cache_resource
 def get_client() -> Client:
-    url = st.secrets["SUPABASE_URL"]
-    key = st.secrets["SUPABASE_KEY"]
+    import os
+    try:
+        url = st.secrets["SUPABASE_URL"]
+        key = st.secrets["SUPABASE_KEY"]
+    except Exception:
+        url = os.getenv("SUPABASE_URL", "")
+        key = os.getenv("SUPABASE_KEY", "")
     return create_client(url, key)
 
 
 def is_connected() -> bool:
+    import os
     try:
+        # Check Streamlit secrets first
         _ = st.secrets["SUPABASE_URL"]
-        _ = st.secrets["SUPABASE_KEY"]
         return True
-    except (KeyError, FileNotFoundError):
-        return False
+    except Exception:
+        # Check env vars
+        return bool(os.getenv("SUPABASE_URL"))
 
 
 # ── Items ────────────────────────────────────────────────────
