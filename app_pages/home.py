@@ -59,22 +59,31 @@ st.markdown("""
 
 .hero-wrapper {
     text-align: center;
-    padding: 2rem 1rem 3rem;
+    padding: 3rem 2rem;
+    background: rgba(10, 10, 15, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    max-width: 850px;
+    margin: 2rem auto 3rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(217,70,239,0.15);
 }
 .hero-title {
     font-size: 3.5rem;
     font-weight: 800;
-    line-height: 1.1;
-    margin-bottom: 1rem;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 4px 15px rgba(0,0,0,1);
+    color: #ffffff;
 }
 .hero-sub {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.9);
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    line-height: 1.5;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.95);
+    max-width: 650px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+    text-shadow: 0 2px 10px rgba(0,0,0,1);
 }
 </style>
 
