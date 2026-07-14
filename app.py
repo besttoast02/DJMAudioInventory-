@@ -322,11 +322,6 @@ hr {
     div[data-testid="stMetric"] [data-testid="stMetricValue"] {
         font-size: 1.3rem !important;
     }
-    
-    /* Sidebar overlay on mobile */
-    section[data-testid="stSidebar"] {
-        z-index: 999 !important;
-    }
 }
 
 @media (max-width: 480px) {
@@ -458,9 +453,7 @@ img[data-testid="stLogo"] {
    HIDE DEPLOY BUTTON, MENU, AND FOOTER
    ═══════════════════════════════════════════════════════════ */
 .stDeployButton,
-button[data-testid="stBaseButton-headerNoPadding"],
 #MainMenu,
-header[data-testid="stHeader"] button[kind="header"],
 div[data-testid="stToolbar"],
 div[data-testid="stDecoration"],
 .viewerBadge_container,

@@ -250,19 +250,18 @@ PACKAGES = {
 }
 
 
-def is_dj_package_in_cart(cart: dict) -> bool:
-    """Check if any DJ package is in the cart."""
+def has_any_event_item(cart: dict) -> bool:
+    """Check if the cart contains any item besides the custom mixes themselves."""
     for key, item in cart.items():
-        if item.get("barcode") in DJ_PACKAGES:
+        if item.get("barcode") not in FREE_WITH_DJ:
             return True
     return False
-
 
 def get_effective_price(barcode: str, cart: dict) -> dict:
     """Return the effective price for a service, accounting for package inclusions.
     Returns dict with rate_half_day, rate_daily, rate_weekend (possibly zeroed).
     """
-    if barcode in FREE_WITH_DJ and is_dj_package_in_cart(cart):
+    if barcode in FREE_WITH_DJ and has_any_event_item(cart):
         return {"rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0}
     # Planning is free with Premium/Ultimate
     if barcode == SVC_PLANNING:

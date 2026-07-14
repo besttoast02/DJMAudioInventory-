@@ -31,6 +31,7 @@ user_text = ""
 # Check text input
 if prompt := st.chat_input("Type your message here..."):
     user_text = prompt
+    st.session_state.input_method = "text"
     st.session_state.tts_text = "" # Clear previous TTS
 
 # Check voice input
@@ -41,6 +42,7 @@ if voice_res and isinstance(voice_res, dict):
         transcript = voice_res.get("text", "")
         if transcript:
             user_text = transcript
+            st.session_state.input_method = "voice"
             st.session_state.tts_text = ""
 
 # ── Display Chat History ──────────────────────────────────────
@@ -189,7 +191,8 @@ if user_text:
                     if ai_reply:
                         st.markdown(ai_reply)
                         st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-                        st.session_state.tts_text = ai_reply
+                        if st.session_state.get("input_method") == "voice":
+                            st.session_state.tts_text = ai_reply
                         
                     success = True
                     break

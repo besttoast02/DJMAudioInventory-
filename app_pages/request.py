@@ -21,6 +21,9 @@ def check_rate_limit() -> bool:
 cart = st.session_state.get("cart", {})
 selected_addons = st.session_state.get("selected_addons", [])
 
+has_services = any(v.get("is_service") or v.get("package_item") for v in cart.values())
+has_equipment = any(not v.get("is_service") and not v.get("package_item") for v in cart.values())
+
 if not cart:
     st.title(":material/shopping_cart_checkout: Checkout")
     st.info("Your cart is empty. Head to **Browse catalog** to add gear.", icon=":material/remove_shopping_cart:")
@@ -117,40 +120,68 @@ elif st.session_state.checkout_step == 2:
     guests = st.session_state.chk_guests
     is_indoor = (st.session_state.chk_placement == "Indoor")
     
-    if is_indoor:
-        if guests <= 75:
-            req, status = "2x EV Evolve 50s (Included in base package)", "ok"
-        elif guests <= 100:
-            req, status = "2x EV Evolve 50s + 1x 18\" Subwoofer (Upgrade recommended)", "warn"
-        elif guests <= 250:
-            req, status = "2x dBTech Ingenias + 1x 18\" Subwoofer (Upgrade required)", "warn"
-        elif guests <= 400:
-            req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
-        elif guests <= 1000:
-            req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
-        else:
-            req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
-    else:
-        if guests <= 100:
-            req, status = "2x EV Evolve 50s (Included in base package)", "ok"
-        elif guests <= 150:
-            req, status = "2x EV Evolve 50s + 1x 18\" Subwoofer (Upgrade recommended)", "warn"
-        elif guests <= 200:
-            req, status = "2x dBTech Ingenias + 1x 18\" Subwoofer (Upgrade required)", "warn"
-        elif guests <= 400:
-            req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
-        elif guests <= 800:
-            req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
-        else:
-            req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
-            
     st.markdown("##### 🔊 Audio Equipment Recommendation")
-    if status == "ok":
-        st.info(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\\n{req}")
-    elif status == "warn":
-        st.warning(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\\n{req}")
-    else:
-        st.error(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\\n{req}")
+    
+    if has_services or not has_equipment:
+        if is_indoor:
+            if guests <= 75:
+                req, status = "2x EV Evolve 50s (Included in base package)", "ok"
+            elif guests <= 100:
+                req, status = "2x EV Evolve 50s + 1x 18\" Subwoofer (Upgrade recommended)", "warn"
+            elif guests <= 250:
+                req, status = "2x dBTech Ingenias + 1x 18\" Subwoofer (Upgrade required)", "warn"
+            elif guests <= 400:
+                req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
+            elif guests <= 1000:
+                req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
+            else:
+                req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
+        else:
+            if guests <= 100:
+                req, status = "2x EV Evolve 50s (Included in base package)", "ok"
+            elif guests <= 150:
+                req, status = "2x EV Evolve 50s + 1x 18\" Subwoofer (Upgrade recommended)", "warn"
+            elif guests <= 200:
+                req, status = "2x dBTech Ingenias + 1x 18\" Subwoofer (Upgrade required)", "warn"
+            elif guests <= 400:
+                req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
+            elif guests <= 800:
+                req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
+            else:
+                req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
+                
+        if status == "ok":
+            st.info(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n{req}")
+        elif status == "warn":
+            st.warning(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n{req}")
+        else:
+            st.error(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n{req}")
+
+    elif has_equipment and not has_services:
+        total_capacity_indoor = 0
+        total_capacity_outdoor = 0
+        for k, v in cart.items():
+            name = v.get("name", "").lower()
+            qty = v.get("qty", 1)
+            
+            if "evolve" in name or "column pa" in name:
+                total_capacity_indoor += 50 * qty
+                total_capacity_outdoor += 40 * qty
+            elif "ingenia" in name or "point source" in name:
+                total_capacity_indoor += 100 * qty
+                total_capacity_outdoor += 75 * qty
+            elif "subwoofer" in name or "sub" in name:
+                total_capacity_indoor += 50 * qty
+                total_capacity_outdoor += 40 * qty
+                
+        cap = total_capacity_indoor if is_indoor else total_capacity_outdoor
+        
+        if cap == 0:
+            st.error(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n🚨 You have no PA speakers in your cart to support your guests.")
+        elif cap >= guests:
+            st.success(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n✅ Your rented audio equipment ({cap} max) comfortably covers your event size.")
+        else:
+            st.warning(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n⚠️ Your rented audio equipment supports approximately {cap} guests. You may need additional PA support.")
     
     col1, col2 = st.columns([1, 4])
     if col1.button("← Back"):
@@ -170,20 +201,35 @@ elif st.session_state.checkout_step == 3:
     event_type = st.session_state.get("chk_event_type", "")
     show_addons = False
     
-    if event_type == "Quinceañera":
+    if has_services or not has_equipment:
+        if event_type == "Quinceañera":
+            show_addons = True
+            st.markdown("### 💃 Baile Sorpresa / Surprise Dance")
+            st.markdown("Would you like us to create a custom mix for your surprise dance? ($50/mix)")
+            st.session_state.chk_add_baile = st.checkbox("Yes, add Baile Sorpresa mix", value=st.session_state.get("chk_add_baile", False))
+            
+        elif event_type == "Wedding":
+            show_addons = True
+            st.markdown("### 👑 Vals Mix")
+            st.markdown("Would you like us to create a custom vals arrangement? ($50/mix)")
+            st.session_state.chk_add_vals = st.checkbox("Yes, add Vals mix", value=st.session_state.get("chk_add_vals", False))
+
+    if has_equipment:
         show_addons = True
-        st.markdown("### 💃 Baile Sorpresa / Surprise Dance")
-        st.markdown("Would you like us to create a custom mix for your surprise dance? ($50/mix)")
-        st.session_state.chk_add_baile = st.checkbox("Yes, add Baile Sorpresa mix", value=st.session_state.get("chk_add_baile", False))
+        st.markdown("### 🚚 Delivery & Setup")
+        st.markdown("Would you like us to deliver and set up your rental equipment? (Estimated flat rate ~$100)")
+        st.session_state.chk_add_delivery = st.checkbox("Yes, add Delivery & Setup", value=st.session_state.get("chk_add_delivery", False))
+
+        st.markdown("### 🎛️ Audio Engineer")
+        st.markdown("Do you need an audio engineer to run the rented equipment during your event?")
+        st.session_state.chk_add_foh = st.checkbox("Yes, add Front of House Engineer", value=st.session_state.get("chk_add_foh", False))
+
+        st.markdown("### 💡 Lighting Service")
+        st.markdown("Would you like to add a lighting package & operator to your rental?")
+        st.session_state.chk_add_lighting = st.checkbox("Yes, add Lighting Service", value=st.session_state.get("chk_add_lighting", False))
         
-    elif event_type == "Wedding":
-        show_addons = True
-        st.markdown("### 👑 Vals Mix")
-        st.markdown("Would you like us to create a custom vals arrangement? ($50/mix)")
-        st.session_state.chk_add_vals = st.checkbox("Yes, add Vals mix", value=st.session_state.get("chk_add_vals", False))
-        
-    else:
-        st.info("No specific recommendations for this event type. Proceed to the next step.")
+    if not show_addons:
+        st.info("No specific recommendations for this event type or rental. Proceed to the next step.")
         
     st.divider()
     col1, col2 = st.columns([1, 4])
@@ -246,6 +292,24 @@ elif st.session_state.checkout_step == 5:
             temp_cart[pkg.SVC_VALS] = {
                 "name": "Vals Custom Mix", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_VALS, "qty": 1, "rate_daily": 0 if has_event_items else 50, "rate_weekend": 0 if has_event_items else 50, "rate_hourly": 0, "is_service": True, "is_hourly": False
             }
+            
+    if st.session_state.get("chk_add_delivery"):
+        if "DJM-SVC-DELIVERY" not in temp_cart:
+            temp_cart["DJM-SVC-DELIVERY"] = {
+                "name": "Delivery & Setup", "brand": "DJM Audio", "category": "Services", "barcode": "DJM-SVC-DELIVERY", "qty": 1, "rate_daily": 100, "rate_weekend": 100, "rate_hourly": 0, "is_service": True, "is_hourly": False
+            }
+            
+    if st.session_state.get("chk_add_foh"):
+        if pkg.SVC_FOH not in temp_cart:
+            temp_cart[pkg.SVC_FOH] = {
+                "name": "FOH Engineer", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_FOH, "qty": 1, "rate_daily": 0, "rate_weekend": 0, "rate_hourly": 50, "is_service": True, "is_hourly": True
+            }
+            
+    if st.session_state.get("chk_add_lighting"):
+        if pkg.SVC_LIGHTING not in temp_cart:
+            temp_cart[pkg.SVC_LIGHTING] = {
+                "name": "Lighting Service (Package & Operator)", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_LIGHTING, "qty": 1, "rate_daily": 250, "rate_weekend": 250, "rate_hourly": 0, "is_service": True, "is_hourly": False
+            }
 
     equipment_items = {k: v for k, v in temp_cart.items() if not v.get("is_service") and not v.get("package_item")}
     service_items = {k: v for k, v in temp_cart.items() if v.get("is_service") or v.get("package_item")}
@@ -276,7 +340,7 @@ elif st.session_state.checkout_step == 5:
                 name_display = name_display.replace("(5hr)", f"({hours} hrs)")
                 
             eff_price = pkg.get_effective_price(k, temp_cart)
-            if v.get("included_free") or eff_price is not None:
+            if eff_price is not None:
                 st.markdown(f"- {v['qty']}x {name_display} (Included)")
                 continue
                 
