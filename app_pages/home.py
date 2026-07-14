@@ -248,7 +248,7 @@ st.divider()
 
 fc1, fc2, fc3 = st.columns([2, 3, 2])
 with fc2:
-    st.image("https://djmaudio.com/wp-content/uploads/2025/02/DJM-Logo-copy-300x300.png", use_container_width=True)
+    st.image("assets/logo.png", use_container_width=True)
 
 st.markdown("""
 <div style="text-align:center; padding: 1rem 0 3rem; color: rgba(255,255,255,0.9);">

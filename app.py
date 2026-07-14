@@ -11,7 +11,7 @@ st.set_page_config(
 )
 
 # ── Branding & Styles ────────────────────────────────────────
-st.logo("assets/logo.jpg", link="https://djmaudio.com")
+st.logo("assets/logo.png", link="https://djmaudio.com")
 
 st.markdown("""
 <style>
@@ -236,6 +236,88 @@ button[data-testid="stBaseButton-elementToolbar"] {
 span[data-testid="stBadge"] {
     border-radius: 20px !important;
     font-weight: 500 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NEON DATE PICKER / CALENDAR
+   ═══════════════════════════════════════════════════════════ */
+/* Date input wrapper — neon border glow */
+div[data-testid="stDateInput"] {
+    border: 2px solid rgba(99, 102, 241, 0.6) !important;
+    border-radius: 14px !important;
+    padding: 8px 12px !important;
+    background: rgba(18, 18, 30, 0.8) !important;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.25), 0 0 15px rgba(197, 78, 233, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+div[data-testid="stDateInput"]:hover,
+div[data-testid="stDateInput"]:focus-within {
+    border-color: rgba(197, 78, 233, 0.8) !important;
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.4), 0 0 25px rgba(197, 78, 233, 0.3) !important;
+}
+
+/* Date input label */
+div[data-testid="stDateInput"] label {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #e0e0e8 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Date input field text */
+div[data-testid="stDateInput"] input {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Calendar popup — neon styled */
+div[data-baseweb="calendar"] {
+    background: rgba(12, 12, 20, 0.98) !important;
+    border: 2px solid rgba(99, 102, 241, 0.5) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 40px rgba(99, 102, 241, 0.3), 0 4px 20px rgba(197, 78, 233, 0.2) !important;
+    padding: 8px !important;
+}
+
+/* Calendar header (month/year nav) */
+div[data-baseweb="calendar"] [data-baseweb="calendar-header"] {
+    background: transparent !important;
+}
+
+div[data-baseweb="calendar"] [data-baseweb="calendar-header"] button {
+    color: #c54ee9 !important;
+    font-weight: 700 !important;
+}
+
+/* Day cells */
+div[data-baseweb="calendar"] [role="gridcell"] button {
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+div[data-baseweb="calendar"] [role="gridcell"] button:hover {
+    background: rgba(99, 102, 241, 0.3) !important;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Selected day */
+div[data-baseweb="calendar"] [role="gridcell"] button[aria-selected="true"],
+div[data-baseweb="calendar"] [role="gridcell"] div[aria-selected="true"] {
+    background: linear-gradient(135deg, #c54ee9, #6366f1) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 20px rgba(197, 78, 233, 0.5), 0 0 20px rgba(99, 102, 241, 0.5) !important;
+}
+
+/* Logo — ensure no background */
+img[data-testid="stLogo"] {
+    background: transparent !important;
 }
 
 /* ═══════════════════════════════════════════════════════════
