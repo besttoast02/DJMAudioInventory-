@@ -6,3 +6,8 @@ pyotp
 qrcode[pil]
 fpdf2
 python-dateutil
+fastapi
+uvicorn
+httpx
+openai
+toml
