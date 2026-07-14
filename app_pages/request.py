@@ -41,29 +41,101 @@ st.markdown("""
 
 st.markdown("Review your gear, fill in your details, and submit for a quote.")
 
-# ── Order summary ────────────────────────────────────────────
-st.subheader("Order summary")
+# ── Editable Order Summary ───────────────────────────────────
+st.subheader("Your Estimate")
+st.caption("Edit quantities, remove items, or add more before submitting.")
+
+# Separate equipment from services
+equipment_items = {k: v for k, v in cart.items() if not v.get("is_service")}
+service_items = {k: v for k, v in cart.items() if v.get("is_service")}
 
 total_half = 0
 total_daily = 0
 total_weekend = 0
+items_to_remove = []
 
-for key, item in cart.items():
-    line_half = item["qty"] * item["rate_half_day"]
-    line_daily = item["qty"] * item["rate_daily"]
-    line_weekend = item["qty"] * item["rate_weekend"]
-    total_half += line_half
-    total_daily += line_daily
-    total_weekend += line_weekend
+# ── Equipment section ────────────────────────────────────
+if equipment_items:
+    st.markdown("##### 🔊 Equipment")
+    for key, item in equipment_items.items():
+        c1, c2, c3, c4, c5 = st.columns([4, 1.5, 1, 1, 0.5])
+        display_brand = "" if item['brand'].lower() == "generic" else f"{item['brand']} "
+        c1.markdown(f"**{display_brand}{item['name']}**")
 
-    c1, c2, c3, c4 = st.columns([5, 1, 1, 1])
-    c1.markdown(f"**{item['brand']}** {item['name']}")
-    c2.markdown(f"×{item['qty']}")
-    c3.caption(f"${line_daily:.0f}/day")
-    c4.caption(f"${line_weekend:.0f}/wknd")
+        new_qty = c2.number_input(
+            "Qty", min_value=0, max_value=item.get("max_qty", 10),
+            value=item["qty"], key=f"ck_qty_{key}", label_visibility="collapsed",
+        )
+        if new_qty != item["qty"]:
+            if new_qty == 0:
+                items_to_remove.append(key)
+            else:
+                st.session_state.cart[key]["qty"] = new_qty
+
+        line_daily = new_qty * item["rate_daily"]
+        line_weekend = new_qty * item["rate_weekend"]
+        line_half = new_qty * item["rate_half_day"]
+        total_half += line_half
+        total_daily += line_daily
+        total_weekend += line_weekend
+
+        c3.caption(f"${line_daily:.0f}/day")
+        c4.caption(f"${line_weekend:.0f}/wknd")
+        if c5.button("✕", key=f"ck_rm_{key}"):
+            items_to_remove.append(key)
+
+# ── Services section ─────────────────────────────────────
+if service_items:
+    st.markdown("##### 🎤 Services")
+    for key, item in service_items.items():
+        c1, c2, c3, c4, c5 = st.columns([4, 1.5, 1, 1, 0.5])
+
+        is_free = item.get("included_free", False)
+        name_suffix = " ✅ Included" if is_free else ""
+        c1.markdown(f"**{item['name']}**{name_suffix}")
+
+        new_qty = c2.number_input(
+            "Qty", min_value=0, max_value=item.get("max_qty", 5),
+            value=item["qty"], key=f"ck_qty_{key}", label_visibility="collapsed",
+        )
+        if new_qty != item["qty"]:
+            if new_qty == 0:
+                items_to_remove.append(key)
+            else:
+                st.session_state.cart[key]["qty"] = new_qty
+
+        line_daily = new_qty * item["rate_daily"]
+        line_weekend = new_qty * item["rate_weekend"]
+        line_half = new_qty * item["rate_half_day"]
+        total_half += line_half
+        total_daily += line_daily
+        total_weekend += line_weekend
+
+        price_label = "Included" if is_free else f"${line_daily:.0f}"
+        c3.caption(price_label)
+        c4.caption("" if is_free else f"${line_weekend:.0f}/wknd")
+        if c5.button("✕", key=f"ck_rm_{key}"):
+            items_to_remove.append(key)
+
+# Handle removals
+for key in items_to_remove:
+    if key in st.session_state.cart:
+        del st.session_state.cart[key]
+if items_to_remove:
+    st.rerun()
+
+# ── Add more links ───────────────────────────────────────
+al1, al2, al3 = st.columns(3)
+if al1.button("← Add more gear", key="add_gear_link", use_container_width=True):
+    st.switch_page("app_pages/browse.py")
+if al2.button("← Add services", key="add_svc_link", use_container_width=True):
+    st.switch_page("app_pages/browse.py")
+if al3.button("← Browse packages", key="add_pkg_link", use_container_width=True):
+    st.switch_page("app_pages/packages.py")
 
 if selected_addons:
     st.caption("**Requested add-ons:** " + ", ".join(selected_addons))
+
 
 # ── Discount code ────────────────────────────────────────────
 st.divider()

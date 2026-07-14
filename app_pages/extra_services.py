@@ -1,4 +1,8 @@
 import streamlit as st
+import package_config as pkg
+
+if "cart" not in st.session_state:
+    st.session_state.cart = {}
 
 st.title(":material/auto_awesome: Extra Services")
 st.markdown("Upgrade your event with premium add-on experiences.")
@@ -38,8 +42,23 @@ with col1:
         
         *Pricing varies — [contact us](app_pages/contact.py) to discuss your project.*
         """)
-        if st.button("Request quote", key="live_rec", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        r1, r2 = st.columns(2)
+        if r1.button("Add EP ($300)", key="live_rec_ep", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.SVC_POST_EP] = {
+                "name": "Post-Production (5-Song EP)", "brand": "Danger Beats",
+                "category": "Services", "barcode": pkg.SVC_POST_EP, "qty": 1,
+                "rate_half_day": 0, "rate_daily": 300, "rate_weekend": 300,
+                "max_qty": 1, "is_service": True,
+            }
+            st.rerun()
+        if r2.button("Add Album ($500)", key="live_rec_album", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.SVC_POST_ALBUM] = {
+                "name": "Post-Production (Full Album 1hr)", "brand": "Danger Beats",
+                "category": "Services", "barcode": pkg.SVC_POST_ALBUM, "qty": 1,
+                "rate_half_day": 0, "rate_daily": 500, "rate_weekend": 500,
+                "max_qty": 1, "is_service": True,
+            }
+            st.rerun()
 
 with col2:
     with st.container(border=True):
@@ -56,8 +75,14 @@ with col2:
         
         **Starting at $300** (pair)
         """)
-        if st.button("Request quote", key="sparks", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart — $300", key="sparks", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.ITEM_SPARKS] = {
+                "name": "Spark Machine (pair)", "brand": "DJM Audio",
+                "category": "Lighting", "barcode": pkg.ITEM_SPARKS, "qty": 1,
+                "rate_half_day": 150, "rate_daily": 300, "rate_weekend": 300,
+                "max_qty": 2, "is_service": False,
+            }
+            st.rerun()
 
 col3, col4 = st.columns(2)
 
@@ -76,8 +101,14 @@ with col3:
         
         **Starting at $600** (1 robot)
         """)
-        if st.button("Request quote", key="robots", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart — $600", key="robots", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.SVC_ROBOT] = {
+                "name": "LED Robot Show (45min–1hr)", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_ROBOT, "qty": 1,
+                "rate_half_day": 0, "rate_daily": 600, "rate_weekend": 600,
+                "max_qty": 3, "is_service": True,
+            }
+            st.rerun()
 
 with col4:
     with st.container(border=True):
@@ -94,12 +125,37 @@ with col4:
         
         **$350** (includes 2 uses)
         """)
-        if st.button("Request quote", key="clouds", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart — $350", key="clouds", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.ITEM_CLOUDS] = {
+                "name": "Dancing on the Clouds (2 uses)", "brand": "DJM Audio",
+                "category": "Lighting", "barcode": pkg.ITEM_CLOUDS, "qty": 1,
+                "rate_half_day": 175, "rate_daily": 350, "rate_weekend": 350,
+                "max_qty": 1, "is_service": False,
+            }
+            st.rerun()
 
 st.divider()
-st.info(
-    "All extra services can be bundled with DJ or equipment rental packages for a discounted rate. "
-    "Contact us for a custom quote!",
-    icon=":material/sell:"
-)
+
+# ── Cart summary ─────────────────────────────────────────────
+cart = st.session_state.get("cart", {})
+extras_in_cart = {k: v for k, v in cart.items() if v.get("is_service") or v.get("category") in ("Lighting",)}
+if extras_in_cart:
+    st.subheader(":material/shopping_cart: Extras in your cart")
+    total = 0
+    for key, item in extras_in_cart.items():
+        c1, c2 = st.columns([5, 1])
+        price = item["qty"] * item["rate_daily"]
+        total += price
+        c1.markdown(f"**{item['name']}** — ${price:.0f}")
+        if c2.button("✕", key=f"ex_rm_{key}"):
+            del st.session_state.cart[key]
+            st.rerun()
+    st.metric("Extras total", f"${total:,.0f}")
+    if st.button("Proceed to Checkout →", icon=":material/shopping_cart_checkout:", type="primary", use_container_width=True):
+        st.switch_page("app_pages/request.py")
+else:
+    st.info(
+        "All extra services can be bundled with DJ or equipment rental packages for a discounted rate. "
+        "Contact us for a custom quote!",
+        icon=":material/sell:"
+    )

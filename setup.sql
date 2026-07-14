@@ -125,3 +125,10 @@ CREATE POLICY "Allow all for service role" ON rental_assignments FOR ALL USING (
 CREATE POLICY "Allow all for service role" ON time_logs FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all for service role" ON contractor_payments FOR ALL USING (true) WITH CHECK (true);
 
+-- ============================================================
+-- Phase 3: Services & Packages as Inventory Items
+-- ============================================================
+-- Services use category = 'Services' and are tracked like items
+-- but without physical inventory constraints.
+-- Barcodes: DJM-SVC-XXXX for services, DJM-LGT-XXXX for effects items
+

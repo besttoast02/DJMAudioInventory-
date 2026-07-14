@@ -1,5 +1,6 @@
 import streamlit as st
 import db
+import package_config as pkg
 from datetime import datetime, date, timedelta
 
 st.title(":material/search: Rental catalog")
@@ -44,7 +45,7 @@ def get_display_category(item: dict) -> str:
     }
     return mapping.get(cat, "_hidden")
 
-DISPLAY_ORDER = ["Speakers", "Mic Kits", "Mixers", "Microphones", "Lighting / DMX", "Truss"]
+DISPLAY_ORDER = ["Speakers", "Mic Kits", "Mixers", "Microphones", "Lighting / DMX", "Truss", "Services"]
 POPULARITY = {
     "evolve 50": 1, "column pa": 1,
     "xdj-xz": 2, "sq-5": 3, "ddj": 4, "djm": 4,
@@ -307,6 +308,90 @@ if filt in ("All", "Mic Kits"):
                             "max_qty": 1,
                         }
                         st.rerun()
+
+# ── Services section ─────────────────────────────────────────
+if filt in ("All", "Services"):
+    services = db.get_services()
+    if services:
+        st.subheader("Services")
+        st.caption("DJ packages, audio engineering, lighting, special effects, and more.")
+
+        # Service display order
+        SVC_ORDER = {
+            "DJM-SVC-0001": 1, "DJM-SVC-0002": 2, "DJM-SVC-0003": 3,
+            "DJM-SVC-0004": 4, "DJM-SVC-0005": 5, "DJM-SVC-0008": 6,
+            "DJM-SVC-0009": 7, "DJM-LGT-0029": 8, "DJM-LGT-0030": 9,
+            "DJM-SVC-0010": 10, "DJM-SVC-0011": 11, "DJM-SVC-0006": 12,
+            "DJM-SVC-0007": 13, "DJM-SVC-0012": 14,
+        }
+        services_sorted = sorted(services, key=lambda s: SVC_ORDER.get(s["barcode"], 99))
+
+        svc_cols = st.columns(3)
+        for idx, svc in enumerate(services_sorted):
+            with svc_cols[idx % 3]:
+                with st.container(border=True):
+                    # Check package-aware pricing
+                    effective = pkg.get_effective_price(svc["barcode"], st.session_state.get("cart", {}))
+                    rate_daily = effective["rate_daily"] if effective else float(svc.get("rate_daily") or 0)
+                    rate_half = effective["rate_half_day"] if effective else float(svc.get("rate_half_day") or 0)
+                    rate_wknd = effective["rate_weekend"] if effective else float(svc.get("rate_weekend") or 0)
+
+                    # Badge
+                    is_service = svc["category"] == "Services"
+                    if is_service:
+                        st.badge("Service", color="violet")
+                    else:
+                        st.badge("Equipment", color="blue")
+
+                    display_brand = "" if svc['brand'].lower() == "generic" else f"**{svc['brand']}** "
+                    st.markdown(f"#### {display_brand}{svc['name']}")
+
+                    # Free indicator
+                    if effective and effective["rate_daily"] == 0:
+                        st.success("✅ Included with your DJ package", icon=":material/check_circle:")
+                    elif rate_daily > 0:
+                        st.markdown(
+                            f"<div style='margin: 0.3rem 0 0.8rem; color: rgba(224,224,232,0.8);'>"
+                            f"Starting at <strong>${rate_daily:.0f}</strong>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+
+                    if svc.get("notes"):
+                        st.caption(svc["notes"])
+
+                    # Add to cart
+                    svc_key = svc["barcode"]
+                    in_cart = st.session_state.cart.get(svc_key, {}).get("qty", 0)
+
+                    sc1, sc2 = st.columns([1, 2])
+                    svc_qty = sc1.number_input(
+                        "Qty", min_value=0, max_value=5, value=in_cart,
+                        key=f"svc_qty_{svc_key}", label_visibility="collapsed"
+                    )
+
+                    btn_label = "Update" if in_cart > 0 else "Add to Cart"
+                    if sc2.button(btn_label, key=f"svc_add_{svc_key}", use_container_width=True, type="primary"):
+                        if svc_qty > 0:
+                            st.session_state.cart[svc_key] = {
+                                "name": svc["name"],
+                                "brand": svc["brand"],
+                                "category": "Services" if is_service else svc["category"],
+                                "barcode": svc["barcode"],
+                                "qty": svc_qty,
+                                "rate_half_day": rate_half,
+                                "rate_daily": rate_daily,
+                                "rate_weekend": rate_wknd,
+                                "max_qty": 5,
+                                "is_service": True,
+                            }
+                            st.rerun()
+                        elif svc_key in st.session_state.cart:
+                            del st.session_state.cart[svc_key]
+                            st.rerun()
+
+                    if in_cart > 0:
+                        st.info(f"✅ {in_cart} in cart")
 
 # ── Add-ons section ──────────────────────────────────────────
 hidden = [i for i in items if i.get("_display_cat") == "_hidden"]

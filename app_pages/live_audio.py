@@ -1,4 +1,8 @@
 import streamlit as st
+import package_config as pkg
+
+if "cart" not in st.session_state:
+    st.session_state.cart = {}
 
 st.title(":material/graphic_eq: Live Audio Engineering")
 st.markdown("Professional sound engineering for concerts, live events, worship services, and corporate productions.")
@@ -24,8 +28,14 @@ with col1:
         
         **Starting at $500**
         """)
-        if st.button("Request quote", key="foh", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart", key="foh", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.SVC_FOH] = {
+                "name": "FOH Engineer (5hr)", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_FOH, "qty": 1,
+                "rate_half_day": 250, "rate_daily": 500, "rate_weekend": 800,
+                "max_qty": 1, "is_service": True,
+            }
+            st.rerun()
 
 with col2:
     with st.container(border=True):
@@ -43,8 +53,14 @@ with col2:
         
         **Starting at $500 / day**
         """)
-        if st.button("Request quote", key="lighting", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart", key="lighting", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.SVC_LIGHTING] = {
+                "name": "Lighting Package (per day)", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_LIGHTING, "qty": 1,
+                "rate_half_day": 250, "rate_daily": 500, "rate_weekend": 800,
+                "max_qty": 1, "is_service": True,
+            }
+            st.rerun()
 
 st.divider()
 
@@ -65,8 +81,14 @@ with col3:
         
         **Starting at $350 / event**
         """)
-        if st.button("Request quote", key="mon", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart", key="mon", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart[pkg.SVC_MONITOR] = {
+                "name": "Monitor Engineer", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_MONITOR, "qty": 1,
+                "rate_half_day": 175, "rate_daily": 350, "rate_weekend": 550,
+                "max_qty": 1, "is_service": True,
+            }
+            st.rerun()
 
 with col4:
     with st.container(border=True):
@@ -89,8 +111,21 @@ with col4:
         
         **$1,000 / day**
         """)
-        if st.button("Request quote", key="full_prod", type="primary", icon=":material/request_quote:", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+        if st.button("Add to Cart", key="full_prod", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            # Add both FOH + Monitor as the complete package
+            st.session_state.cart[pkg.SVC_FOH] = {
+                "name": "Complete Live Audio — FOH Engineer", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_FOH, "qty": 1,
+                "rate_half_day": 500, "rate_daily": 1000, "rate_weekend": 1000,
+                "max_qty": 1, "is_service": True, "package_item": True,
+            }
+            st.session_state.cart[pkg.SVC_MONITOR] = {
+                "name": "Complete Live Audio — Monitor Engineer", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_MONITOR, "qty": 1,
+                "rate_half_day": 0, "rate_daily": 0, "rate_weekend": 0,
+                "max_qty": 1, "is_service": True, "included_free": True,
+            }
+            st.rerun()
 
 st.divider()
 st.subheader("Equipment we bring")

@@ -25,6 +25,7 @@ CATEGORY_PREFIXES = {
     "DI / Signal": "DI",
     "Coaxial": "COX",
     "PA Systems": "PA",
+    "Services": "SVC",
 }
 
 # Categories that are add-on only (not publicly rentable)
@@ -75,6 +76,13 @@ def get_items_by_status(status: str) -> list[dict]:
 
 def get_available_items() -> list[dict]:
     return get_items_by_status("available")
+
+
+def get_services() -> list[dict]:
+    """Get all service items (category = 'Services')."""
+    sb = get_client()
+    res = sb.table("items").select("*").eq("category", "Services").eq("status", "available").order("barcode").execute()
+    return res.data
 
 
 def get_item_count() -> dict:
