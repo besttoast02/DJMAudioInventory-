@@ -11,3 +11,5 @@ uvicorn
 httpx
 openai
 toml
+beautifulsoup4
+rembg
