@@ -56,10 +56,10 @@ for i in items:
 
 rentable = [i for i in items if i["_display_cat"] not in ("_hidden",)]
 
-# Group by type
+# Group by type (use name only so items with slightly different brands still merge)
 grouped = {}
 for i in rentable:
-    key = f"{i['brand']}|{i['name']}"
+    key = i['name']
     if key not in grouped:
         grouped[key] = {
             "name": i["name"],
@@ -72,6 +72,9 @@ for i in rentable:
             "specs_markdown": i.get("specs_markdown", ""),
         }
     grouped[key]["qty"] += 1
+    # Prefer specs from whichever unit has them
+    if not grouped[key]["specs_markdown"] and i.get("specs_markdown"):
+        grouped[key]["specs_markdown"] = i["specs_markdown"]
 
 # ── Category filter ──────────────────────────────────────────
 active_cats = sorted(

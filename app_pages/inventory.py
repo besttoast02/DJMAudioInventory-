@@ -43,27 +43,57 @@ if search:
 
 st.caption(f"Showing {len(filtered)} of {len(items)} items")
 
-# ── TABLE VIEW (read-only) ───────────────────────────────────
+# ── TABLE VIEW (grouped by name) ─────────────────────────────
 if view == "Table":
     if filtered:
-        df = pd.DataFrame([{
-            "Barcode": i["barcode"],
-            "Name": i["name"],
-            "Brand": i["brand"],
-            "Category": i["category"],
-            "Case": i.get("storage_case") or "—",
-            "Status": i["status"],
-            "Purchased": f"${float(i.get('purchase_price') or 0):,.0f}",
-            "Value": f"${float(i.get('current_value') or 0):,.0f}",
-            "½ Day": f"${float(i.get('rate_half_day') or 0):,.0f}",
-            "Daily": f"${float(i.get('rate_daily') or 0):,.0f}",
-            "Weekend": f"${float(i.get('rate_weekend') or 0):,.0f}",
-            "Notes": i.get("notes") or "",
-        } for i in filtered])
+        # Group items by name
+        grouped_inv = {}
+        for i in filtered:
+            key = i["name"]
+            if key not in grouped_inv:
+                grouped_inv[key] = {
+                    "name": i["name"],
+                    "brand": i["brand"],
+                    "category": i["category"],
+                    "rate_half_day": float(i.get("rate_half_day") or 0),
+                    "rate_daily": float(i.get("rate_daily") or 0),
+                    "rate_weekend": float(i.get("rate_weekend") or 0),
+                    "units": [],
+                }
+            grouped_inv[key]["units"].append(i)
 
+        # Summary table
+        summary_rows = []
+        for name, info in sorted(grouped_inv.items()):
+            units = info["units"]
+            avail = sum(1 for u in units if u["status"] == "available")
+            total_val = sum(float(u.get("current_value") or 0) for u in units)
+            summary_rows.append({
+                "Name": name,
+                "Brand": info["brand"],
+                "Category": info["category"],
+                "Qty": len(units),
+                "Available": avail,
+                "Daily": f"${info['rate_daily']:.0f}",
+                "Value": f"${total_val:,.0f}",
+            })
+
+        df = pd.DataFrame(summary_rows)
         st.dataframe(df, width="stretch", hide_index=True)
 
-        # Summary row
+        # Expandable detail per item group
+        for name, info in sorted(grouped_inv.items()):
+            units = info["units"]
+            if len(units) > 1:
+                with st.expander(f"**{info['brand']}** {name} — {len(units)} units"):
+                    for u in units:
+                        status_color = {"available": "green", "in_use": "blue", "damaged": "orange", "lost": "red"}.get(u["status"], "gray")
+                        c1, c2, c3 = st.columns([3, 2, 2])
+                        c1.code(u["barcode"])
+                        c2.badge(u["status"], color=status_color)
+                        c3.caption(u.get("storage_case") or "—")
+
+        # Summary metrics
         total_purchase = sum(float(i.get("purchase_price") or 0) for i in filtered)
         total_value = sum(float(i.get("current_value") or 0) for i in filtered)
         sc1, sc2, sc3 = st.columns(3)
