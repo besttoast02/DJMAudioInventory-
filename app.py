@@ -65,26 +65,26 @@ div[data-testid="stVerticalBlock"] > div[data-testid="stContainer"] {
 }
 
 div[data-testid="stVerticalBlock"] > div[data-testid="stContainer"]:hover {
-    border-color: rgba(197,78,233,0.25) !important;
-    box-shadow: 0 4px 24px rgba(197,78,233,0.06);
+    border-color: rgba(217,70,239,0.3) !important;
+    box-shadow: 0 4px 24px rgba(59,130,246,0.15), 0 -2px 10px rgba(217,70,239,0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════
    BUTTONS
    ═══════════════════════════════════════════════════════════ */
 button[data-testid="stBaseButton-primary"] {
-    background: linear-gradient(135deg, #c54ee9 0%, #8b5cf6 100%) !important;
+    background: linear-gradient(135deg, #d946ef 0%, #3b82f6 100%) !important;
     border: none !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
     letter-spacing: 0.3px;
     transition: all 0.3s ease !important;
-    box-shadow: 0 2px 12px rgba(197,78,233,0.25);
+    box-shadow: 0 2px 15px rgba(217,70,239,0.4), 0 2px 15px rgba(59,130,246,0.4);
 }
 
 button[data-testid="stBaseButton-primary"]:hover {
-    box-shadow: 0 4px 20px rgba(197,78,233,0.4) !important;
-    transform: translateY(-1px);
+    box-shadow: 0 4px 25px rgba(217,70,239,0.6), 0 4px 25px rgba(59,130,246,0.6) !important;
+    transform: translateY(-2px);
 }
 
 button[data-testid="stBaseButton-secondary"] {
@@ -110,8 +110,8 @@ div[data-testid="stMetric"] {
 }
 
 div[data-testid="stMetric"]:hover {
-    border-color: rgba(197,78,233,0.3);
-    box-shadow: 0 0 20px rgba(197,78,233,0.08);
+    border-color: rgba(59,130,246,0.4);
+    box-shadow: 0 0 20px rgba(217,70,239,0.15), 0 0 20px rgba(59,130,246,0.15);
 }
 
 div[data-testid="stMetric"] label {
@@ -151,7 +151,10 @@ button[data-baseweb="tab"] {
    DIVIDERS
    ═══════════════════════════════════════════════════════════ */
 hr {
-    border-color: rgba(197,78,233,0.1) !important;
+    border: 0 !important;
+    height: 1px !important;
+    background: linear-gradient(90deg, transparent, rgba(217,70,239,0.8), rgba(59,130,246,0.8), transparent) !important;
+    box-shadow: 0 0 10px rgba(217,70,239,0.5), 0 0 10px rgba(59,130,246,0.5) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -38,7 +38,7 @@ st.markdown("""
 
 .eq-bar {
     width: clamp(10px, 2vw, 30px);
-    background: linear-gradient(to top, rgba(139,92,246,0.3), rgba(197,78,233,0.7));
+    background: linear-gradient(to top, rgba(217,70,239,0.5), rgba(59,130,246,0.9));
     border-radius: 4px 4px 0 0;
     animation: eq-bounce 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
     animation-delay: var(--d);
