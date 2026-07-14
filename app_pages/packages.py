@@ -112,7 +112,7 @@ with col1:
         - Wireless microphone
         - MC services
         
-        **$800**
+        **$750**
         """)
         if st.button("Customize & Add to Cart", key="pkg_essential", type="primary", use_container_width=True):
             st.session_state["active_pkg"] = "essential"

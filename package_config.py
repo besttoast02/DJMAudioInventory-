@@ -178,10 +178,10 @@ FREE_WITH_DJ = {SVC_VALS, SVC_BAILE}
 
 # ── Package definitions ──────────────────────────────────────
 PACKAGES = {
-    # ── Essential Package ($800) ─────────────────────────
+    # ── Essential Package ($750) ─────────────────────────
     "essential": {
         "name": "Essential Package",
-        "price": 800,
+        "price": 750,
         "base_items": [
             {"barcode": PKG_DJ_PARTY, "name": "DJ — Party Package (5hr)", "qty": 1},
         ],
