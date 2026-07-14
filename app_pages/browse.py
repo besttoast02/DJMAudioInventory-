@@ -69,6 +69,7 @@ for i in rentable:
             "rate_half_day": float(i.get("rate_half_day") or 0),
             "rate_daily": float(i.get("rate_daily") or 0),
             "rate_weekend": float(i.get("rate_weekend") or 0),
+            "specs_markdown": i.get("specs_markdown", ""),
         }
     grouped[key]["qty"] += 1
 
@@ -106,6 +107,11 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
                         f"daily ${info['rate_daily']:.0f} · "
                         f"weekend ${info['rate_weekend']:.0f}"
                     )
+                
+                if info.get("specs_markdown"):
+                    with st.popover("View Specs & Coverage", use_container_width=True):
+                        st.markdown(info["specs_markdown"])
+
 
                 # Cart controls
                 in_cart = st.session_state.cart.get(key, {}).get("qty", 0)

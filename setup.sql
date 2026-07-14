@@ -18,6 +18,7 @@ CREATE TABLE items (
   rate_daily NUMERIC(10,2) DEFAULT 0,
   rate_weekend NUMERIC(10,2) DEFAULT 0,
   notes TEXT,
+  specs_markdown TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

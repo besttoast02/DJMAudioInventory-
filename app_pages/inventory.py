@@ -11,7 +11,7 @@ if not items:
     st.stop()
 
 # ── View mode toggle ─────────────────────────────────────────
-view = st.pills("View", ["Table", "Edit mode", "Add new", "Bulk update"], default="Table")
+view = st.pills("View", ["Table", "Edit mode", "Add new", "Bulk update", "Data Sheets"], default="Table")
 
 # ── Filters (shared) ─────────────────────────────────────────
 categories = sorted(set(i["category"] for i in items))
@@ -253,3 +253,29 @@ elif view == "Bulk update":
                         st.warning("Enter at least one price > $0")
                 else:
                     st.warning("No matching items found")
+
+# ── DATA SHEETS ──────────────────────────────────────────────
+elif view == "Data Sheets":
+    st.markdown("Edit Data Sheets & Coverage specs for your speakers (Markdown supported).")
+    pa_systems = [i for i in items if i["category"] in ["PA Systems", "Lighting", "Mixers", "Microphones"]]
+    if not pa_systems:
+        st.info("No supported items found.")
+    else:
+        # Group by name to edit the spec once per model, not per barcode
+        grouped = {}
+        for i in pa_systems:
+            key = i["name"]
+            if key not in grouped:
+                grouped[key] = i
+        
+        for name, info in grouped.items():
+            with st.expander(f"**{info['brand']}** {name}"):
+                with st.form(f"form_specs_{info['id']}"):
+                    new_specs = st.text_area("Data Sheet (Markdown)", value=info.get("specs_markdown") or "", height=300)
+                    if st.form_submit_button("Save Specs", icon=":material/save:", type="primary"):
+                        # update all items with this name
+                        to_update = [x["id"] for x in items if x["name"] == name]
+                        for uid in to_update:
+                            db.update_item(uid, {"specs_markdown": new_specs})
+                        st.success(f"Specs saved for all {len(to_update)} unit(s)!", icon=":material/check_circle:")
+                        st.rerun()
