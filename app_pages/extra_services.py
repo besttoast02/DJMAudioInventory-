@@ -181,9 +181,12 @@ if extras_in_cart:
     total = 0
     for key, item in extras_in_cart.items():
         c1, c2 = st.columns([5, 1])
-        price = item["qty"] * item["rate_daily"]
+        eff_price = pkg.get_effective_price(key, cart)
+        rate = eff_price["rate_daily"] if eff_price is not None else item["rate_daily"]
+        price = item["qty"] * rate
         total += price
-        c1.markdown(f"**{item['name']}** — ${price:.0f}")
+        price_label = "Included ✅" if item.get("included_free") or eff_price is not None else f"${price:.0f}"
+        c1.markdown(f"**{item['name']}** — {price_label}")
         if c2.button("✕", key=f"ex_rm_{key}"):
             del st.session_state.cart[key]
             st.rerun()

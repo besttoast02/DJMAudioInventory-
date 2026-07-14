@@ -327,10 +327,13 @@ cart = st.session_state.get("cart", {})
 if cart:
     st.divider()
     st.subheader(":material/shopping_cart: Your Cart")
-    total = sum(item["qty"] * item["rate_daily"] for item in cart.values())
+    total = 0
     for key, item in cart.items():
         c1, c2, c3 = st.columns([5, 2, 1])
-        price_label = "Included ✅" if item.get("included_free") else f"${item['rate_daily'] * item['qty']:.0f}"
+        eff_price = pkg.get_effective_price(key, cart)
+        rate = eff_price["rate_daily"] if eff_price is not None else item["rate_daily"]
+        total += rate * item["qty"]
+        price_label = "Included ✅" if item.get("included_free") or eff_price is not None else f"${rate * item['qty']:.0f}"
         c1.markdown(f"**{item['name']}**")
         c2.markdown(price_label)
         if c3.button("✕", key=f"pkg_rm_{key}"):

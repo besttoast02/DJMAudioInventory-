@@ -96,12 +96,61 @@ elif st.session_state.checkout_step == 2:
         placeholder="123 Main St, Los Angeles, CA"
     )
     
-    st.markdown("### Event Size")
-    st.session_state.chk_guests = st.number_input(
-        "Expected guest count", 
-        min_value=10, max_value=5000, step=50,
-        value=st.session_state.get("chk_guests", st.session_state.get("pkg_guest_count", 150))
-    )
+    st.markdown("### Event Size & Placement")
+    
+    col_g, col_p = st.columns(2)
+    with col_g:
+        st.session_state.chk_guests = st.number_input(
+            "Expected guest count", 
+            min_value=10, max_value=5000, step=50,
+            value=st.session_state.get("chk_guests", st.session_state.get("pkg_guest_count", 150))
+        )
+    with col_p:
+        st.session_state.chk_placement = st.radio(
+            "Venue Placement",
+            options=["Indoor", "Outdoor"],
+            index=0 if st.session_state.get("chk_placement", "Indoor") == "Indoor" else 1,
+            horizontal=True
+        )
+
+    # Audio Capacity Evaluator
+    guests = st.session_state.chk_guests
+    is_indoor = (st.session_state.chk_placement == "Indoor")
+    
+    if is_indoor:
+        if guests <= 75:
+            req, status = "2x EV Evolve 50s (Included in base package)", "ok"
+        elif guests <= 100:
+            req, status = "2x EV Evolve 50s + 1x 18\" Subwoofer (Upgrade recommended)", "warn"
+        elif guests <= 250:
+            req, status = "2x dBTech Ingenias + 1x 18\" Subwoofer (Upgrade required)", "warn"
+        elif guests <= 400:
+            req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
+        elif guests <= 1000:
+            req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
+        else:
+            req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
+    else:
+        if guests <= 100:
+            req, status = "2x EV Evolve 50s (Included in base package)", "ok"
+        elif guests <= 150:
+            req, status = "2x EV Evolve 50s + 1x 18\" Subwoofer (Upgrade recommended)", "warn"
+        elif guests <= 200:
+            req, status = "2x dBTech Ingenias + 1x 18\" Subwoofer (Upgrade required)", "warn"
+        elif guests <= 400:
+            req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
+        elif guests <= 800:
+            req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
+        else:
+            req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
+            
+    st.markdown("##### 🔊 Audio Equipment Recommendation")
+    if status == "ok":
+        st.info(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\\n{req}")
+    elif status == "warn":
+        st.warning(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\\n{req}")
+    else:
+        st.error(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\\n{req}")
     
     col1, col2 = st.columns([1, 4])
     if col1.button("← Back"):
@@ -226,7 +275,8 @@ elif st.session_state.checkout_step == 5:
             if "(5hr)" in name_display:
                 name_display = name_display.replace("(5hr)", f"({hours} hrs)")
                 
-            if v.get("included_free"):
+            eff_price = pkg.get_effective_price(k, temp_cart)
+            if v.get("included_free") or eff_price is not None:
                 st.markdown(f"- {v['qty']}x {name_display} (Included)")
                 continue
                 
@@ -234,9 +284,13 @@ elif st.session_state.checkout_step == 5:
             
             # Flat-rate items (e.g. Packages, Spark Machines, Custom Mixes)
             if v.get("is_hourly") is False:
-                line = v["rate_daily"] * qty
+                rate = eff_price["rate_daily"] if eff_price is not None else v["rate_daily"]
+                line = rate * qty
                 total_services += line
-                st.markdown(f"- {qty}x {name_display} (Total: ${line:.0f})")
+                if rate == 0:
+                    st.markdown(f"- {qty}x {name_display} (Included)")
+                else:
+                    st.markdown(f"- {qty}x {name_display} (Total: ${line:.0f})")
                 continue
 
             # Base hourly rate fallback
