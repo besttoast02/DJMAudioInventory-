@@ -18,9 +18,10 @@ categories = sorted(set(i["category"] for i in items))
 cases = sorted(set(i["storage_case"] for i in items if i.get("storage_case")))
 statuses = ["All", "available", "in_use", "damaged", "lost"]
 
-fc1, fc2, fc3, fc4 = st.columns(4)
+fc1, fc2 = st.columns(2)
 filt_status = fc1.selectbox("Status", statuses, index=0)
 filt_cat = fc2.selectbox("Category", ["All"] + categories, index=0)
+fc3, fc4 = st.columns(2)
 filt_case = fc3.selectbox("Storage case", ["All"] + cases, index=0)
 search = fc4.text_input("Search", placeholder="Name, brand, barcode…")
 
@@ -161,12 +162,13 @@ elif view == "Add new":
         new_case = ac4.text_input("Storage case", placeholder="Blue Makita Bag 1")
 
         st.markdown("**Pricing**")
-        pc1, pc2, pc3, pc4, pc5 = st.columns(5)
+        pc1, pc2 = st.columns(2)
         new_purchase = pc1.number_input("Purchase $", min_value=0.0, step=1.0, format="%.2f")
         new_value = pc2.number_input("Current value $", min_value=0.0, step=1.0, format="%.2f")
-        new_half = pc3.number_input("½ Day rate $", min_value=0.0, step=1.0, format="%.2f")
-        new_daily = pc4.number_input("Daily rate $", min_value=0.0, step=1.0, format="%.2f")
-        new_weekend = pc5.number_input("Weekend rate $", min_value=0.0, step=1.0, format="%.2f")
+        pc3, pc4, pc5 = st.columns(3)
+        new_half = pc3.number_input("½ Day $", min_value=0.0, step=1.0, format="%.2f")
+        new_daily = pc4.number_input("Daily $", min_value=0.0, step=1.0, format="%.2f")
+        new_weekend = pc5.number_input("Wknd $", min_value=0.0, step=1.0, format="%.2f")
 
         ac5, ac6 = st.columns(2)
         new_qty = ac5.number_input("Quantity to add", min_value=1, max_value=50, value=1,
