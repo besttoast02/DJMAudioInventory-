@@ -59,10 +59,10 @@ def past_events_section():
     st.markdown("<br>", unsafe_allow_html=True)
     
     e1, e2, e3, e4 = st.columns(4)
-    e1.info("**December 2024**\n\nSW Cleanup Inc. Christmas Celebration\n\n*Alhambra, CA*")
-    e2.info("**August 2024**\n\nNational Night Out\n\n*Boyle Heights, CA*")
-    e3.info("**June 2024**\n\nJuneteenth Festival\n\n*El Segundo, CA*")
-    e4.info("**May 2023**\n\nSt John the Baptist Festival\n\n*Baldwin Park, CA*")
+    e1.info("**December 2025**\n\nSW Cleanup Inc. Christmas Celebration\n\n*Alhambra, CA*")
+    e2.info("**August 2025**\n\nNational Night Out - LAPD of Hollenbeck\n\n*Boyle Heights, CA*")
+    e3.info("**June 2024**\n\nJuneteenth Festival - Black In Mayberry\n\n*El Segundo, CA*")
+    e4.info("**May 2026**\n\nSt John the Baptist Festival\n\n*Baldwin Park, CA*")
 
 # ── Render Page ──────────────────────────────────────────────
 hero_section()
