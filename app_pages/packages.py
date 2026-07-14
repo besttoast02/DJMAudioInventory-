@@ -129,7 +129,6 @@ with col2:
         - Full PA system + subs
         - Moving head lights + dance floor wash
         - 2x wireless microphones
-        - Dancing on the clouds effect
         - MC services (bilingual)
         - Event timeline planning
         - Vals & baile sorpresa mixes included

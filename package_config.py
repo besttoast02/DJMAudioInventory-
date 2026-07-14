@@ -197,12 +197,11 @@ PACKAGES = {
         "price": 1500,
         "base_items": [
             {"barcode": PKG_DJ_WEDDING, "name": "DJ — Wedding Package (5hr)", "qty": 1},
-            {"barcode": ITEM_CLOUDS, "name": "Dancing on the Clouds (2 uses)", "qty": 1},
         ],
         "included_free": [SVC_VALS, SVC_BAILE, SVC_PLANNING],
         "questionnaire": [
             "event_type", "guest_count", "venue_type",
-            "add_sparks", "add_robot", "add_recording", "extra_hours",
+            "add_clouds", "add_sparks", "add_robot", "add_recording", "extra_hours",
         ],
     },
     # ── Ultimate Package ($2,500) ────────────────────────
