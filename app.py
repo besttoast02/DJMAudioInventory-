@@ -281,18 +281,40 @@ if not db.is_connected():
     st.stop()
 
 # ── Auth state ───────────────────────────────────────────────
+import hashlib
+from datetime import datetime, timezone
+
 if "is_admin" not in st.session_state:
     st.session_state.is_admin = False
     st.session_state.admin_login_time = None
 
-# Session timeout (2 hours)
-SESSION_TIMEOUT_SECONDS = 7200
+# Session timeout (8 hours)
+SESSION_TIMEOUT_SECONDS = 28800
+
+# ── Persistent admin token via query params ──────────────────
+# On login, we set ?admin_token=<hash> so refreshes keep the session alive.
+ADMIN_PASSWORD = db.get_secret("ADMIN_PASSWORD", "")
+ADMIN_TOKEN_SALT = "djmaudio_admin_2024"
+
+def _make_admin_token() -> str:
+    """Generate a simple admin session token."""
+    raw = f"{ADMIN_PASSWORD}:{ADMIN_TOKEN_SALT}"
+    return hashlib.sha256(raw.encode()).hexdigest()[:24]
+
+# Check if admin token exists in URL (restores session after refresh)
+query_admin_token = st.query_params.get("admin_token", "")
+if query_admin_token and query_admin_token == _make_admin_token():
+    if not st.session_state.is_admin:
+        st.session_state.is_admin = True
+        st.session_state.admin_login_time = datetime.now(timezone.utc)
+
+# Session timeout check
 if st.session_state.is_admin and st.session_state.get("admin_login_time"):
-    from datetime import datetime, timezone
     elapsed = (datetime.now(timezone.utc) - st.session_state.admin_login_time).total_seconds()
     if elapsed > SESSION_TIMEOUT_SECONDS:
         st.session_state.is_admin = False
         st.session_state.admin_login_time = None
+        st.query_params.pop("admin_token", None)
         st.toast("Session expired. Please log in again.", icon=":material/timer_off:")
 
 # ── Secret admin gate ────────────────────────────────────────
@@ -327,21 +349,21 @@ with st.sidebar:
             if st.button("Log in", icon=":material/login:", type="primary",
                          key="admin_login_btn"):
                 try:
-                    if pw == db.get_secret("ADMIN_PASSWORD"):
+                    if pw == ADMIN_PASSWORD:
                         admin_2fa_secret = db.get_secret("ADMIN_2FA_SECRET")
                         if admin_2fa_secret:
                             totp = pyotp.TOTP(admin_2fa_secret)
                             if totp.verify(totp_code):
                                 st.session_state.is_admin = True
-                                from datetime import datetime, timezone
                                 st.session_state.admin_login_time = datetime.now(timezone.utc)
+                                st.query_params["admin_token"] = _make_admin_token()
                                 st.rerun()
                             else:
                                 st.error("Invalid 2FA code")
                         else:
                             st.session_state.is_admin = True
-                            from datetime import datetime, timezone
                             st.session_state.admin_login_time = datetime.now(timezone.utc)
+                            st.query_params["admin_token"] = _make_admin_token()
                             st.rerun()
                     else:
                         st.error("Wrong password")
@@ -354,11 +376,16 @@ with st.sidebar:
         if st.button("Log out", icon=":material/logout:", key="admin_logout_btn"):
             st.session_state.is_admin = False
             st.session_state["gate_unlocked"] = False
+            st.query_params.pop("admin_token", None)
             st.rerun()
 
 # ── Navigation ───────────────────────────────────────────────
 public_pages = [
     st.Page("app_pages/home.py", title="Home", icon=":material/home:"),
+    st.Page("app_pages/dj_services.py", title="DJ Services", icon=":material/headphones:"),
+    st.Page("app_pages/live_audio.py", title="Live Audio", icon=":material/graphic_eq:"),
+    st.Page("app_pages/packages.py", title="Packages", icon=":material/celebration:"),
+    st.Page("app_pages/extra_services.py", title="Extras", icon=":material/auto_awesome:"),
     st.Page("app_pages/browse.py", title="Rentals", icon=":material/search:"),
     st.Page("app_pages/request.py", title="Checkout", icon=":material/shopping_cart_checkout:"),
     st.Page("app_pages/ai_assistant.py", title="AI Assistant", icon=":material/smart_toy:"),

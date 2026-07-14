@@ -139,17 +139,50 @@ with st.form("checkout_form", border=True):
     return_date = rc6.date_input("Return date", value=default_return)
 
     st.markdown("### Pickup / Delivery")
-    # ── Jurisdiction & entity (admin sees flags) ─────────
+    # ── Jurisdiction & entity ─────────────────────────────
     rc7, rc8 = st.columns(2)
     jurisdictions = list(db.JURISDICTION_TAX_RATES.keys())
     jurisdiction = rc7.selectbox("City / Jurisdiction", jurisdictions, index=0)
     entity = rc8.selectbox("Service type", ["DJM Audio (DJ / Rentals)", "Danger Beats (Studio)"])
     has_tent = st.checkbox("Event includes tent >= 450 sq ft")
 
-    # Show auto-flags
-    flags = db.get_jurisdiction_flags(jurisdiction, has_tent)
-    for flag in flags:
-        st.warning(flag)
+    # Jurisdiction flags are stored internally for admin use only — not shown to clients
+
+    # ── Delivery option ──────────────────────────────────
+    fulfillment = st.radio(
+        "How would you like to get your gear?",
+        ["Pickup (free)", "Delivery (+fee)"],
+        horizontal=True,
+    )
+    delivery_fee = 0.0
+    if fulfillment == "Delivery (+fee)":
+        delivery_address = st.text_input("Delivery address", placeholder="123 Main St, City, CA 91234")
+        DELIVERY_ZONES = {
+            "Within 10 miles (Baldwin Park area)": 50.0,
+            "10–25 miles (SGV / Pasadena / Pomona)": 85.0,
+            "25–40 miles (Downtown LA / OC / IE)": 125.0,
+            "40+ miles (custom quote)": 175.0,
+        }
+        zone = st.selectbox("Delivery zone", list(DELIVERY_ZONES.keys()))
+        delivery_fee = DELIVERY_ZONES[zone]
+        st.info(f"Delivery fee: **${delivery_fee:.0f}** (round trip)", icon=":material/local_shipping:")
+
+    # ── Pickup / Return time slots ───────────────────────
+    st.markdown("##### Preferred times")
+    t1, t2 = st.columns(2)
+    from datetime import time as dt_time
+    pickup_time = t1.time_input("Pickup time", value=dt_time(10, 0), key="pickup_time")
+    return_time = t2.time_input("Return time", value=dt_time(18, 0), key="return_time")
+    st.caption("*Times are tentative — we'll confirm exact availability after reviewing your request.*")
+
+    # ── Liability hold notice ────────────────────────────
+    total_retail = sum(item.get("purchase_price", 0) * item.get("qty", 1) for item in cart.values() if isinstance(item, dict))
+    if total_retail > 0:
+        st.markdown(
+            f"> :material/credit_card: **Equipment liability hold**: A credit card authorization "
+            f"of **${total_retail:,.0f}** (total retail value) will be placed at pickup and "
+            f"released upon safe return of all equipment."
+        )
 
     notes = st.text_area(
         "Additional notes (Optional)",
@@ -206,9 +239,26 @@ with st.form("checkout_form", border=True):
 
         full_notes += f"\n\n=== ESTIMATED PRICING ===\n"
         full_notes += f"½ day: ${final_half:.0f} | Daily: ${final_daily:.0f} | Weekend: ${final_weekend:.0f}"
+        if delivery_fee > 0:
+            full_notes += f"\nDelivery fee: ${delivery_fee:.0f}"
+            full_notes += f"\nTotal w/ delivery (daily): ${final_daily + delivery_fee:.0f}"
         if discount_pct > 0:
             full_notes += f"\nDiscount: {discount_row['code']} ({discount_pct}% off)"
             full_notes += f"\nOriginal daily: ${total_daily:.0f} → Discounted: ${final_daily:.0f}"
+
+        # Fulfillment details
+        full_notes += f"\n\n=== FULFILLMENT ===\n"
+        full_notes += f"Method: {fulfillment}\n"
+        if fulfillment == "Delivery (+fee)":
+            full_notes += f"Delivery address: {delivery_address}\n"
+            full_notes += f"Delivery zone: {zone}\n"
+        full_notes += f"Preferred pickup time: {pickup_time.strftime('%I:%M %p')}\n"
+        full_notes += f"Preferred return time: {return_time.strftime('%I:%M %p')}"
+
+        # Liability hold
+        if total_retail > 0:
+            full_notes += f"\n\n=== LIABILITY HOLD ===\n"
+            full_notes += f"Equipment retail value (hold amount): ${total_retail:,.0f}"
 
         if notes:
             full_notes += f"\n\n=== CLIENT NOTES ===\n{notes}"
@@ -222,7 +272,7 @@ with st.form("checkout_form", border=True):
             return_date=str(return_date),
             venue=venue,
             notes=full_notes,
-            estimated_cost=float(final_daily)
+            estimated_cost=float(final_daily + delivery_fee)
         )
 
         # Mark discount code as used

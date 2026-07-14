@@ -42,25 +42,27 @@ with tab_rental:
 
         cost = st.number_input("Total cost ($)", value=float(rental.get("final_cost") or rental.get("estimated_cost") or 0), key="rc_cost")
 
-        if st.form_submit_button("Generate Rental Agreement PDF", type="primary", icon=":material/picture_as_pdf:"):
-            data = {
-                "id": rental.get("id", "MANUAL"),
-                "client_name": client, "client_phone": phone,
-                "event_name": event, "venue": venue,
-                "event_date": evt_date, "return_date": ret_date,
-                "final_cost": cost, "estimated_cost": cost,
-            }
-            # Get items if linked to a real rental
-            items = db.get_rental_items(rental["id"]) if rental.get("id") else []
-            pdf_bytes = db.generate_invoice_pdf(data, items)  # Reuse invoice format with full terms
-            waiver_bytes = db.generate_waiver_pdf(data)
+        generate_rental = st.form_submit_button("Generate Rental Agreement PDF", type="primary", icon=":material/picture_as_pdf:")
 
-            st.download_button("📄 Download Rental Agreement", data=waiver_bytes,
-                             file_name=f"DJM_Rental_Agreement_{client[:15]}.pdf",
-                             mime="application/pdf", key="dl_rental")
-            st.download_button("📄 Download Invoice", data=pdf_bytes,
-                             file_name=f"DJM_Invoice_{client[:15]}.pdf",
-                             mime="application/pdf", key="dl_inv")
+    # Download buttons OUTSIDE the form
+    if generate_rental:
+        data = {
+            "id": rental.get("id", "MANUAL"),
+            "client_name": client, "client_phone": phone,
+            "event_name": event, "venue": venue,
+            "event_date": evt_date, "return_date": ret_date,
+            "final_cost": cost, "estimated_cost": cost,
+        }
+        items = db.get_rental_items(rental["id"]) if rental.get("id") else []
+        pdf_bytes = db.generate_invoice_pdf(data, items)
+        waiver_bytes = db.generate_waiver_pdf(data)
+
+        st.download_button("📄 Download Rental Agreement", data=waiver_bytes,
+                         file_name=f"DJM_Rental_Agreement_{client[:15]}.pdf",
+                         mime="application/pdf", key="dl_rental")
+        st.download_button("📄 Download Invoice", data=pdf_bytes,
+                         file_name=f"DJM_Invoice_{client[:15]}.pdf",
+                         mime="application/pdf", key="dl_inv")
 
 # ── DJ Services Agreement ────────────────────────────────────
 with tab_dj:
@@ -87,17 +89,19 @@ with tab_dj:
 
         licensing = st.radio("Music licensing responsibility", ["Venue is responsible", "Company (DJM Audio) is responsible"], key="dj_lic")
 
-        if st.form_submit_button("Generate DJ Services Agreement PDF", type="primary", icon=":material/picture_as_pdf:"):
-            data = {
-                "client_name": client_dj, "client_phone": phone_dj,
-                "event_name": event_dj, "venue": venue_dj,
-                "event_date": edate_dj, "return_date": rdate_dj,
-                "final_cost": cost_dj, "estimated_cost": cost_dj,
-            }
-            pdf_bytes = db.generate_dj_services_pdf(data)
-            st.download_button("📄 Download DJ Services Agreement", data=pdf_bytes,
-                             file_name=f"DJM_DJ_Agreement_{client_dj[:15]}.pdf",
-                             mime="application/pdf", key="dl_dj")
+        generate_dj = st.form_submit_button("Generate DJ Services Agreement PDF", type="primary", icon=":material/picture_as_pdf:")
+
+    if generate_dj:
+        data = {
+            "client_name": client_dj, "client_phone": phone_dj,
+            "event_name": event_dj, "venue": venue_dj,
+            "event_date": edate_dj, "return_date": rdate_dj,
+            "final_cost": cost_dj, "estimated_cost": cost_dj,
+        }
+        pdf_bytes = db.generate_dj_services_pdf(data)
+        st.download_button("📄 Download DJ Services Agreement", data=pdf_bytes,
+                         file_name=f"DJM_DJ_Agreement_{client_dj[:15]}.pdf",
+                         mime="application/pdf", key="dl_dj")
 
 # ── Studio Use Agreement ─────────────────────────────────────
 with tab_studio:
@@ -115,16 +119,18 @@ with tab_studio:
 
         cost_st = st.number_input("Session fee ($)", value=0.0, key="st_cost")
 
-        if st.form_submit_button("Generate Studio Agreement PDF", type="primary", icon=":material/picture_as_pdf:"):
-            data = {
-                "client_name": client_st, "client_phone": phone_st,
-                "event_name": session, "event_date": sdate,
-                "venue": "Danger Beats Studio", "final_cost": cost_st,
-            }
-            pdf_bytes = db.generate_studio_use_pdf(data)
-            st.download_button("📄 Download Studio Agreement", data=pdf_bytes,
-                             file_name=f"DangerBeats_Studio_{client_st[:15]}.pdf",
-                             mime="application/pdf", key="dl_studio")
+        generate_studio = st.form_submit_button("Generate Studio Agreement PDF", type="primary", icon=":material/picture_as_pdf:")
+
+    if generate_studio:
+        data = {
+            "client_name": client_st, "client_phone": phone_st,
+            "event_name": session, "event_date": sdate,
+            "venue": "Danger Beats Studio", "final_cost": cost_st,
+        }
+        pdf_bytes = db.generate_studio_use_pdf(data)
+        st.download_button("📄 Download Studio Agreement", data=pdf_bytes,
+                         file_name=f"DangerBeats_Studio_{client_st[:15]}.pdf",
+                         mime="application/pdf", key="dl_studio")
 
 # ── Independent Contractor Agreement ─────────────────────────
 with tab_contractor:
@@ -146,28 +152,30 @@ with tab_contractor:
 
         scope = st.text_area("Scope of work", placeholder="DJ second stage, run lighting board, assist with load-in/out...", key="cc_scope")
 
-        if st.form_submit_button("Generate Contractor Agreement PDF", type="primary", icon=":material/picture_as_pdf:"):
-            from fpdf import FPDF
-            from datetime import datetime
+        generate_contractor = st.form_submit_button("Generate Contractor Agreement PDF", type="primary", icon=":material/picture_as_pdf:")
 
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_auto_page_break(auto=True, margin=15)
+    if generate_contractor:
+        from fpdf import FPDF
+        from datetime import datetime
 
-            pdf.set_fill_color(102, 126, 234)
-            pdf.rect(0, 0, 210, 35, "F")
-            pdf.set_text_color(255, 255, 255)
-            pdf.set_font("Helvetica", "B", 18)
-            pdf.set_y(8)
-            pdf.cell(0, 10, "INDEPENDENT CONTRACTOR AGREEMENT", ln=True, align="C")
-            pdf.set_font("Helvetica", "", 9)
-            pdf.cell(0, 6, "DJM Audio Productions LLC", ln=True, align="C")
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
 
-            pdf.set_text_color(0, 0, 0)
-            pdf.set_y(45)
-            pdf.set_font("Helvetica", "", 10)
+        pdf.set_fill_color(102, 126, 234)
+        pdf.rect(0, 0, 210, 35, "F")
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font("Helvetica", "B", 18)
+        pdf.set_y(8)
+        pdf.cell(0, 10, "INDEPENDENT CONTRACTOR AGREEMENT", ln=True, align="C")
+        pdf.set_font("Helvetica", "", 9)
+        pdf.cell(0, 6, "DJM Audio Productions LLC", ln=True, align="C")
 
-            text = f"""INDEPENDENT CONTRACTOR AGREEMENT
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_y(45)
+        pdf.set_font("Helvetica", "", 10)
+
+        text = f"""INDEPENDENT CONTRACTOR AGREEMENT
 
 This Agreement is between DJM Audio Productions LLC ("Company") and {contractor_name} ("Contractor").
 
@@ -214,17 +222,17 @@ This Agreement is governed by the laws of the State of California.
 
 Generated: {datetime.now().strftime('%B %d, %Y')}"""
 
-            pdf.multi_cell(0, 5, text)
+        pdf.multi_cell(0, 5, text)
 
-            pdf.ln(10)
-            pdf.set_font("Helvetica", "B", 11)
-            pdf.cell(95, 8, f"Contractor: {contractor_name}")
-            pdf.cell(95, 8, f"Date: {datetime.now().strftime('%m/%d/%Y')}", ln=True)
-            pdf.ln(5)
-            pdf.cell(95, 8, "Contractor Signature: ____________________")
-            pdf.cell(95, 8, "DJM Audio Rep: ____________________", ln=True)
+        pdf.ln(10)
+        pdf.set_font("Helvetica", "B", 11)
+        pdf.cell(95, 8, f"Contractor: {contractor_name}")
+        pdf.cell(95, 8, f"Date: {datetime.now().strftime('%m/%d/%Y')}", ln=True)
+        pdf.ln(5)
+        pdf.cell(95, 8, "Contractor Signature: ____________________")
+        pdf.cell(95, 8, "DJM Audio Rep: ____________________", ln=True)
 
-            pdf_bytes = pdf.output()
-            st.download_button("📄 Download Contractor Agreement", data=pdf_bytes,
-                             file_name=f"DJM_Contractor_{contractor_name[:15]}.pdf",
-                             mime="application/pdf", key="dl_contractor")
+        pdf_bytes = pdf.output()
+        st.download_button("📄 Download Contractor Agreement", data=pdf_bytes,
+                         file_name=f"DJM_Contractor_{contractor_name[:15]}.pdf",
+                         mime="application/pdf", key="dl_contractor")
