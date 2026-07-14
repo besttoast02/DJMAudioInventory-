@@ -69,32 +69,28 @@ with col3:
             st.switch_page("app_pages/contact.py")
 
 with col4:
-    st.empty()  # Balanced layout
-
-st.divider()
-
-with st.container(border=True):
-    st.markdown("### 🏟️ Complete Live Audio Package")
-    st.badge("Best Value", color="green")
-    st.markdown("""
-    Complete audio production for large events — we bring everything.
-    
-    **Includes:**
-    - FOH engineer + dedicated monitor engineer
-    - Full PA system (mains + subs + monitors)
-    - Allen & Heath digital mixing console & stagebox
-    - All microphones, DI boxes, and cabling
-    - System tuning with measurement tools
-    - Load-in, setup, soundcheck, teardown
-    
-    **Optional add-on:**
-    - Multi-track recording + post-production of live performance / album
-    - Lighting package ($500/day)
-    
-    **$1,000 / day**
-    """)
-    if st.button("Request quote", key="full_prod", type="primary", icon=":material/request_quote:", use_container_width=True):
-        st.switch_page("app_pages/contact.py")
+    with st.container(border=True):
+        st.markdown("### 🏟️ Complete Live Audio Package")
+        st.badge("Best Value", color="green")
+        st.markdown("""
+        Complete audio production for large events — we bring everything.
+        
+        **Includes:**
+        - FOH engineer + dedicated monitor engineer
+        - Full PA system (mains + subs + monitors)
+        - Allen & Heath digital mixing console & stagebox
+        - All microphones, DI boxes, and cabling
+        - System tuning with measurement tools
+        - Load-in, setup, soundcheck, teardown
+        
+        **Optional add-on:**
+        - Multi-track recording + post-production of live performance / album
+        - Lighting package ($500/day)
+        
+        **$1,000 / day**
+        """)
+        if st.button("Request quote", key="full_prod", type="primary", icon=":material/request_quote:", use_container_width=True):
+            st.switch_page("app_pages/contact.py")
 
 st.divider()
 st.subheader("Equipment we bring")
