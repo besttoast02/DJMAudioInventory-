@@ -79,14 +79,53 @@ if user_text:
     )
     
     MODELS_TO_TRY = [
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "qwen/qwen3-next-80b-a3b-instruct:free",
-        "meta-llama/llama-3.2-3b-instruct:free",
-        "nousresearch/hermes-3-llama-3.1-405b:free"
+        "google/gemini-2.5-flash",
+        "google/gemini-2.5-flash-lite",
     ]
     
-    # Tools are removed because OpenRouter free tier models frequently disable tool-calling endpoints, 
-    # causing 404 errors. We inject inventory via system prompt instead!
+    def add_item_to_cart(barcode: str, qty: int = 1):
+        inventory = db.get_available_items()
+        item = next((i for i in inventory if i["barcode"] == barcode), None)
+        if not item:
+            return f"Item {barcode} not found in inventory."
+            
+        if "cart" not in st.session_state:
+            st.session_state.cart = {}
+            
+        if barcode in st.session_state.cart:
+            st.session_state.cart[barcode]["qty"] += qty
+        else:
+            st.session_state.cart[barcode] = {
+                "name": item["name"],
+                "brand": item.get("brand", ""),
+                "category": item.get("category", ""),
+                "barcode": barcode,
+                "qty": qty,
+                "rate_daily": item.get("rate_daily", 0),
+                "rate_weekend": item.get("rate_weekend", 0),
+                "rate_half_day": item.get("rate_half_day", 0),
+                "max_qty": item.get("quantity", 1),
+                "is_service": False,
+            }
+        return f"Successfully added {qty}x {item['name']} to cart."
+
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "add_item_to_cart",
+                "description": "Add an item to the user's rental cart. Use the barcode from the inventory.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "barcode": {"type": "string", "description": "The exact barcode of the item"},
+                        "qty": {"type": "integer", "description": "Quantity to add"}
+                    },
+                    "required": ["barcode", "qty"]
+                }
+            }
+        }
+    ]
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
@@ -101,40 +140,63 @@ if user_text:
                     # Fetch live inventory immediately
                     try:
                         inventory = db.get_available_items()
-                        inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
+                        inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0), "barcode": i['barcode']} for i in inventory])
                     except Exception as e:
                         inv_str = f"Database error: {e}"
                         
                     # Prepend system prompt to the messages sent to LLM (hidden from UI)
                     system_prompt = {
                         "role": "system",
-                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list."
+                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them."
                     }
                     temp_messages.insert(0, system_prompt)
                     
-                    # 1. Single LLM Call (No Tools needed!)
+                    # 1. LLM Call
                     response = client.chat.completions.create(
                         model=MODEL_NAME,
-                        messages=temp_messages
+                        messages=temp_messages,
+                        tools=tools
                     )
                     
-                    ai_reply = response.choices[0].message.content
+                    msg = response.choices[0].message
+                    ai_reply = msg.content
 
-                    # Show reply
-                    st.markdown(ai_reply)
-                    
-                    # Update real session state only on success
-                    # (We do NOT save the system_prompt into session_state to save tokens on future turns)
-                    st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-                    
-                    # Set TTS Text so the component reads it out loud
-                    st.session_state.tts_text = ai_reply
+                    if msg.tool_calls:
+                        temp_messages.append(msg.model_dump())
+                        for tc in msg.tool_calls:
+                            if tc.function.name == "add_item_to_cart":
+                                args = json.loads(tc.function.arguments)
+                                result = add_item_to_cart(args.get("barcode"), args.get("qty", 1))
+                                temp_messages.append({
+                                    "role": "tool",
+                                    "tool_call_id": tc.id,
+                                    "name": tc.function.name,
+                                    "content": result
+                                })
+                        
+                        response2 = client.chat.completions.create(
+                            model=MODEL_NAME,
+                            messages=temp_messages
+                        )
+                        ai_reply = response2.choices[0].message.content
+                        
+                        # Add tool calls to history
+                        st.session_state.messages.append(msg.model_dump())
+                        for m in temp_messages:
+                            if m.get("role") == "tool":
+                                st.session_state.messages.append(m)
+
+                    if ai_reply:
+                        st.markdown(ai_reply)
+                        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                        st.session_state.tts_text = ai_reply
+                        
                     success = True
-                    break # Break the model loop on success
+                    break
 
                 except Exception as e:
                     last_error = str(e)
-                    continue # Try the next model regardless of the error
+                    continue 
             
             if success:
                 st.rerun()

@@ -162,134 +162,96 @@ with col3:
             st.session_state["active_pkg"] = "ultimate"
             st.rerun()
 
-# ── Package Questionnaire Dialog ─────────────────────────────
-active = st.session_state.get("active_pkg")
-if active and active in pkg.PACKAGES:
+@st.dialog("🛒 Customize Package", width="large")
+def customize_package_dialog(active):
     config = pkg.PACKAGES[active]
-    st.divider()
-
-    st.markdown(
-        """
-        <style>
-        div[data-testid="stForm"] {
-            border: 2px solid #fff !important;
-            border-radius: 12px !important;
-            box-shadow: 0 0 10px #fff, 0 0 20px #d946ef, 0 0 30px #d946ef !important;
-            animation: pulse-border 2s infinite alternate;
-        }
-        @keyframes pulse-border {
-            from { box-shadow: 0 0 5px #fff, 0 0 10px #d946ef; }
-            to { box-shadow: 0 0 10px #fff, 0 0 20px #d946ef, 0 0 30px #d946ef; }
-        }
-        </style>
-        <div id="customize-section"></div>
-        <script>
-            setTimeout(function() {
-                const el = window.parent.document.getElementById('customize-section');
-                if (el) {
-                    el.scrollIntoView({behavior: 'smooth', block: 'start'});
-                }
-            }, 500);
-        </script>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.subheader(f"🛒 Customize: {config['name']}")
     st.markdown(f"Answer a few questions to build your personalized estimate for the **{config['name']}**.")
 
-    with st.form(f"questionnaire_{active}", border=True, clear_on_submit=False):
-        st.markdown("##### 📋 Event Details")
-        q1, q2 = st.columns(2)
-        event_type = q1.selectbox(
-            "Event type",
-            ["Wedding", "Quinceañera", "Birthday / Party", "Corporate", "Concert / Festival", "Other"],
-        )
-        guest_count = q2.number_input("Expected guest count", min_value=20, max_value=2000, value=150, step=25)
+    st.markdown("##### 📋 Event Details")
+    q1, q2 = st.columns(2)
+    event_type = q1.selectbox(
+        "Event type",
+        ["Wedding", "Quinceañera", "Birthday / Party", "Corporate", "Concert / Festival", "Other"],
+    )
+    guest_count = q2.number_input("Expected guest count", min_value=20, max_value=2000, value=150, step=25)
 
-        q3, q4 = st.columns(2)
-        venue_type = q3.selectbox("Venue type", ["Indoor", "Outdoor", "Both / Mixed"])
-        hours_total = q4.number_input("Total hours", min_value=5, max_value=15, value=5)
-        st.info("ℹ️ Packages include a minimum of 5 hours. For shorter events, services are billed hourly a-la-carte.")
+    q3, q4 = st.columns(2)
+    venue_type = q3.selectbox("Venue type", ["Indoor", "Outdoor", "Both / Mixed"])
+    hours_total = q4.number_input("Total hours", min_value=5, max_value=15, value=5)
+    st.info("ℹ️ Packages include a minimum of 5 hours. For shorter events, services are billed hourly a-la-carte.")
 
+    st.divider()
+    st.markdown("##### ✨ Add-Ons & Extras")
+    questions = config["questionnaire"]
+
+    extras = {}
+    ex1, ex2, ex3 = st.columns(3)
+
+    # Only show questions relevant to this package
+    with ex1:
+        if "add_sparks" in questions and pkg.ITEM_SPARKS not in [i["barcode"] for i in config["base_items"]]:
+            extras["add_sparks"] = st.checkbox("🔥 Spark Machines (+$300)", key=f"q_sparks_{active}")
+        if "add_clouds" in questions and pkg.ITEM_CLOUDS not in [i["barcode"] for i in config["base_items"]]:
+            extras["add_clouds"] = st.checkbox("☁️ Dancing on the Clouds (+$350)", key=f"q_clouds_{active}")
+        if "add_monitors" in questions:
+            extras["add_monitors"] = st.checkbox("🎧 Monitor Engineer (+$350)", key=f"q_monitors_{active}")
+
+    with ex2:
+        if "add_robot" in questions and pkg.SVC_ROBOT not in [i["barcode"] for i in config["base_items"]]:
+            extras["add_robot"] = st.checkbox("🤖 LED Robot Show (+$600)", key=f"q_robot_{active}")
+        if "add_lighting" in questions and pkg.SVC_LIGHTING not in [i["barcode"] for i in config["base_items"]]:
+            extras["add_lighting"] = st.checkbox("💡 Lighting Package (+$500/day)", key=f"q_lighting_{active}")
+
+    with ex3:
+        if "add_recording" in questions:
+            recording_type = st.radio(
+                "🎙️ Live Recording Post-Production",
+                ["None", "5-Song EP (+$300)", "Full Album (+$500)"],
+                key=f"q_recording_{active}",
+            )
+            if recording_type == "5-Song EP (+$300)":
+                extras["add_recording_ep"] = True
+            elif recording_type == "Full Album (+$500)":
+                extras["add_recording_album"] = True
+
+    # Mixes (free with DJ packages)
+    if "add_mixes" in questions:
         st.divider()
-        st.markdown("##### ✨ Add-Ons & Extras")
-        questions = config["questionnaire"]
+        st.markdown("##### 🎵 Custom Mixes")
+        mx1, mx2 = st.columns(2)
+        with mx1:
+            if config.get("included_free") and pkg.SVC_VALS in config["included_free"]:
+                st.success("✅ Vals mix — Included free")
+            else:
+                extras["add_vals"] = st.checkbox("👑 Vals Custom Mix (+$50)", key=f"q_vals_{active}")
+        with mx2:
+            if config.get("included_free") and pkg.SVC_BAILE in config["included_free"]:
+                st.success("✅ Baile sorpresa mix — Included free")
+            else:
+                extras["add_baile"] = st.checkbox("💃 Baile Sorpresa Mix (+$50)", key=f"q_baile_{active}")
 
-        extras = {}
-        ex1, ex2, ex3 = st.columns(3)
+    st.divider()
+    notes = st.text_area("Any special requests?", placeholder="Specific songs, timing, setup needs...", max_chars=500)
 
-        # Only show questions relevant to this package
-        with ex1:
-            if "add_sparks" in questions and pkg.ITEM_SPARKS not in [i["barcode"] for i in config["base_items"]]:
-                extras["add_sparks"] = st.checkbox("🔥 Spark Machines (+$300)", key=f"q_sparks_{active}")
-            if "add_clouds" in questions and pkg.ITEM_CLOUDS not in [i["barcode"] for i in config["base_items"]]:
-                extras["add_clouds"] = st.checkbox("☁️ Dancing on the Clouds (+$350)", key=f"q_clouds_{active}")
-            if "add_monitors" in questions:
-                extras["add_monitors"] = st.checkbox("🎧 Monitor Engineer (+$350)", key=f"q_monitors_{active}")
+    if st.button(f"Add {config['name']} to Cart →", type="primary", use_container_width=True, icon=":material/add_shopping_cart:"):
+        add_package_to_cart(active, extras)
+        st.toast("🛒 Added to cart!", icon="✅")
 
-        with ex2:
-            if "add_robot" in questions and pkg.SVC_ROBOT not in [i["barcode"] for i in config["base_items"]]:
-                extras["add_robot"] = st.checkbox("🤖 LED Robot Show (+$600)", key=f"q_robot_{active}")
-            if "add_lighting" in questions and pkg.SVC_LIGHTING not in [i["barcode"] for i in config["base_items"]]:
-                extras["add_lighting"] = st.checkbox("💡 Lighting Package (+$500/day)", key=f"q_lighting_{active}")
+        # Store event details in session for checkout
+        st.session_state["pkg_event_type"] = event_type
+        st.session_state["pkg_guest_count"] = guest_count
+        st.session_state["pkg_venue_type"] = venue_type
+        st.session_state["pkg_total_hours"] = hours_total
+        if notes:
+            st.session_state["pkg_notes"] = notes
 
-        with ex3:
-            if "add_recording" in questions:
-                recording_type = st.radio(
-                    "🎙️ Live Recording Post-Production",
-                    ["None", "5-Song EP (+$300)", "Full Album (+$500)"],
-                    key=f"q_recording_{active}",
-                )
-                if recording_type == "5-Song EP (+$300)":
-                    extras["add_recording_ep"] = True
-                elif recording_type == "Full Album (+$500)":
-                    extras["add_recording_album"] = True
-
-        # Mixes (free with DJ packages)
-        if "add_mixes" in questions:
-            st.divider()
-            st.markdown("##### 🎵 Custom Mixes")
-            mx1, mx2 = st.columns(2)
-            with mx1:
-                if config.get("included_free") and pkg.SVC_VALS in config["included_free"]:
-                    st.success("✅ Vals mix — Included free")
-                else:
-                    extras["add_vals"] = st.checkbox("👑 Vals Custom Mix (+$50)", key=f"q_vals_{active}")
-            with mx2:
-                if config.get("included_free") and pkg.SVC_BAILE in config["included_free"]:
-                    st.success("✅ Baile sorpresa mix — Included free")
-                else:
-                    extras["add_baile"] = st.checkbox("💃 Baile Sorpresa Mix (+$50)", key=f"q_baile_{active}")
-
-        st.divider()
-        notes = st.text_area("Any special requests?", placeholder="Specific songs, timing, setup needs...", max_chars=500)
-
-        submitted = st.form_submit_button(
-            f"Add {config['name']} to Cart →",
-            type="primary", use_container_width=True, icon=":material/add_shopping_cart:",
-        )
-
-        if submitted:
-            add_package_to_cart(active, extras)
-            st.toast("🛒 Added to cart!", icon="✅")
-
-            # Store event details in session for checkout
-            st.session_state["pkg_event_type"] = event_type
-            st.session_state["pkg_guest_count"] = guest_count
-            st.session_state["pkg_venue_type"] = venue_type
-            st.session_state["pkg_total_hours"] = hours_total
-            if notes:
-                st.session_state["pkg_notes"] = notes
-
-            del st.session_state["active_pkg"]
-            st.success(f"✅ {config['name']} added to cart with your selections!", icon=":material/check_circle:")
-            st.balloons()
-
-    # Cancel button outside form
-    if st.button("Cancel", key="cancel_pkg"):
         del st.session_state["active_pkg"]
         st.rerun()
+
+# ── Package Questionnaire Trigger ─────────────────────────────
+active = st.session_state.get("active_pkg")
+if active and active in pkg.PACKAGES:
+    customize_package_dialog(active)
 
 # ── Cultural Services ────────────────────────────────────────
 st.divider()

@@ -103,9 +103,9 @@ st.divider()
 st.subheader("Why choose DJM Audio Productions?")
 
 w1, w2, w3 = st.columns(3)
-w1.metric("Events completed", "500+")
-w2.metric("Years experience", "10+")
-w3.metric("5-star reviews", "200+")
+w1.metric("Events completed", "250+")
+w2.metric("Years experience", "9+")
+w3.metric("5-star reviews", "150+")
 
 st.markdown("""
 - ✅ Fully licensed and insured (LLC)

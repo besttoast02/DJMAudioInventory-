@@ -44,22 +44,22 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: clamp(2px, 0.5vw, 6px);
+    gap: clamp(1px, 0.3vw, 4px);
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
     padding-bottom: 5vh;
 }
 .eq-bar {
-    width: clamp(10px, 2vw, 30px);
-    background: linear-gradient(to top, rgba(217,70,239,0.3), rgba(59,130,246,0.5));
+    width: clamp(8px, 1.5vw, 20px);
+    background: linear-gradient(to top, rgba(217,70,239,0.1), rgba(59,130,246,0.15));
     border-radius: 4px 4px 0 0;
-    animation: eq-bounce 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    animation: eq-bounce 1s infinite alternate ease-in-out;
     animation-delay: var(--d);
     height: var(--h);
 }
 @keyframes eq-bounce {
-    0% { height: 10%; }
+    0% { height: 5%; }
     100% { height: var(--h); }
 }
 
@@ -67,6 +67,11 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
 [data-testid="stMainBlockContainer"] {
     position: relative;
     z-index: 2;
+}
+
+/* Fix logo cropping */
+img {
+    object-fit: contain !important;
 }
 </style>
 
@@ -81,6 +86,11 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
     <div class="eq-bar" style="--d: 0.79s; --h: 58%"></div>
     <div class="eq-bar" style="--d: 1.36s; --h: 81%"></div>
     <div class="eq-bar" style="--d: 0.38s; --h: 34%"></div>
+    <div class="eq-bar" style="--d: 1.12s; --h: 65%"></div>
+    <div class="eq-bar" style="--d: 0.55s; --h: 90%"></div>
+    <div class="eq-bar" style="--d: 1.82s; --h: 20%"></div>
+    <div class="eq-bar" style="--d: 0.64s; --h: 55%"></div>
+    <div class="eq-bar" style="--d: 1.25s; --h: 70%"></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -524,12 +534,21 @@ with st.sidebar:
         cart_total_items = sum(item.get("qty", 1) for item in cart.values())
         st.caption(f"{cart_total_items} item(s) added")
         
-        for key, item in cart.items():
+        for key, item in list(cart.items()):
             qty = item.get("qty", 1)
             brand = f"{item['brand']} " if item.get('brand', '').lower() != 'generic' else ""
-            st.markdown(f"**{qty}x** {brand}{item['name']}")
+            c_name, c_del = st.columns([0.8, 0.2])
+            c_name.markdown(f"**{qty}x** {brand}{item['name']}")
+            if c_del.button("✖", key=f"rm_cart_{key}", help="Remove"):
+                del st.session_state.cart[key]
+                st.rerun()
             
-        if st.button("Proceed to Checkout →", type="primary", use_container_width=True, key="sidebar_checkout_btn"):
+        st.write("")
+        b1, b2 = st.columns(2)
+        if b1.button("🗑️ Empty", use_container_width=True, key="empty_cart_btn"):
+            st.session_state.cart = {}
+            st.rerun()
+        if b2.button("Checkout →", type="primary", use_container_width=True, key="sidebar_checkout_btn"):
             st.switch_page("app_pages/request.py")
     else:
         st.subheader(":material/shopping_cart: Cart")
