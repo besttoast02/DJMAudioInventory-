@@ -211,8 +211,8 @@ e1, e2, e3, e4 = st.columns(4)
 
 with e1:
     with st.container(border=True):
-        st.markdown("**SW Cleanup Inc.**")
-        st.caption("Alhambra, CA")
+        st.markdown("**St. Louis of France Festival**")
+        st.caption("La Puente, CA")
 
 with e2:
     with st.container(border=True):
