@@ -131,6 +131,7 @@ with col2:
         - 2x wireless microphones
         - MC services (bilingual)
         - Event timeline planning
+        - Dancing on the clouds
         - Vals & baile sorpresa mixes included
         
         **$1,500**
