@@ -81,20 +81,8 @@ async def process_with_llm(user_id: str, user_text: str):
     # We use a fast, free model capable of tool calling
     MODEL_NAME = "meta-llama/llama-3.3-70b-instruct:free"
     
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "get_inventory",
-                "description": "Get the live DJMAudio inventory of rental equipment to suggest to the user.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                }
-            }
-        }
-    ]
+    # We inject the inventory as a system prompt rather than using OpenRouter tools, 
+    # as many free tier models throw 404s when attempting to use tool calling endpoints.
 
     # We loop through a list of models to gracefully handle rate limits on the free tier
     MODELS_TO_TRY = [
@@ -111,42 +99,26 @@ async def process_with_llm(user_id: str, user_text: str):
         # Use a temporary list for this model's attempt
         temp_messages = list(messages)
         try:
+            # Fetch live inventory immediately
+            try:
+                inventory = db.get_available_items()
+                inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
+            except Exception as e:
+                inv_str = f"Database error: {e}"
+                
+            # Prepend system prompt to the messages sent to LLM
+            system_prompt = {
+                "role": "system",
+                "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list."
+            }
+            temp_messages.insert(0, system_prompt)
+            
             response = await client.chat.completions.create(
                 model=MODEL_NAME,
-                messages=temp_messages,
-                tools=tools
+                messages=temp_messages
             )
             
-            response_message = response.choices[0].message
-            
-            # Check if model wants to call a tool
-            if response_message.tool_calls:
-                temp_messages.append(response_message.model_dump())
-                for tool_call in response_message.tool_calls:
-                    if tool_call.function.name == "get_inventory":
-                        # Call the actual DB
-                        try:
-                            inventory = db.get_available_items()
-                            # Summarize to save tokens
-                            inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
-                        except Exception as e:
-                            inv_str = f"Error fetching inventory: {str(e)}"
-                        
-                        temp_messages.append({
-                            "tool_call_id": tool_call.id,
-                            "role": "tool",
-                            "name": "get_inventory",
-                            "content": inv_str
-                        })
-                
-                # Get final response after tool call
-                second_response = await client.chat.completions.create(
-                    model=MODEL_NAME,
-                    messages=temp_messages
-                )
-                ai_reply = second_response.choices[0].message.content
-            else:
-                ai_reply = response_message.content
+            ai_reply = response.choices[0].message.content
             
             # Save AI reply
             conn = sqlite3.connect('bot_memory.db')

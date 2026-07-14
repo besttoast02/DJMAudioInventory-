@@ -85,20 +85,8 @@ if user_text:
         "nousresearch/hermes-3-llama-3.1-405b:free"
     ]
     
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "get_inventory",
-                "description": "Get the live DJMAudio inventory of rental equipment to suggest to the user.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                }
-            }
-        }
-    ]
+    # Tools are removed because OpenRouter free tier models frequently disable tool-calling endpoints, 
+    # causing 404 errors. We inject inventory via system prompt instead!
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
@@ -110,49 +98,33 @@ if user_text:
                 temp_messages = list(st.session_state.messages)
                 
                 try:
-                    # 1. Initial LLM Call
+                    # Fetch live inventory immediately
+                    try:
+                        inventory = db.get_available_items()
+                        inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
+                    except Exception as e:
+                        inv_str = f"Database error: {e}"
+                        
+                    # Prepend system prompt to the messages sent to LLM (hidden from UI)
+                    system_prompt = {
+                        "role": "system",
+                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list."
+                    }
+                    temp_messages.insert(0, system_prompt)
+                    
+                    # 1. Single LLM Call (No Tools needed!)
                     response = client.chat.completions.create(
                         model=MODEL_NAME,
-                        messages=temp_messages,
-                        tools=tools
+                        messages=temp_messages
                     )
                     
-                    response_message = response.choices[0].message
-                    
-                    # Check for tool calls
-                    if response_message.tool_calls:
-                        # Append the assistant's tool call request to history as a dict
-                        temp_messages.append(response_message.model_dump())
-                        
-                        for tool_call in response_message.tool_calls:
-                            if tool_call.function.name == "get_inventory":
-                                try:
-                                    inventory = db.get_available_items()
-                                    inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
-                                except Exception as e:
-                                    inv_str = f"Error fetching inventory: {str(e)}"
-                                
-                                temp_messages.append({
-                                    "tool_call_id": tool_call.id,
-                                    "role": "tool",
-                                    "name": "get_inventory",
-                                    "content": inv_str
-                                })
-                        
-                        # 2. Second LLM Call with tool results
-                        second_response = client.chat.completions.create(
-                            model=MODEL_NAME,
-                            messages=temp_messages
-                        )
-                        ai_reply = second_response.choices[0].message.content
-                    else:
-                        ai_reply = response_message.content
+                    ai_reply = response.choices[0].message.content
 
                     # Show reply
                     st.markdown(ai_reply)
                     
                     # Update real session state only on success
-                    st.session_state.messages = temp_messages
+                    # (We do NOT save the system_prompt into session_state to save tokens on future turns)
                     st.session_state.messages.append({"role": "assistant", "content": ai_reply})
                     
                     # Set TTS Text so the component reads it out loud
