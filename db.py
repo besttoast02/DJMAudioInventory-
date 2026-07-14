@@ -586,3 +586,260 @@ def notify(subject: str, body: str):
     send_sms_notification(sms_text)
 
 
+# ── Maintenance Log ──────────────────────────────────────────
+
+def log_maintenance(item_id: str, action: str, notes: str = "", cost: float = 0):
+    sb = get_client()
+    sb.table("maintenance_log").insert({
+        "item_id": item_id,
+        "action": action,
+        "notes": notes,
+        "cost": cost,
+    }).execute()
+
+
+def get_maintenance_for_item(item_id: str) -> list:
+    sb = get_client()
+    res = sb.table("maintenance_log").select("*").eq("item_id", item_id).order("created_at", desc=True).execute()
+    return res.data
+
+
+def get_all_maintenance() -> list:
+    sb = get_client()
+    res = sb.table("maintenance_log").select("*, items(name, barcode, brand)").order("created_at", desc=True).limit(50).execute()
+    return res.data
+
+
+# ── Feedback ─────────────────────────────────────────────────
+
+def submit_feedback(rental_id: str, rating: int, comment: str = ""):
+    sb = get_client()
+    sb.table("feedback").insert({
+        "rental_id": rental_id,
+        "rating": rating,
+        "comment": comment,
+    }).execute()
+
+
+def get_feedback_for_rental(rental_id: str) -> list:
+    sb = get_client()
+    res = sb.table("feedback").select("*").eq("rental_id", rental_id).execute()
+    return res.data
+
+
+def get_all_feedback() -> list:
+    sb = get_client()
+    res = sb.table("feedback").select("*, rentals(event_name, client_name)").order("created_at", desc=True).execute()
+    return res.data
+
+
+# ── Waivers ──────────────────────────────────────────────────
+
+def save_waiver(rental_id: str, client_name: str, signature_data: str, waiver_text: str):
+    sb = get_client()
+    sb.table("waivers").insert({
+        "rental_id": rental_id,
+        "client_name": client_name,
+        "signature_data": signature_data,
+        "waiver_text": waiver_text,
+    }).execute()
+
+
+def get_waiver_for_rental(rental_id: str) -> dict | None:
+    sb = get_client()
+    res = sb.table("waivers").select("*").eq("rental_id", rental_id).execute()
+    return res.data[0] if res.data else None
+
+
+# ── Check-in / Check-out Scanning ────────────────────────────
+
+def checkin_item(item_id: str, rental_id: str = None):
+    """Mark item as returned/available."""
+    sb = get_client()
+    sb.table("items").update({"status": "available"}).eq("id", item_id).execute()
+    log_activity("Gear checked in", f"Item returned to inventory", rental_id)
+
+
+def checkout_item(item_id: str, rental_id: str = None):
+    """Mark item as deployed/in_use."""
+    sb = get_client()
+    sb.table("items").update({"status": "in_use"}).eq("id", item_id).execute()
+    log_activity("Gear checked out", f"Item deployed for event", rental_id)
+
+
+def get_item_by_barcode(barcode: str) -> dict | None:
+    sb = get_client()
+    res = sb.table("items").select("*").eq("barcode", barcode).execute()
+    return res.data[0] if res.data else None
+
+
+# ── Invoice / PDF Generation ─────────────────────────────────
+
+def generate_invoice_pdf(rental: dict, items: list) -> bytes:
+    """Generate a professional PDF invoice and return as bytes."""
+    from fpdf import FPDF
+    from datetime import datetime
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Header
+    pdf.set_fill_color(102, 126, 234)
+    pdf.rect(0, 0, 210, 40, "F")
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 24)
+    pdf.set_y(10)
+    pdf.cell(0, 10, "DJM AUDIO", ln=True, align="L")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, "Professional Audio & Lighting Rentals | Los Angeles, CA", ln=True)
+
+    # Invoice info
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(50)
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, "INVOICE", ln=True)
+
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(95, 6, f"Date: {datetime.now().strftime('%B %d, %Y')}")
+    pdf.cell(95, 6, f"Invoice #: INV-{rental.get('id', 'N/A')[:8].upper()}", ln=True)
+
+    pdf.ln(5)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(0, 6, "Bill To:", ln=True)
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 5, f"{rental.get('client_name', 'N/A')}", ln=True)
+    pdf.cell(0, 5, f"Phone: {rental.get('client_phone', 'N/A')}", ln=True)
+
+    pdf.ln(5)
+    pdf.cell(95, 5, f"Event: {rental.get('event_name', 'N/A')}")
+    pdf.cell(95, 5, f"Venue: {rental.get('venue', 'TBD')}", ln=True)
+    pdf.cell(95, 5, f"Event Date: {rental.get('event_date', 'N/A')}")
+    pdf.cell(95, 5, f"Return Date: {rental.get('return_date', 'N/A')}", ln=True)
+
+    # Items table
+    pdf.ln(10)
+    pdf.set_fill_color(240, 240, 240)
+    pdf.set_font("Helvetica", "B", 10)
+    pdf.cell(90, 8, "Item", border=1, fill=True)
+    pdf.cell(30, 8, "Qty", border=1, fill=True, align="C")
+    pdf.cell(35, 8, "Rate", border=1, fill=True, align="C")
+    pdf.cell(35, 8, "Subtotal", border=1, fill=True, align="C")
+    pdf.ln()
+
+    pdf.set_font("Helvetica", "", 10)
+    total = 0
+    for item in items:
+        i = item.get("items", {})
+        if not i:
+            continue
+        rate = float(i.get("rate_daily") or 0)
+        total += rate
+        pdf.cell(90, 7, f"{i.get('brand', '')} {i.get('name', '')}"[:45], border=1)
+        pdf.cell(30, 7, "1", border=1, align="C")
+        pdf.cell(35, 7, f"${rate:.2f}", border=1, align="C")
+        pdf.cell(35, 7, f"${rate:.2f}", border=1, align="C")
+        pdf.ln()
+
+    # Total
+    final_cost = float(rental.get("final_cost") or rental.get("estimated_cost") or total)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(155, 8, "TOTAL", border=1, align="R")
+    pdf.cell(35, 8, f"${final_cost:.2f}", border=1, align="C")
+    pdf.ln()
+
+    # Footer
+    pdf.ln(15)
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.multi_cell(0, 5,
+        "Thank you for choosing DJM Audio! Payment is due upon delivery. "
+        "All equipment must be returned in the same condition. "
+        "Late returns will be charged at the daily rate. "
+        "Contact: djmaudiopro@gmail.com"
+    )
+
+    return pdf.output()
+
+
+def generate_waiver_pdf(rental: dict, signature_data: str = "") -> bytes:
+    """Generate a liability waiver PDF."""
+    from fpdf import FPDF
+    from datetime import datetime
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Header
+    pdf.set_fill_color(102, 126, 234)
+    pdf.rect(0, 0, 210, 35, "F")
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font("Helvetica", "B", 20)
+    pdf.set_y(8)
+    pdf.cell(0, 10, "DJM AUDIO — LIABILITY WAIVER", ln=True, align="C")
+    pdf.set_font("Helvetica", "", 9)
+    pdf.cell(0, 6, "Equipment Rental Agreement & Liability Release", ln=True, align="C")
+
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_y(45)
+    pdf.set_font("Helvetica", "", 10)
+
+    client = rental.get("client_name", "________________")
+    event = rental.get("event_name", "________________")
+    evt_date = rental.get("event_date", "____")
+    ret_date = rental.get("return_date", "____")
+
+    waiver_text = f"""EQUIPMENT RENTAL AGREEMENT
+
+This Equipment Rental Agreement ("Agreement") is entered into between DJM Audio ("Company") and {client} ("Renter") on {datetime.now().strftime('%B %d, %Y')}.
+
+EVENT DETAILS:
+Event: {event}
+Event Date: {evt_date}
+Return Date: {ret_date}
+Venue: {rental.get('venue', 'TBD')}
+
+TERMS AND CONDITIONS:
+
+1. RENTAL PERIOD: Equipment must be returned by the Return Date specified above. Late returns will be charged at the applicable daily rate.
+
+2. CARE OF EQUIPMENT: Renter agrees to exercise reasonable care in the use, handling, and storage of all rented equipment. Equipment must be returned in the same condition as received.
+
+3. DAMAGE & LOSS: Renter is fully responsible for any damage, loss, or theft of equipment from the time of pickup/delivery until return. Renter agrees to pay the full replacement cost for any lost or irreparably damaged equipment.
+
+4. LIABILITY RELEASE: Renter assumes all risk associated with the use of rented equipment. DJM Audio shall not be liable for any injury, damage, or loss arising from the use of rented equipment.
+
+5. INDEMNIFICATION: Renter agrees to indemnify and hold harmless DJM Audio from any claims, damages, or expenses arising from Renter's use of the equipment.
+
+6. CANCELLATION: Cancellations made less than 48 hours before the event date may be subject to a cancellation fee of up to 50% of the rental cost.
+
+7. PAYMENT: Full payment is due upon delivery/pickup of equipment unless otherwise agreed in writing.
+
+By signing below, Renter acknowledges that they have read, understood, and agree to all terms and conditions outlined in this Agreement."""
+
+    pdf.multi_cell(0, 5, waiver_text)
+
+    pdf.ln(10)
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(95, 8, f"Renter: {client}")
+    pdf.cell(95, 8, f"Date: {datetime.now().strftime('%m/%d/%Y')}", ln=True)
+    pdf.ln(5)
+    pdf.cell(95, 8, "Signature: ________________________")
+    pdf.cell(95, 8, "DJM Audio Rep: ________________________", ln=True)
+
+    return pdf.output()
+
+
+def send_feedback_request_email(rental: dict):
+    """Send post-event feedback request to client."""
+    client_name = rental.get("client_name", "Valued Customer")
+    event_name = rental.get("event_name", "your event")
+
+    # We don't have client email, so notify admin to follow up
+    body = (
+        f"Rental '{event_name}' for {client_name} is complete.\n\n"
+        f"Consider following up with {client_name} at {rental.get('client_phone', 'N/A')} "
+        f"to collect feedback and ask for a review.\n\n"
+        f"Feedback link: Share your app's feedback page with them."
+    )
+    send_email_notification(f"📝 Follow up: {event_name}", body)

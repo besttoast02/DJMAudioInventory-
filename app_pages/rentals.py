@@ -141,10 +141,42 @@ with tab_active:
 
             with c2:
                 st.space("small")
+                
+                # Invoice PDF
+                ri_for_pdf = db.get_rental_items(r["id"]) if "ri" not in dir() else ri
+                try:
+                    invoice_bytes = db.generate_invoice_pdf(r, ri_for_pdf)
+                    st.download_button(
+                        "📄 Invoice",
+                        data=invoice_bytes,
+                        file_name=f"DJM_Invoice_{r['event_name'][:20]}.pdf",
+                        mime="application/pdf",
+                        key=f"inv_{r['id']}",
+                        use_container_width=True
+                    )
+                except Exception:
+                    pass
+                
+                # Waiver PDF
+                try:
+                    waiver_bytes = db.generate_waiver_pdf(r)
+                    st.download_button(
+                        "📋 Waiver",
+                        data=waiver_bytes,
+                        file_name=f"DJM_Waiver_{r['event_name'][:20]}.pdf",
+                        mime="application/pdf",
+                        key=f"waiver_{r['id']}",
+                        use_container_width=True
+                    )
+                except Exception:
+                    pass
+                
                 if st.button("Mark returned", key=f"return_{r['id']}",
                              icon=":material/assignment_return:", type="primary",
                              use_container_width=True):
                     db.return_rental(r["id"])
+                    db.log_activity("Rental returned", f"{r['event_name']} — {r['client_name']}", r["id"])
+                    db.send_feedback_request_email(r)
                     st.success("Marked as returned!", icon=":material/check_circle:")
                     st.rerun()
 
