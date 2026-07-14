@@ -42,17 +42,18 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
     width: 100vw;
     height: 100vh;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: flex-end;
-    gap: clamp(1px, 0.3vw, 4px);
+    gap: 1px;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
-    padding-bottom: 5vh;
+    padding: 0 1vw 5vh 1vw;
 }
 .eq-bar {
-    width: clamp(8px, 1.5vw, 20px);
-    background: linear-gradient(to top, rgba(217,70,239,0.1), rgba(59,130,246,0.15));
+    flex: 1;
+    max-width: 1.5vw;
+    background: linear-gradient(to top, rgba(217,70,239,0.15), rgba(59,130,246,0.3));
     border-radius: 4px 4px 0 0;
     animation: eq-bounce 1s infinite alternate ease-in-out;
     animation-delay: var(--d);
@@ -76,7 +77,71 @@ img {
 </style>
 
 <div id="bg-eq-container">
-    <div class="eq-bar" style="--d: 1.49s; --h: 35%"></div>
+    <div class="eq-bar" style="--d: 0.18s; --h: 47%"></div>
+    <div class="eq-bar" style="--d: 1.11s; --h: 91%"></div>
+    <div class="eq-bar" style="--d: 0.19s; --h: 54%"></div>
+    <div class="eq-bar" style="--d: 0.16s; --h: 52%"></div>
+    <div class="eq-bar" style="--d: 0.68s; --h: 99%"></div>
+    <div class="eq-bar" style="--d: 0.81s; --h: 79%"></div>
+    <div class="eq-bar" style="--d: 1.05s; --h: 83%"></div>
+    <div class="eq-bar" style="--d: 0.93s; --h: 77%"></div>
+    <div class="eq-bar" style="--d: 1.14s; --h: 88%"></div>
+    <div class="eq-bar" style="--d: 0.91s; --h: 80%"></div>
+    <div class="eq-bar" style="--d: 1.28s; --h: 78%"></div>
+    <div class="eq-bar" style="--d: 1.1s; --h: 100%"></div>
+    <div class="eq-bar" style="--d: 0.48s; --h: 73%"></div>
+    <div class="eq-bar" style="--d: 0.65s; --h: 100%"></div>
+    <div class="eq-bar" style="--d: 1.5s; --h: 100%"></div>
+    <div class="eq-bar" style="--d: 1.36s; --h: 91%"></div>
+    <div class="eq-bar" style="--d: 1.66s; --h: 74%"></div>
+    <div class="eq-bar" style="--d: 1.76s; --h: 92%"></div>
+    <div class="eq-bar" style="--d: 0.88s; --h: 85%"></div>
+    <div class="eq-bar" style="--d: 1.49s; --h: 100%"></div>
+    <div class="eq-bar" style="--d: 0.51s; --h: 90%"></div>
+    <div class="eq-bar" style="--d: 1.39s; --h: 95%"></div>
+    <div class="eq-bar" style="--d: 0.88s; --h: 91%"></div>
+    <div class="eq-bar" style="--d: 1.23s; --h: 72%"></div>
+    <div class="eq-bar" style="--d: 0.24s; --h: 71%"></div>
+    <div class="eq-bar" style="--d: 0.38s; --h: 75%"></div>
+    <div class="eq-bar" style="--d: 1.79s; --h: 65%"></div>
+    <div class="eq-bar" style="--d: 0.87s; --h: 66%"></div>
+    <div class="eq-bar" style="--d: 0.66s; --h: 87%"></div>
+    <div class="eq-bar" style="--d: 1.43s; --h: 99%"></div>
+    <div class="eq-bar" style="--d: 1.26s; --h: 73%"></div>
+    <div class="eq-bar" style="--d: 1.79s; --h: 58%"></div>
+    <div class="eq-bar" style="--d: 1.33s; --h: 61%"></div>
+    <div class="eq-bar" style="--d: 0.22s; --h: 66%"></div>
+    <div class="eq-bar" style="--d: 1.18s; --h: 52%"></div>
+    <div class="eq-bar" style="--d: 1.7s; --h: 55%"></div>
+    <div class="eq-bar" style="--d: 1.78s; --h: 85%"></div>
+    <div class="eq-bar" style="--d: 1.29s; --h: 99%"></div>
+    <div class="eq-bar" style="--d: 1.02s; --h: 82%"></div>
+    <div class="eq-bar" style="--d: 1.11s; --h: 90%"></div>
+    <div class="eq-bar" style="--d: 0.62s; --h: 61%"></div>
+    <div class="eq-bar" style="--d: 0.28s; --h: 75%"></div>
+    <div class="eq-bar" style="--d: 1.59s; --h: 92%"></div>
+    <div class="eq-bar" style="--d: 1.18s; --h: 59%"></div>
+    <div class="eq-bar" style="--d: 1.34s; --h: 95%"></div>
+    <div class="eq-bar" style="--d: 1.56s; --h: 89%"></div>
+    <div class="eq-bar" style="--d: 0.46s; --h: 43%"></div>
+    <div class="eq-bar" style="--d: 1.63s; --h: 59%"></div>
+    <div class="eq-bar" style="--d: 0.7s; --h: 70%"></div>
+    <div class="eq-bar" style="--d: 0.26s; --h: 60%"></div>
+    <div class="eq-bar" style="--d: 1.32s; --h: 66%"></div>
+    <div class="eq-bar" style="--d: 1.31s; --h: 62%"></div>
+    <div class="eq-bar" style="--d: 1.7s; --h: 44%"></div>
+    <div class="eq-bar" style="--d: 0.29s; --h: 73%"></div>
+    <div class="eq-bar" style="--d: 0.4s; --h: 30%"></div>
+    <div class="eq-bar" style="--d: 0.48s; --h: 68%"></div>
+    <div class="eq-bar" style="--d: 0.66s; --h: 52%"></div>
+    <div class="eq-bar" style="--d: 1.23s; --h: 62%"></div>
+    <div class="eq-bar" style="--d: 1.32s; --h: 50%"></div>
+    <div class="eq-bar" style="--d: 1.73s; --h: 64%"></div>
+    <div class="eq-bar" style="--d: 0.74s; --h: 53%"></div>
+    <div class="eq-bar" style="--d: 0.32s; --h: 54%"></div>
+    <div class="eq-bar" style="--d: 1.65s; --h: 50%"></div>
+    <div class="eq-bar" style="--d: 0.45s; --h: 51%"></div>
+</div>
     <div class="eq-bar" style="--d: 0.31s; --h: 84%"></div>
     <div class="eq-bar" style="--d: 0.79s; --h: 43%"></div>
     <div class="eq-bar" style="--d: 0.4s; --h: 45%"></div>
