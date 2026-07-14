@@ -16,11 +16,11 @@ st.logo("https://djmaudio.com/wp-content/uploads/2025/02/DJM-Logo-copy-300x300.p
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
-html, body, [class*="st-"] {
+html, body, .stApp {
     font-family: 'DM Sans', sans-serif;
 }
-/* Prevent DM Sans from overriding Material Icons */
-.material-symbols-rounded, .material-symbols-outlined, [class*="material-symbols"] {
+/* Explicitly protect icons */
+span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
     font-family: 'Material Symbols Rounded' !important;
 }
 </style>
