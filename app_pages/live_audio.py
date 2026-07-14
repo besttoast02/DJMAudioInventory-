@@ -97,11 +97,18 @@ st.subheader("Equipment we bring")
 st.markdown("""
 | Category | Equipment |
 |----------|-----------|
-| **Consoles** | Allen & Heath SQ-5, SQ-6 + stagebox |
-| **PA Systems** | DbTech speakers, DAS Vantec subs |
-| **Microphones** | Shure SM57/58, Beta 58A, Sennheiser e935/e945 |
-| **Wireless** | Shure BLX systems |
-| **Processing** | dbx, Radial DI boxes |
-| **Monitoring** | Yamaha DBR15, custom IEM systems |
-| **Lighting** | ADJ moving heads, wash lights, uplights |
+| **Mixing Consoles** | Allen & Heath SQ-5 Digital Mixer + AR2412 Stagebox, Pioneer DJ XDJ-XZ All-In-One DJ System |
+| **PA Speakers** | dB Technologies Ingenia IG3T Powered Columns (×4), Electro-Voice Evolve 50 Powered Column Systems (×2) |
+| **Subwoofers** | JBL SRX828SP Dual 18″ Powered Subs (×2), DAS Event 218A Dual 18″ Powered Subs (×2) |
+| **Monitors** | Yamaha DBR15 Powered Speakers (×3) |
+| **Wireless Systems** | Shure QLXD24/KSM8 Digital Wireless, Shure BLX24/Beta58A Wireless Handheld, Shure Bodypack Transmitters, Antenna Distribution |
+| **Vocal Microphones** | Shure Beta 58A (×6), Shure SM57 (×7) |
+| **Drum Microphones** | Audix D6 Kick, Audix i5, Shure PGA52 Kick, Shure PGA56 Drum (×3), Sennheiser e904 (×3), Sennheiser e906 (×2), Shure PGA81 Condensers (×2) |
+| **DI Boxes** | Radial JDI Duplex Dual Passive Direct Boxes (×2) |
+| **Lighting — Moving Heads** | ADJ Vizi Beam RXONE (×2), ADJ Inno Pocket Z4 (×4), Joyfirst 7R Beam/Wash (×4) |
+| **Lighting — Wash & Effects** | ADJ Element Hex Battery Uplights (×6), ADJ Dotz Flood (×3), ADJ WiFLY EXR Battery (×3), Chauvet Fog Fury Jett Pro (×2) |
+| **Lighting Control** | ADJ Airstream DMX Bridge, full DMX cabling infrastructure |
+| **Truss & Rigging** | Aluminum truss segments (5′–10′), clamps, safety cables |
+| **Cabling** | Neutrik XLR (up to 50′), Warm Audio XLR, Roland XLR, Jumperz XLR, Seetronic/Neutrik Powercon, Cat5e data runs |
+| **Stands** | On-Stage boom stands (×8), CLC boom stands (×5), low-profile stands |
 """)
