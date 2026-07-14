@@ -1,7 +1,8 @@
 import streamlit as st
 import db
 import pandas as pd
-
+import os
+import json
 st.title(":material/inventory_2: Inventory")
 
 items = db.get_all_items()
@@ -81,17 +82,64 @@ if view == "Table":
         df = pd.DataFrame(summary_rows)
         st.dataframe(df, width="stretch", hide_index=True)
 
+        # Load maintenance data for manuals
+        maint_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "maintenance_data.json")
+        try:
+            with open(maint_file, "r") as f:
+                maint_data = json.load(f)
+        except Exception:
+            maint_data = {}
+
+        # Helper to map item to maintenance key
+        def get_m_key(name):
+            name_lower = name.lower()
+            for pattern, key in [
+                ("sm57", "shure_sm57"), ("beta 58a", "shure_beta58a"), ("pga52", "shure_pga52"),
+                ("pga56", "shure_pga56"), ("pga57", "shure_pga57"), ("pga81", "shure_pga81"),
+                ("i5 dynamic", "audix_i5"), ("d6 kick", "audix_d6"), ("e904", "sennheiser_e904"),
+                ("e906", "sennheiser_e906"), ("sq-5", "allen_heath_sq5"), ("xdj-xz", "pioneer_xdj_xz"),
+                ("ig3t", "dbtechnologies_ingenia_ig3t"), ("srx828sp", "jbl_srx828sp"),
+                ("event 218a", "das_event_218a"), ("dbr15", "yamaha_dbr15"),
+                ("evolve 50", "electro_voice_evolve50"), ("blx24", "shure_blx24_beta58a"),
+                ("qlxd24", "shure_qlxd24_ksm8"), ("vizi beam", "adj_vizi_beam_rxone"),
+                ("dotz flood", "adj_dotz_flood"), ("element hex", "adj_element_hex"),
+                ("wifly exr", "adj_wifly_exr_battery"), ("airstream", "adj_airstream_dmx_bridge"),
+                ("inno pocket", "adj_inno_pocket_z4"), ("fog fury", "chauvet_fog_fury_jett_pro"),
+                ("beam moving head", "joyfirst_beam_moving_head"), ("jdi duplex", "radial_jdi_duplex"),
+            ]:
+                if pattern in name_lower: return key
+            return None
+
         # Expandable detail per item group
         for name, info in sorted(grouped_inv.items()):
             units = info["units"]
-            if len(units) > 1:
-                with st.expander(f"**{info['brand']}** {name} — {len(units)} units"):
-                    for u in units:
-                        status_color = {"available": "green", "in_use": "blue", "damaged": "orange", "lost": "red"}.get(u["status"], "gray")
-                        c1, c2, c3 = st.columns([3, 2, 2])
-                        c1.code(u["barcode"])
-                        c2.badge(u["status"], color=status_color)
-                        c3.caption(u.get("storage_case") or "—")
+            with st.expander(f"**{info['brand']}** {name} — {len(units)} units"):
+                m_key = get_m_key(name)
+                m_info = maint_data.get(m_key, {}) if m_key else {}
+                
+                # Check for PDF
+                pdf_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "manuals", f"{m_key}.pdf")
+                has_pdf = os.path.exists(pdf_path)
+                
+                if m_info or has_pdf:
+                    bc1, bc2 = st.columns([1, 1])
+                    if has_pdf:
+                        with open(pdf_path, "rb") as f:
+                            bc1.download_button("⬇️ Download PDF Manual", data=f.read(), file_name=f"{m_key}.pdf", mime="application/pdf", key=f"dl_{m_key}")
+                    elif m_info.get("manual_ref"):
+                        bc1.link_button("📄 View Manual / Product Page", m_info["manual_ref"], use_container_width=True)
+                    
+                    if m_info:
+                        if bc2.button("🔧 View Maintenance Plan", key=f"vm_{m_key}", use_container_width=True):
+                            st.switch_page("app_pages/maintenance.py")
+                    st.divider()
+
+                for u in units:
+                    status_color = {"available": "green", "in_use": "blue", "damaged": "orange", "lost": "red"}.get(u["status"], "gray")
+                    c1, c2, c3 = st.columns([3, 2, 2])
+                    c1.code(u["barcode"])
+                    c2.badge(u["status"], color=status_color)
+                    c3.caption(u.get("storage_case") or "—")
 
         # Summary metrics
         total_purchase = sum(float(i.get("purchase_price") or 0) for i in filtered)

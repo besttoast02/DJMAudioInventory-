@@ -1,0 +1,843 @@
+{
+  "shure_sm57": {
+    "brand": "Shure",
+    "model": "SM57",
+    "category": "Microphones",
+    "manual_ref": "https://pubs.shure.com/guide/sm57",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe grille and body with a dry lint-free cloth",
+        "Check XLR connector pins for bent or damaged contacts",
+        "Inspect cable strain relief for cracking",
+        "Store in protective pouch or case"
+      ],
+      "monthly": [
+        "Remove grille (unscrew) and clean with mild soap and water — let dry completely before reattaching",
+        "Inspect internal cartridge mount for looseness",
+        "Check for rattling by gently shaking — may indicate loose capsule"
+      ],
+      "quarterly": [
+        "Test frequency response with a reference source (pink noise + analyzer)",
+        "Compare output level against a known-good SM57",
+        "Inspect transformer for signs of corrosion or damage"
+      ],
+      "replace_when": [
+        "Rattling capsule that persists after reseating",
+        "Intermittent signal or crackling not caused by cable",
+        "Significant drop in output level (>6dB compared to reference)",
+        "Physical deformation of grille or body affecting capsule alignment"
+      ]
+    }
+  },
+  "shure_beta58a": {
+    "brand": "Shure",
+    "model": "Beta 58A",
+    "category": "Microphones",
+    "manual_ref": "https://pubs.shure.com/guide/beta58a",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe grille with antibacterial wipe (vocal mic — multiple users)",
+        "Check XLR connector for bent pins",
+        "Inspect windscreen for dents or deformation",
+        "Store in clip and protective pouch"
+      ],
+      "monthly": [
+        "Remove grille and soak in warm soapy water for 5 minutes, air dry completely",
+        "Inspect neodymium capsule — do NOT touch diaphragm",
+        "Test supercardioid pattern — check for rear rejection degradation"
+      ],
+      "quarterly": [
+        "Full frequency response comparison test vs reference unit",
+        "Check handling noise isolation — tap test shouldn't produce excessive thump",
+        "Inspect internal shock mount elastomers for wear"
+      ],
+      "replace_when": [
+        "Consistent sibilance issues not present in new units",
+        "Loss of rear rejection (supercardioid pattern degraded)",
+        "Capsule rattle or mechanical noise during handling",
+        "XLR connector loose or intermittent after resoldering"
+      ]
+    }
+  },
+  "shure_pga52": {
+    "brand": "Shure",
+    "model": "PGA52",
+    "category": "Microphones",
+    "manual_ref": "https://pubs.shure.com/guide/PGA52",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe body clean — kick drum mics collect significant dust",
+        "Check swivel mount tightness",
+        "Inspect XLR connection"
+      ],
+      "monthly": [
+        "Clean grille screen with compressed air to remove dust buildup",
+        "Check mounting clip/adapter for cracks"
+      ],
+      "quarterly": [
+        "Compare low-frequency response (40-100Hz) against reference",
+        "Inspect internal damping for deterioration"
+      ],
+      "replace_when": [
+        "Loss of low-frequency extension (kick sounds thin)",
+        "Physical damage to body from drum hardware contact",
+        "Intermittent signal"
+      ]
+    }
+  },
+  "shure_pga56": {
+    "brand": "Shure",
+    "model": "PGA56",
+    "category": "Microphones",
+    "manual_ref": "https://pubs.shure.com/guide/PGA56",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe down body and rim mount clamp",
+        "Check rim mount tension — should hold securely without over-tightening",
+        "Inspect XLR connector"
+      ],
+      "monthly": [
+        "Clean grille with compressed air",
+        "Inspect rim clamp rubber pads for wear — replace if torn"
+      ],
+      "quarterly": [
+        "Test frequency response for consistency",
+        "Check swivel joint tightness"
+      ],
+      "replace_when": [
+        "Rim clamp mechanism stripped or broken",
+        "Capsule damage from stick hits",
+        "Signal dropout"
+      ]
+    }
+  },
+  "shure_pga57": {
+    "brand": "Shure",
+    "model": "PGA57",
+    "category": "Microphones",
+    "manual_ref": "https://pubs.shure.com/guide/PGA57",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe grille and body clean",
+        "Check XLR connector pins",
+        "Store in protective case"
+      ],
+      "monthly": [
+        "Clean grille — remove and wash if heavily soiled",
+        "Inspect for physical damage from amp placement"
+      ],
+      "quarterly": [
+        "Compare output level against reference SM57/PGA57"
+      ],
+      "replace_when": [
+        "Capsule rattle",
+        "Significant output level drop",
+        "Physical deformation"
+      ]
+    }
+  },
+  "shure_pga81": {
+    "brand": "Shure",
+    "model": "PGA81",
+    "category": "Microphones",
+    "manual_ref": "https://pubs.shure.com/guide/PGA81",
+    "maintenance": {
+      "after_each_use": [
+        "Cap the microphone with protective cover",
+        "Avoid moisture — condensers are sensitive to humidity",
+        "Store with silica gel packets"
+      ],
+      "monthly": [
+        "Inspect diaphragm through grille for contamination (use flashlight)",
+        "Test phantom power draw — should be consistent"
+      ],
+      "quarterly": [
+        "Full frequency response test — condensers are more sensitive to degradation",
+        "Check for increased self-noise (hiss)"
+      ],
+      "replace_when": [
+        "Elevated self-noise / hiss",
+        "Loss of high-frequency detail",
+        "Capsule contamination (moisture/dust inside)",
+        "Phantom power issues"
+      ]
+    }
+  },
+  "audix_i5": {
+    "brand": "Audix",
+    "model": "i5",
+    "category": "Microphones",
+    "manual_ref": "https://audixusa.com/products/i5",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe clean with dry cloth",
+        "Check VLM capsule alignment (look through grille)",
+        "Inspect XLR"
+      ],
+      "monthly": [
+        "Remove grille, clean with mild soap and water",
+        "Inspect capsule for debris"
+      ],
+      "quarterly": [
+        "Compare frequency response against reference"
+      ],
+      "replace_when": [
+        "Capsule damage",
+        "Intermittent signal",
+        "Physical damage"
+      ]
+    }
+  },
+  "audix_d6": {
+    "brand": "Audix",
+    "model": "D6",
+    "category": "Microphones",
+    "manual_ref": "https://audixusa.com/products/d6",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe clean — kick mics collect heavy dust",
+        "Check stand adapter/clip",
+        "Inspect XLR"
+      ],
+      "monthly": [
+        "Clean grille with compressed air",
+        "Check internal VLM capsule for debris"
+      ],
+      "quarterly": [
+        "Test low-frequency extension and compare to reference"
+      ],
+      "replace_when": [
+        "Loss of characteristic low-end punch",
+        "Physical damage from drum hardware",
+        "Intermittent signal"
+      ]
+    }
+  },
+  "sennheiser_e904": {
+    "brand": "Sennheiser",
+    "model": "evolution e904",
+    "category": "Microphones",
+    "manual_ref": "https://www.sennheiser.com/en-us/catalog/products/microphones/e-904/e904-500200",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe clean with dry cloth",
+        "Check rim clamp mechanism — ensure spring tension is correct",
+        "Inspect integrated cable if applicable"
+      ],
+      "monthly": [
+        "Clean grille screen",
+        "Check rim clamp rubber pads for wear",
+        "Inspect hinge/pivot points"
+      ],
+      "quarterly": [
+        "Test frequency response",
+        "Check clamp spring tension — replace if weak"
+      ],
+      "replace_when": [
+        "Clamp mechanism broken or weak",
+        "Capsule rattle",
+        "Corrosion on body or connector"
+      ]
+    }
+  },
+  "sennheiser_e906": {
+    "brand": "Sennheiser",
+    "model": "e906",
+    "category": "Microphones",
+    "manual_ref": "https://www.sennheiser.com/en-us/catalog/products/microphones/e-906/e906-500202",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe clean — collect dust from guitar amp grilles",
+        "Check 3-position presence switch for proper function",
+        "Coil cable neatly to avoid strain"
+      ],
+      "monthly": [
+        "Test all 3 presence switch positions for proper operation",
+        "Clean body and grille"
+      ],
+      "quarterly": [
+        "Compare frequency response in all switch positions"
+      ],
+      "replace_when": [
+        "Presence switch faulty or intermittent",
+        "Cable strain at XLR junction",
+        "Capsule damage"
+      ]
+    }
+  },
+  "allen_heath_sq5": {
+    "brand": "Allen & Heath",
+    "model": "SQ-5",
+    "category": "Mixers",
+    "manual_ref": "https://www.allen-heath.com/hardware/sq/sq-5/",
+    "maintenance": {
+      "after_each_use": [
+        "Power down properly using the rear switch (not just unplugging)",
+        "Clean faders with compressed air — prevent dust from entering fader tracks",
+        "Wipe touchscreen with microfiber cloth (no liquids)",
+        "Check all I/O connections are unplugged to prevent connector strain",
+        "Cover with dust cover for transport"
+      ],
+      "monthly": [
+        "Run fader calibration routine (Utility > Calibrate Faders)",
+        "Update firmware if new version available (allen-heath.com/resources)",
+        "Check fan vents for dust buildup — clean with compressed air",
+        "Inspect all XLR and TRS jacks for bent pins or debris",
+        "Test all preamps with phantom power on/off for noise",
+        "Back up all show files to USB"
+      ],
+      "quarterly": [
+        "Full I/O test — verify every input and output channel",
+        "Check SLink / AES connections with stagebox",
+        "Inspect power cable and IEC connector for wear",
+        "Test USB recording functionality",
+        "Clean expansion card contacts if using optional I/O cards"
+      ],
+      "replace_when": [
+        "Touchscreen unresponsive or displaying artifacts",
+        "Faders not responding to calibration (motorized faders worn)",
+        "Preamps producing excessive noise or crosstalk",
+        "Fan failure (overheating warnings)",
+        "Digital artifacts or DSP glitches not resolved by firmware update"
+      ]
+    }
+  },
+  "pioneer_xdj_xz": {
+    "brand": "Pioneer DJ",
+    "model": "XDJ-XZ",
+    "category": "Mixers",
+    "manual_ref": "https://www.pioneerdj.com/en/product/all-in-one-system/xdj-xz/black/overview/",
+    "maintenance": {
+      "after_each_use": [
+        "Clean jog wheels with microfiber cloth (no alcohol — damages coating)",
+        "Wipe faders and knobs — prevent liquid/residue from entering",
+        "Eject USB drives properly before powering down",
+        "Check all RCA and XLR outputs are disconnected",
+        "Store in padded case with dust cover"
+      ],
+      "monthly": [
+        "Clean channel faders with Caig DeoxIT Fader spray (remove knob caps first)",
+        "Check jog wheel sensitivity and calibration",
+        "Update firmware via Pioneer DJ website",
+        "Inspect USB ports for debris or loose connections",
+        "Test all effects and beat FX for proper operation",
+        "Check headphone jack for intermittent contact"
+      ],
+      "quarterly": [
+        "Full audio path test — all 4 channels, both master outputs",
+        "Test booth output independently",
+        "Check crossfader cut-in adjustment",
+        "Inspect power supply for proper voltage",
+        "Clean air vents and fan intake"
+      ],
+      "replace_when": [
+        "Jog wheels lose touch sensitivity",
+        "Channel faders bleed audio when fully down",
+        "Display screen failure or persistent artifacts",
+        "USB ports not recognizing drives after cleaning",
+        "Crossfader intermittent despite cleaning"
+      ]
+    }
+  },
+  "dbtechnologies_ingenia_ig3t": {
+    "brand": "dBTechnologies",
+    "model": "Ingenia IG3T",
+    "category": "PA Systems",
+    "manual_ref": "https://www.dbtechnologies.com/en/products/ingenia/ig3t/",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe enclosure clean with damp cloth",
+        "Check all Speakon/XLR connections",
+        "Inspect grille for dents or damage",
+        "Check mounting hardware and rigging points"
+      ],
+      "monthly": [
+        "Inspect speaker cones through grille for tears or deformation",
+        "Check power cable and IEC inlet",
+        "Test DSP presets and onboard processing",
+        "Verify RDNet control connectivity (if applicable)"
+      ],
+      "quarterly": [
+        "Full SPL output test at rated distance",
+        "Check amplifier thermal protection — run at moderate level for 30min",
+        "Inspect suspension/rigging hardware for fatigue",
+        "Update firmware if available"
+      ],
+      "replace_when": [
+        "Visible cone tears or delamination",
+        "Amp module producing distortion at normal levels",
+        "DSP not loading presets properly",
+        "Rigging points showing signs of fatigue or cracking",
+        "Reconing needed (compare cost vs. replacement)"
+      ]
+    }
+  },
+  "jbl_srx828sp": {
+    "brand": "JBL",
+    "model": "SRX828SP",
+    "category": "PA Systems",
+    "manual_ref": "https://jblpro.com/en/products/srx828sp",
+    "maintenance": {
+      "after_each_use": [
+        "Check grilles for damage — dual 18\" drivers are expensive to replace",
+        "Inspect Speakon connectors",
+        "Verify casters/wheels are secure (if bottom-mounted)",
+        "Check handles for cracks or looseness"
+      ],
+      "monthly": [
+        "Inspect dual 18\" woofer cones for tears, creasing, or delamination",
+        "Clean air vents on amplifier module",
+        "Test Crown amplifier module — listen for distortion at moderate levels",
+        "Check crossover and DSP preset operation via LCD panel"
+      ],
+      "quarterly": [
+        "Full power test at rated output (check for thermal limiting)",
+        "Inspect voice coil alignment (gentle push test on cones)",
+        "Check cabinet joints for separation or rattling",
+        "Verify all suspension points and M10 rigging inserts"
+      ],
+      "replace_when": [
+        "Woofer reconing required (significant voice coil rub)",
+        "Amplifier module thermal shutdown at normal operating levels",
+        "Cabinet structural damage",
+        "Driver delamination or foam surround deterioration"
+      ]
+    }
+  },
+  "das_event_218a": {
+    "brand": "DAS",
+    "model": "Event 218A",
+    "category": "PA Systems",
+    "manual_ref": "https://www.dasaudio.com/en/products/event-series/event-218a/",
+    "maintenance": {
+      "after_each_use": [
+        "Inspect dual 18\" cones through grille",
+        "Check all connections (Speakon, powerCON)",
+        "Verify caster wheel locks",
+        "Wipe exterior clean"
+      ],
+      "monthly": [
+        "Inspect cone surrounds for foam deterioration",
+        "Clean amplifier ventilation ports",
+        "Test DSP and limiter operation",
+        "Check internal wiring connections (remove rear panel if accessible)"
+      ],
+      "quarterly": [
+        "Full power output test with measurement mic",
+        "Check for rattling at high SPL (cabinet hardware, grille)",
+        "Verify polarity of all drivers"
+      ],
+      "replace_when": [
+        "Foam surround deterioration on woofers",
+        "Amplifier clipping at normal levels",
+        "Voice coil rub (scraping sound on excursion)",
+        "Cabinet structural compromise"
+      ]
+    }
+  },
+  "yamaha_dbr15": {
+    "brand": "Yamaha",
+    "model": "DBR15",
+    "category": "PA Systems",
+    "manual_ref": "https://usa.yamaha.com/products/proaudio/speakers/dbr/index.html",
+    "maintenance": {
+      "after_each_use": [
+        "Power down and disconnect all cables",
+        "Wipe exterior with dry cloth",
+        "Check pole mount socket for wear",
+        "Store upright to prevent driver sag"
+      ],
+      "monthly": [
+        "Inspect 15\" woofer and 1\" HF driver through grille",
+        "Clean air vents on class-D amplifier",
+        "Test combo XLR/TRS inputs for proper signal",
+        "Check D-CONTOUR and HPF switch operation"
+      ],
+      "quarterly": [
+        "Full frequency response test (60Hz-20kHz coverage)",
+        "Inspect HF compression driver diaphragm",
+        "Check cabinet mounting points"
+      ],
+      "replace_when": [
+        "HF driver diaphragm failure (harsh distortion on highs)",
+        "Woofer reconing needed",
+        "Amplifier module failure",
+        "Persistent buzz or rattle in cabinet"
+      ]
+    }
+  },
+  "electro_voice_evolve50": {
+    "brand": "Electro-Voice",
+    "model": "Evolve 50",
+    "category": "PA Systems",
+    "manual_ref": "https://products.electrovoice.com/na/en/evolve-50/",
+    "maintenance": {
+      "after_each_use": [
+        "Disconnect column sections carefully — align pins before separating",
+        "Wipe column array elements clean",
+        "Check subwoofer connection plate for debris",
+        "Store column sections in padded bag",
+        "Inspect column pin connectors for bending"
+      ],
+      "monthly": [
+        "Clean all 8 column array drivers (3.5\" elements)",
+        "Inspect sub 12\" driver through grille",
+        "Test QuickSmart DSP presets and Bluetooth connectivity",
+        "Check power cable and connector",
+        "Verify column lock mechanism engages fully"
+      ],
+      "quarterly": [
+        "Full system test — column + sub as matched system",
+        "Check column element alignment and phasing",
+        "Firmware update via EV QuickSmart Mobile app",
+        "Inspect sub amp module cooling"
+      ],
+      "replace_when": [
+        "Column element driver failure (reduced coverage pattern)",
+        "Sub woofer reconing needed",
+        "Connection pin mechanism worn (column wobbles)",
+        "DSP module malfunction",
+        "Bluetooth module failure"
+      ]
+    }
+  },
+  "shure_blx24_beta58a": {
+    "brand": "Shure",
+    "model": "BLX24/Beta58A Wireless System",
+    "category": "Wireless",
+    "manual_ref": "https://pubs.shure.com/guide/BLX",
+    "maintenance": {
+      "after_each_use": [
+        "Remove batteries from handheld transmitter after each event",
+        "Wipe handheld grille with antibacterial wipe",
+        "Check receiver antenna connections — hand-tighten only",
+        "Store antennas detached for transport"
+      ],
+      "monthly": [
+        "Clean battery contacts with isopropyl alcohol and cotton swab",
+        "Test all available frequencies for interference",
+        "Check antenna cables (BNC connectors) for damage",
+        "Scan for best available frequency group",
+        "Replace batteries preventively before events (use fresh AA)"
+      ],
+      "quarterly": [
+        "Full RF performance test — check range at venue distances",
+        "Compare signal quality with new BLX system (if available)",
+        "Inspect receiver rack mount hardware"
+      ],
+      "replace_when": [
+        "Frequent dropouts not resolved by frequency scanning",
+        "Battery contacts corroded beyond cleaning",
+        "Receiver display failure",
+        "Antenna connector loose or damaged",
+        "Transmitter capsule issues (see Beta 58A maintenance)"
+      ]
+    }
+  },
+  "shure_qlxd24_ksm8": {
+    "brand": "Shure",
+    "model": "QLXD24/KSM8 Wireless System",
+    "category": "Wireless",
+    "manual_ref": "https://pubs.shure.com/guide/QLXD",
+    "maintenance": {
+      "after_each_use": [
+        "Remove rechargeable battery from transmitter",
+        "Charge Shure SB900A battery fully — do not leave depleted",
+        "Wipe KSM8 capsule grille with antibacterial cloth",
+        "Verify receiver powered down properly",
+        "Store antennas carefully — do not bend"
+      ],
+      "monthly": [
+        "Run Shure Wireless Workbench frequency coordination scan",
+        "Check SB900A battery health (cycles remaining shown on receiver)",
+        "Clean receiver ventilation",
+        "Test IR sync between transmitter and receiver",
+        "Network scan for coordinated frequencies if multi-system"
+      ],
+      "quarterly": [
+        "Full range test at maximum expected distance",
+        "Check KSM8 dual-diaphragm capsule alignment (Shure service if needed)",
+        "Update firmware via Shure Update Utility",
+        "Inspect rack mount ears and Ethernet port"
+      ],
+      "replace_when": [
+        "SB900A battery holds less than 3 hours (replace battery, not system)",
+        "Persistent RF interference not resolved by coordination",
+        "KSM8 capsule producing mechanical noise",
+        "Receiver ethernet/network port failure",
+        "IR sync window damaged"
+      ]
+    }
+  },
+  "adj_vizi_beam_rxone": {
+    "brand": "American DJ",
+    "model": "Vizi Beam RXONE",
+    "category": "Lighting",
+    "manual_ref": "https://www.adj.com/vizi-beam-rxone",
+    "maintenance": {
+      "after_each_use": [
+        "Allow fixture to cool before handling (lamp heat)",
+        "Return to home position (pan/tilt center) before powering down",
+        "Check safety cable attachment point",
+        "Inspect clamp tightness and truss mount"
+      ],
+      "monthly": [
+        "Clean optical lens and front glass with lens cloth",
+        "Clean gobo wheel — remove dust from gobo patterns",
+        "Check color wheel operation through all colors",
+        "Lubricate pan/tilt motors with white lithium grease if squeaking",
+        "Clean air filters / ventilation openings",
+        "Check DMX in/out connections"
+      ],
+      "quarterly": [
+        "Full DMX channel test — verify all functions respond correctly",
+        "Check lamp hours (replace lamp per manufacturer schedule)",
+        "Inspect stepper motors for smooth operation",
+        "Check internal wiring for heat damage",
+        "Test prism rotation"
+      ],
+      "replace_when": [
+        "Pan/tilt stepper motors failing (jerky movement, lost steps)",
+        "Lamp socket damage (arcing)",
+        "Color wheel or gobo wheel stuck",
+        "DMX receiver board failure",
+        "Excessive fan noise indicating bearing failure"
+      ]
+    }
+  },
+  "adj_dotz_flood": {
+    "brand": "ADJ",
+    "model": "Dotz Flood",
+    "category": "Lighting",
+    "manual_ref": "https://www.adj.com/dotz-flood",
+    "maintenance": {
+      "after_each_use": [
+        "Wipe lens clean of dust and fingerprints",
+        "Check power cable connection",
+        "Inspect housing for physical damage"
+      ],
+      "monthly": [
+        "Clean COB LED lens thoroughly",
+        "Test all DMX modes and color mixing",
+        "Check mounting bracket tightness"
+      ],
+      "quarterly": [
+        "Full color accuracy test — compare against reference",
+        "Check LED output for dimming (LED degradation)",
+        "Inspect power supply"
+      ],
+      "replace_when": [
+        "LED COB module significantly dimmed",
+        "Color mixing inaccurate despite calibration",
+        "Power supply failure",
+        "DMX board failure"
+      ]
+    }
+  },
+  "adj_element_hex": {
+    "brand": "ADJ",
+    "model": "Element Hex",
+    "category": "Lighting",
+    "manual_ref": "https://www.adj.com/element-hex",
+    "maintenance": {
+      "after_each_use": [
+        "Fully charge battery after each use — do not store depleted",
+        "Wipe lens and housing clean",
+        "Check wireless DMX (WiFLY) connectivity"
+      ],
+      "monthly": [
+        "Check battery charge cycle count — lithium batteries have limited cycles",
+        "Clean WiFLY antenna area",
+        "Test all RGBAW+UV color channels",
+        "Inspect charging port for damage"
+      ],
+      "quarterly": [
+        "Full battery health check — charge to 100%, measure runtime",
+        "Compare brightness output against new unit",
+        "Update fixture firmware if available"
+      ],
+      "replace_when": [
+        "Battery runtime drops below 50% of rated time",
+        "WiFLY wireless DMX consistently drops connection",
+        "LED output significantly dimmed",
+        "Charging circuit failure"
+      ]
+    }
+  },
+  "adj_wifly_exr_battery": {
+    "brand": "ADJ",
+    "model": "WiFLY EXR Battery",
+    "category": "Lighting",
+    "manual_ref": "https://www.adj.com/wifly-exr-battery",
+    "maintenance": {
+      "after_each_use": [
+        "Ensure all paired fixtures are unpaired/reset if no longer needed",
+        "Store in dry location — wireless electronics are moisture-sensitive"
+      ],
+      "monthly": [
+        "Test wireless range and signal stability at maximum expected distance",
+        "Charge/replace battery",
+        "Verify clean pairing with all fixtures"
+      ],
+      "quarterly": [
+        "Full range test in event-like RF environment",
+        "Check for firmware updates"
+      ],
+      "replace_when": [
+        "Consistent wireless dropouts at normal distances",
+        "Battery no longer holds charge",
+        "Unit fails to pair with compatible fixtures"
+      ]
+    }
+  },
+  "adj_airstream_dmx_bridge": {
+    "brand": "ADJ",
+    "model": "Airstream DMX Bridge",
+    "category": "Lighting",
+    "manual_ref": "https://www.adj.com/airstream-dmx-bridge",
+    "maintenance": {
+      "after_each_use": [
+        "Power down properly",
+        "Disconnect DMX cables gently",
+        "Store in protective case"
+      ],
+      "monthly": [
+        "Test WiFi connectivity and app pairing",
+        "Verify DMX output on all 512 channels",
+        "Check firmware version"
+      ],
+      "quarterly": [
+        "Full network stability test over extended period",
+        "Compare DMX output accuracy with hardware controller"
+      ],
+      "replace_when": [
+        "WiFi module fails to connect consistently",
+        "DMX output glitching or dropping channels",
+        "Power supply failure"
+      ]
+    }
+  },
+  "adj_inno_pocket_z4": {
+    "brand": "American DJ",
+    "model": "Inno Pocket Z4",
+    "category": "Lighting",
+    "manual_ref": "https://www.adj.com/inno-pocket-z4",
+    "maintenance": {
+      "after_each_use": [
+        "Allow to cool before storing",
+        "Check safety cable and clamp",
+        "Clean lens of dust/haze residue"
+      ],
+      "monthly": [
+        "Clean optical system with lens cloth",
+        "Check zoom motor operation through full range",
+        "Test pan/tilt movement for smoothness",
+        "Clean ventilation openings"
+      ],
+      "quarterly": [
+        "Full DMX function test",
+        "Check LED output consistency across all 4 RGBW zones",
+        "Inspect stepper motor operation"
+      ],
+      "replace_when": [
+        "Zoom motor failure",
+        "Pan/tilt stepper motors skipping",
+        "LED zone failure",
+        "DMX receiver failure"
+      ]
+    }
+  },
+  "chauvet_fog_fury_jett_pro": {
+    "brand": "Chauvet",
+    "model": "Fog Fury Jett Pro",
+    "category": "Lighting",
+    "manual_ref": "https://www.chauvetdj.com/products/fog-fury-jett-pro/",
+    "maintenance": {
+      "after_each_use": [
+        "Run the fog machine dry for 30 seconds after last burst (prevents clogging)",
+        "Empty remaining fluid from tank if storing for >1 week",
+        "Wipe nozzle clean of residue",
+        "Check LED array above nozzle for fog residue"
+      ],
+      "monthly": [
+        "Run vinegar/water flush through pump to prevent mineral buildup",
+        "Clean LED lenses above fog nozzle",
+        "Check fluid pump for proper flow rate",
+        "Inspect heater element power cable",
+        "Test DMX control of fog output level"
+      ],
+      "quarterly": [
+        "Full pump flush with manufacturer cleaning fluid",
+        "Check heater core element — should reach operating temp in <5 minutes",
+        "Test all LED colors while fogging",
+        "Inspect fluid tank for mold or contamination"
+      ],
+      "replace_when": [
+        "Heater element takes >10 minutes to heat (element degradation)",
+        "Pump cannot produce fog even with fresh fluid and clean nozzle",
+        "Persistent fluid leaks",
+        "LED array failure"
+      ]
+    }
+  },
+  "joyfirst_beam_moving_head": {
+    "brand": "Joyfirst",
+    "model": "Beam Moving Head 7R",
+    "category": "Lighting",
+    "manual_ref": "",
+    "maintenance": {
+      "after_each_use": [
+        "Allow lamp to cool for at least 10 minutes before moving",
+        "Return to home position before power off",
+        "Check safety cable and clamp",
+        "Inspect lens for cracks (7R lamps run very hot)"
+      ],
+      "monthly": [
+        "Clean front lens and internal optics with lens cleaning solution",
+        "Clean gobo and color wheels",
+        "Check lamp hours — 7R lamps last ~2000 hours",
+        "Clean fans and ventilation (critical for lamp cooling)",
+        "Lubricate pan/tilt bearings if noisy"
+      ],
+      "quarterly": [
+        "Full DMX function test — all channels",
+        "Check lamp alignment in reflector",
+        "Inspect internal wiring for heat damage",
+        "Replace air filters"
+      ],
+      "replace_when": [
+        "7R lamp past rated hours (even if still functioning — explosion risk)",
+        "Pan/tilt motor failure",
+        "Ballast failure (lamp won't strike)",
+        "Significant optical damage"
+      ]
+    }
+  },
+  "radial_jdi_duplex": {
+    "brand": "Radial",
+    "model": "JDI Duplex",
+    "category": "DI / Signal",
+    "manual_ref": "https://www.radialeng.com/product/jdi-duplex",
+    "maintenance": {
+      "after_each_use": [
+        "Check all 1/4\" and XLR connections for debris",
+        "Verify ground lift switches are in default position",
+        "Store in padded case — Jensen transformers are precision components"
+      ],
+      "monthly": [
+        "Test both channels with a known signal source",
+        "Check pad switch operation (-15dB)",
+        "Verify ground lift switch eliminates hum when engaged"
+      ],
+      "quarterly": [
+        "Full frequency response test through both channels",
+        "Compare output level between channels (should match within 1dB)"
+      ],
+      "replace_when": [
+        "Jensen transformer failure (extremely rare — >20 year lifespan)",
+        "Connector jacks loose or intermittent after resoldering",
+        "Significant channel imbalance"
+      ]
+    }
+  }
+}
