@@ -337,8 +337,12 @@ if hidden and filt == "All":
     with st.expander(":material/extension: **Optional add-ons** — included with your rental on request"):
         st.caption("Let us know what you need and we'll include the right cables, stands, and accessories.")
         acols = st.columns(3)
+        
+        with acols[0]:
+            st.checkbox("Cable Covers / Ramps", key="addon_Cable Covers / Ramps")
+            
         for idx, (label, count) in enumerate(sorted(addon_cats.items())):
-            with acols[idx % 3]:
+            with acols[(idx + 1) % 3]:
                 st.checkbox(f"{label} ({count})", key=f"addon_{label}")
 
 # ── Floating cart summary ────────────────────────────────────

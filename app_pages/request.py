@@ -200,6 +200,9 @@ with st.form("checkout_form", border=True):
         if selected_addons:
             full_notes += "\n\n=== ADD-ONS ===\n"
             full_notes += "\n".join(f"• {a}" for a in selected_addons)
+            if "Cable Covers / Ramps" in selected_addons:
+                full_notes += "\n\n=== ACTION REQUIRED ===\n"
+                full_notes += "Cable Covers / Ramps requested. Need a plan to examine how much linear feet of covers are needed and what can be done with just gaffer tape."
 
         full_notes += f"\n\n=== ESTIMATED PRICING ===\n"
         full_notes += f"½ day: ${final_half:.0f} | Daily: ${final_daily:.0f} | Weekend: ${final_weekend:.0f}"
