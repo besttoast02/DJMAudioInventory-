@@ -9,40 +9,46 @@ st.markdown("""
     backdrop-filter: blur(10px);
 }
 
-/* Background video container fixed to the top */
-#bg-video-container {
+/* Background EQ container fixed to the top */
+#bg-eq-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 70vh;
-    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(2px, 0.5vw, 6px);
     z-index: 0;
     pointer-events: none;
+    overflow: hidden;
+    padding-bottom: 5vh;
 }
-#bg-video-container::after {
+#bg-eq-container::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Gradient fades from semi-transparent to solid background color to blend with the rest of the page */
-    background: linear-gradient(to bottom, rgba(14, 17, 23, 0.5) 0%, rgba(14, 17, 23, 1) 100%);
+    background: linear-gradient(to bottom, rgba(14, 17, 23, 0.4) 0%, rgba(14, 17, 23, 1) 100%);
     z-index: 1;
 }
-#bg-video-container video {
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
+
+.eq-bar {
+    width: clamp(10px, 2vw, 30px);
+    background: linear-gradient(to top, rgba(139,92,246,0.3), rgba(197,78,233,0.7));
+    border-radius: 4px 4px 0 0;
+    animation: eq-bounce 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    animation-delay: var(--d);
+    height: var(--h);
     z-index: 0;
-    filter: brightness(0.8);
+}
+
+@keyframes eq-bounce {
+    0% { height: 10%; }
+    100% { height: var(--h); }
 }
 
 /* Ensure content sits above the video */
@@ -53,7 +59,7 @@ st.markdown("""
 
 .hero-wrapper {
     text-align: center;
-    padding: 6rem 1rem 3rem;
+    padding: 2rem 1rem 3rem;
 }
 .hero-title {
     font-size: 3.5rem;
@@ -72,10 +78,47 @@ st.markdown("""
 }
 </style>
 
-<div id="bg-video-container">
-    <video autoplay loop muted playsinline>
-        <source src="https://videos.pexels.com/video-files/3163534/3163534-uhd_2560_1440_30fps.mp4" type="video/mp4">
-    </video>
+<div id="bg-eq-container">
+    <div class="eq-bar" style="--d: 1.49s; --h: 35%"></div>
+    <div class="eq-bar" style="--d: 0.31s; --h: 84%"></div>
+    <div class="eq-bar" style="--d: 0.79s; --h: 43%"></div>
+    <div class="eq-bar" style="--d: 0.4s; --h: 45%"></div>
+    <div class="eq-bar" style="--d: 0.95s; --h: 77%"></div>
+    <div class="eq-bar" style="--d: 1.37s; --h: 38%"></div>
+    <div class="eq-bar" style="--d: 1.18s; --h: 84%"></div>
+    <div class="eq-bar" style="--d: 0.79s; --h: 58%"></div>
+    <div class="eq-bar" style="--d: 1.36s; --h: 81%"></div>
+    <div class="eq-bar" style="--d: 0.38s; --h: 34%"></div>
+    <div class="eq-bar" style="--d: 0.95s; --h: 66%"></div>
+    <div class="eq-bar" style="--d: 0.53s; --h: 78%"></div>
+    <div class="eq-bar" style="--d: 1.23s; --h: 55%"></div>
+    <div class="eq-bar" style="--d: 1.25s; --h: 69%"></div>
+    <div class="eq-bar" style="--d: 0.17s; --h: 35%"></div>
+    <div class="eq-bar" style="--d: 1.1s; --h: 63%"></div>
+    <div class="eq-bar" style="--d: 1.45s; --h: 84%"></div>
+    <div class="eq-bar" style="--d: 1.38s; --h: 48%"></div>
+    <div class="eq-bar" style="--d: 1.17s; --h: 77%"></div>
+    <div class="eq-bar" style="--d: 0.15s; --h: 49%"></div>
+    <div class="eq-bar" style="--d: 1.18s; --h: 46%"></div>
+    <div class="eq-bar" style="--d: 0.18s; --h: 95%"></div>
+    <div class="eq-bar" style="--d: 1.38s; --h: 68%"></div>
+    <div class="eq-bar" style="--d: 0.96s; --h: 83%"></div>
+    <div class="eq-bar" style="--d: 0.51s; --h: 53%"></div>
+    <div class="eq-bar" style="--d: 0.31s; --h: 68%"></div>
+    <div class="eq-bar" style="--d: 0.82s; --h: 51%"></div>
+    <div class="eq-bar" style="--d: 0.91s; --h: 48%"></div>
+    <div class="eq-bar" style="--d: 0.49s; --h: 57%"></div>
+    <div class="eq-bar" style="--d: 0.43s; --h: 31%"></div>
+    <div class="eq-bar" style="--d: 1.17s; --h: 88%"></div>
+    <div class="eq-bar" style="--d: 0.56s; --h: 72%"></div>
+    <div class="eq-bar" style="--d: 0.56s; --h: 44%"></div>
+    <div class="eq-bar" style="--d: 0.05s; --h: 62%"></div>
+    <div class="eq-bar" style="--d: 1.12s; --h: 59%"></div>
+    <div class="eq-bar" style="--d: 0.6s; --h: 52%"></div>
+    <div class="eq-bar" style="--d: 0.04s; --h: 71%"></div>
+    <div class="eq-bar" style="--d: 0.37s; --h: 90%"></div>
+    <div class="eq-bar" style="--d: 0.09s; --h: 73%"></div>
+    <div class="eq-bar" style="--d: 0.46s; --h: 69%"></div>
 </div>
 
 <div class="hero-wrapper">
