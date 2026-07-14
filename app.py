@@ -25,95 +25,13 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   EQ VISUALIZER BACKGROUND — pure CSS, always-on
+   AMBIENT BACKGROUND GLOW — non-interfering, no overlays
    ═══════════════════════════════════════════════════════════ */
-@keyframes eqPulse1 { 0%,100%{height:8%} 50%{height:45%} }
-@keyframes eqPulse2 { 0%,100%{height:12%} 50%{height:60%} }
-@keyframes eqPulse3 { 0%,100%{height:6%} 50%{height:35%} }
-@keyframes eqPulse4 { 0%,100%{height:15%} 50%{height:55%} }
-@keyframes eqPulse5 { 0%,100%{height:10%} 50%{height:50%} }
-
-.stApp::before {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 100vh;
-    z-index: 0;
-    pointer-events: none;
+.stApp {
     background:
-        /* EQ bar 1 */
-        linear-gradient(0deg, rgba(197,78,233,0.06) 0%, transparent 100%) no-repeat,
-        /* EQ bar 2 */
-        linear-gradient(0deg, rgba(99,102,241,0.05) 0%, transparent 100%) no-repeat,
-        /* Subtle radial glow */
-        radial-gradient(ellipse at 50% 100%, rgba(197,78,233,0.04) 0%, transparent 60%);
-}
-
-/* EQ bars container */
-.stApp::after {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 200px;
-    z-index: 0;
-    pointer-events: none;
-    background:
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 18px,
-            rgba(197,78,233,0.025) 18px,
-            rgba(197,78,233,0.025) 20px
-        );
-    mask-image: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
-}
-
-/* Animated EQ bars via box-shadows */
-.stApp .stMainBlockContainer::before {
-    content: '';
-    position: fixed;
-    bottom: 0;
-    left: 5%;
-    width: 90%;
-    height: 0;
-    z-index: 0;
-    pointer-events: none;
-    box-shadow:
-        0vw 0 0 2px rgba(197,78,233,0.08),
-        3vw 0 0 2px rgba(139,92,246,0.08),
-        6vw 0 0 2px rgba(99,102,241,0.08),
-        9vw 0 0 2px rgba(197,78,233,0.06),
-        12vw 0 0 2px rgba(139,92,246,0.06),
-        15vw 0 0 2px rgba(99,102,241,0.06),
-        18vw 0 0 2px rgba(197,78,233,0.05),
-        21vw 0 0 2px rgba(139,92,246,0.05),
-        24vw 0 0 2px rgba(99,102,241,0.05),
-        27vw 0 0 2px rgba(197,78,233,0.04),
-        30vw 0 0 2px rgba(139,92,246,0.04),
-        33vw 0 0 2px rgba(99,102,241,0.04),
-        36vw 0 0 2px rgba(197,78,233,0.05),
-        39vw 0 0 2px rgba(139,92,246,0.06),
-        42vw 0 0 2px rgba(99,102,241,0.07),
-        45vw 0 0 2px rgba(197,78,233,0.08),
-        48vw 0 0 2px rgba(139,92,246,0.07),
-        51vw 0 0 2px rgba(99,102,241,0.06),
-        54vw 0 0 2px rgba(197,78,233,0.05),
-        57vw 0 0 2px rgba(139,92,246,0.04),
-        60vw 0 0 2px rgba(99,102,241,0.05),
-        63vw 0 0 2px rgba(197,78,233,0.06),
-        66vw 0 0 2px rgba(139,92,246,0.07),
-        69vw 0 0 2px rgba(99,102,241,0.08),
-        72vw 0 0 2px rgba(197,78,233,0.06),
-        75vw 0 0 2px rgba(139,92,246,0.05),
-        78vw 0 0 2px rgba(99,102,241,0.04),
-        81vw 0 0 2px rgba(197,78,233,0.05),
-        84vw 0 0 2px rgba(139,92,246,0.06),
-        87vw 0 0 2px rgba(99,102,241,0.07);
+        radial-gradient(ellipse at 50% 100%, rgba(197,78,233,0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.02) 0%, transparent 40%),
+        radial-gradient(ellipse at 20% 60%, rgba(139,92,246,0.02) 0%, transparent 40%) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════
