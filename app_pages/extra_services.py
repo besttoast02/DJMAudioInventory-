@@ -10,18 +10,19 @@ col1, col2 = st.columns(2)
 
 with col1:
     with st.container(border=True):
-        st.markdown("### 🎵 Live Recording & Post-Production")
+        st.markdown("### 🎵 Live Album Post-Production")
+        st.badge("FOH / Audio Package Add-on", color="blue")
         st.markdown("""
-        Capture your live performance forever.
+        When we're your FOH engineer, we record every channel at no extra cost — the pricing below is for **professional post-production** mixing and mastering with analog outboard gear.
         
-        **Pricing:**
+        **Post-production pricing:**
         - **5-song EP** — $300
         - **Full performance album** (1 hour) — $500
         - Scalable for longer sets — contact us
         
         **What you get:**
-        - Multi-track recording of your live event
-        - Professional mixing and mastering in post
+        - Multi-track recording included with any FOH booking
+        - Professional mixing and mastering in post with analog gear
         - Delivered as a polished live album (digital)
         - Individual stems available on request
         - Turnaround: **1 week**
