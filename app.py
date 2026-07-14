@@ -98,6 +98,7 @@ public_pages = [
 ]
 
 admin_pages = [
+    st.Page("app_pages/command_center.py", title="Command Center", icon=":material/command_line:", default=True),
     st.Page("app_pages/dashboard.py", title="Dashboard", icon=":material/dashboard:"),
     st.Page("app_pages/inventory.py", title="Inventory", icon=":material/inventory_2:"),
     st.Page("app_pages/quick_add.py", title="Quick add", icon=":material/auto_fix_high:"),

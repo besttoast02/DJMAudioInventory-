@@ -65,12 +65,18 @@ with tab_pending:
                             else:
                                 db.approve_rental(r["id"], selected_ids)
                                 db.set_final_cost(r["id"], final_cost)
+                                db.log_activity("Rental approved", f"{r['event_name']} — {r['client_name']} — ${final_cost:.0f}", r["id"])
+                                db.notify(
+                                    f"✅ Approved: {r['event_name']}",
+                                    f"Rental approved for {r['client_name']}\n\nEvent: {r['event_name']}\nDate: {r['event_date']}\nVenue: {r.get('venue', 'TBD')}\nFinal cost: ${final_cost:.0f}\nItems assigned: {len(selected_ids)}"
+                                )
                                 st.success(f"Approved! {len(selected_ids)} items assigned.", icon=":material/check_circle:")
                                 st.rerun()
 
                 if st.button("Reject", key=f"reject_{r['id']}",
                              icon=":material/close:", use_container_width=True):
                     db.cancel_rental(r["id"])
+                    db.log_activity("Rental rejected", f"{r['event_name']} — {r['client_name']}", r["id"])
                     st.rerun()
 
 # ── Active tab ───────────────────────────────────────────────

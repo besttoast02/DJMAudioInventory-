@@ -422,3 +422,132 @@ def delete_discount_code(code_id: str):
     sb = get_client()
     sb.table("discount_codes").delete().eq("id", code_id).execute()
 
+
+# ── Todos ────────────────────────────────────────────────────
+
+def create_todo(title: str, due_date: str = None, rental_id: str = None):
+    sb = get_client()
+    row = {"title": title, "done": False}
+    if due_date:
+        row["due_date"] = due_date
+    if rental_id:
+        row["rental_id"] = rental_id
+    sb.table("todos").insert(row).execute()
+
+
+def get_todos(show_done: bool = False) -> list:
+    sb = get_client()
+    q = sb.table("todos").select("*, rentals(event_name)").order("created_at", desc=True)
+    if not show_done:
+        q = q.eq("done", False)
+    return q.execute().data
+
+
+def toggle_todo(todo_id: str, done: bool):
+    sb = get_client()
+    sb.table("todos").update({"done": done}).eq("id", todo_id).execute()
+
+
+def delete_todo(todo_id: str):
+    sb = get_client()
+    sb.table("todos").delete().eq("id", todo_id).execute()
+
+
+# ── Activity Log ─────────────────────────────────────────────
+
+def log_activity(action: str, detail: str = None, rental_id: str = None):
+    sb = get_client()
+    row = {"action": action}
+    if detail:
+        row["detail"] = detail
+    if rental_id:
+        row["rental_id"] = rental_id
+    try:
+        sb.table("activity_log").insert(row).execute()
+    except Exception:
+        pass  # Don't break the app if logging fails
+
+
+def get_recent_activity(limit: int = 15) -> list:
+    sb = get_client()
+    res = sb.table("activity_log").select("*").order("created_at", desc=True).limit(limit).execute()
+    return res.data
+
+
+# ── Email Notifications ──────────────────────────────────────
+
+def send_email_notification(subject: str, body: str):
+    """Send an email notification using Gmail SMTP."""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    try:
+        smtp_user = st.secrets.get("SMTP_USER")
+        smtp_pass = st.secrets.get("SMTP_APP_PASSWORD")
+        notify_to = st.secrets.get("NOTIFY_EMAIL")
+
+        if not all([smtp_user, smtp_pass, notify_to]):
+            return  # Silently skip if not configured
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = f"DJM Audio Alerts <{smtp_user}>"
+        msg["To"] = notify_to
+
+        # Plain text
+        msg.attach(MIMEText(body, "plain"))
+
+        # HTML version
+        html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px 12px 0 0;">
+                <h2 style="color: white; margin: 0;">🎵 DJM Audio</h2>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 12px 12px; border: 1px solid #e9ecef;">
+                <h3>{subject}</h3>
+                <div style="white-space: pre-wrap; line-height: 1.6;">{body}</div>
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 16px 0;">
+                <p style="color: #6c757d; font-size: 12px;">Sent from DJM Audio Inventory System</p>
+            </div>
+        </div>
+        """
+        msg.attach(MIMEText(html, "html"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_user, notify_to, msg.as_string())
+
+    except Exception as e:
+        # Log but don't crash
+        print(f"Email notification failed: {e}")
+
+
+def send_sms_notification(message: str):
+    """Send SMS via Twilio if configured."""
+    try:
+        account_sid = st.secrets.get("TWILIO_SID")
+        auth_token = st.secrets.get("TWILIO_TOKEN")
+        from_number = st.secrets.get("TWILIO_FROM")
+        to_number = st.secrets.get("NOTIFY_PHONE")
+
+        if not all([account_sid, auth_token, from_number, to_number]):
+            return  # Silently skip if not configured
+
+        from twilio.rest import Client as TwilioClient
+        client = TwilioClient(account_sid, auth_token)
+        client.messages.create(body=message, from_=from_number, to=to_number)
+    except ImportError:
+        pass  # twilio not installed
+    except Exception as e:
+        print(f"SMS notification failed: {e}")
+
+
+def notify(subject: str, body: str):
+    """Send both email and SMS notifications."""
+    send_email_notification(subject, body)
+    # SMS gets a shortened version
+    sms_text = f"DJM Audio: {subject}"
+    send_sms_notification(sms_text)
+
+

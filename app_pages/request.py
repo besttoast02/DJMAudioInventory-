@@ -201,6 +201,19 @@ with st.form("checkout_form", border=True):
             if 'applied_discount' in st.session_state:
                 del st.session_state['applied_discount']
 
+        # ── Notify admin ─────────────────────────────────────
+        notify_body = (
+            f"New rental request from {client_name}\n\n"
+            f"Event: {event_name}\n"
+            f"Date: {event_date} → {return_date}\n"
+            f"Venue: {venue or 'TBD'}\n"
+            f"Phone: {client_phone}\n"
+            f"Estimated daily: ${final_daily:.0f}\n\n"
+            f"Gear:\n" + "\n".join(gear_lines)
+        )
+        db.notify(f"📋 New Request: {event_name}", notify_body)
+        db.log_activity("New rental request", f"{client_name} — {event_name} on {event_date}")
+
         # Track submission for rate limiting
         st.session_state.submit_timestamps.append(datetime.now().timestamp())
 
