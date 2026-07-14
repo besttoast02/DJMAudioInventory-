@@ -119,6 +119,15 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
             with st.container(border=True):
                 display_brand = "" if info['brand'].lower() == "generic" else f"**{info['brand']}** "
                 st.markdown(f"#### {display_brand}{info['name']}")
+                
+                # Image
+                img_path = "assets/IMG_2223_bg_removed.png" if idx % 2 == 0 else "assets/IMG_2236_bg_removed.png"
+                img_col1, img_col2, img_col3 = st.columns([1, 2, 1])
+                try:
+                    img_col2.image(img_path, use_container_width=True)
+                except Exception:
+                    pass
+
                 st.badge(f"{info['qty']} available", color="green")
 
                 if info["rate_daily"] > 0:
