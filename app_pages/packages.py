@@ -55,6 +55,7 @@ def add_package_to_cart(package_key: str, extras: dict):
                 "max_qty": 1,
                 "is_service": True,
                 "included_free": True,
+                "is_hourly": False,
             }
 
     # Add selected extras
@@ -89,6 +90,7 @@ def add_package_to_cart(package_key: str, extras: dict):
                 "max_qty": 5,
                 "is_service": True,
                 "included_free": is_free,
+                "is_hourly": False,
             }
 
 
@@ -166,10 +168,38 @@ active = st.session_state.get("active_pkg")
 if active and active in pkg.PACKAGES:
     config = pkg.PACKAGES[active]
     st.divider()
+
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stForm"] {
+            border: 2px solid #fff !important;
+            border-radius: 12px !important;
+            box-shadow: 0 0 10px #fff, 0 0 20px #d946ef, 0 0 30px #d946ef !important;
+            animation: pulse-border 2s infinite alternate;
+        }
+        @keyframes pulse-border {
+            from { box-shadow: 0 0 5px #fff, 0 0 10px #d946ef; }
+            to { box-shadow: 0 0 10px #fff, 0 0 20px #d946ef, 0 0 30px #d946ef; }
+        }
+        </style>
+        <div id="customize-section"></div>
+        <script>
+            setTimeout(function() {
+                const el = window.parent.document.getElementById('customize-section');
+                if (el) {
+                    el.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }
+            }, 500);
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.subheader(f"🛒 Customize: {config['name']}")
     st.markdown(f"Answer a few questions to build your personalized estimate for the **{config['name']}**.")
 
-    with st.form(f"questionnaire_{active}", border=True):
+    with st.form(f"questionnaire_{active}", border=True, clear_on_submit=False):
         st.markdown("##### 📋 Event Details")
         q1, q2 = st.columns(2)
         event_type = q1.selectbox(
@@ -180,7 +210,8 @@ if active and active in pkg.PACKAGES:
 
         q3, q4 = st.columns(2)
         venue_type = q3.selectbox("Venue type", ["Indoor", "Outdoor", "Both / Mixed"])
-        hours_extra = q4.number_input("Extra hours beyond 5", min_value=0, max_value=10, value=0)
+        hours_total = q4.number_input("Total hours", min_value=5, max_value=15, value=5)
+        st.info("ℹ️ Packages include a minimum of 5 hours. For shorter events, services are billed hourly a-la-carte.")
 
         st.divider()
         st.markdown("##### ✨ Add-Ons & Extras")
@@ -248,7 +279,7 @@ if active and active in pkg.PACKAGES:
             st.session_state["pkg_event_type"] = event_type
             st.session_state["pkg_guest_count"] = guest_count
             st.session_state["pkg_venue_type"] = venue_type
-            st.session_state["pkg_extra_hours"] = hours_extra
+            st.session_state["pkg_total_hours"] = hours_total
             if notes:
                 st.session_state["pkg_notes"] = notes
 
@@ -288,7 +319,7 @@ with q1:
                 "name": "Baile Sorpresa Custom Mix", "brand": "DJM Audio",
                 "category": "Services", "barcode": pkg.SVC_BAILE, "qty": 1,
                 "rate_half_day": 0, "rate_daily": 50, "rate_weekend": 50,
-                "max_qty": 1, "is_service": True,
+                "max_qty": 1, "is_service": True, "is_hourly": False,
             }
             st.rerun()
 
@@ -313,7 +344,7 @@ with q2:
                 "name": "Vals Custom Mix", "brand": "DJM Audio",
                 "category": "Services", "barcode": pkg.SVC_VALS, "qty": 1,
                 "rate_half_day": 0, "rate_daily": 50, "rate_weekend": 50,
-                "max_qty": 1, "is_service": True,
+                "max_qty": 1, "is_service": True, "is_hourly": False,
             }
             st.rerun()
 

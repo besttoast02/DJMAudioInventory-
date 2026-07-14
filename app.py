@@ -34,6 +34,60 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
         radial-gradient(ellipse at 20% 60%, rgba(139,92,246,0.02) 0%, transparent 40%) !important;
 }
 
+/* Background EQ globally */
+#bg-eq-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: clamp(2px, 0.5vw, 6px);
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    padding-bottom: 5vh;
+}
+.eq-bar {
+    width: clamp(10px, 2vw, 30px);
+    background: linear-gradient(to top, rgba(217,70,239,0.3), rgba(59,130,246,0.5));
+    border-radius: 4px 4px 0 0;
+    animation: eq-bounce 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    animation-delay: var(--d);
+    height: var(--h);
+}
+@keyframes eq-bounce {
+    0% { height: 10%; }
+    100% { height: var(--h); }
+}
+
+/* Ensure main content is above background */
+[data-testid="stMainBlockContainer"] {
+    position: relative;
+    z-index: 2;
+}
+</style>
+
+<div id="bg-eq-container">
+    <div class="eq-bar" style="--d: 1.49s; --h: 35%"></div>
+    <div class="eq-bar" style="--d: 0.31s; --h: 84%"></div>
+    <div class="eq-bar" style="--d: 0.79s; --h: 43%"></div>
+    <div class="eq-bar" style="--d: 0.4s; --h: 45%"></div>
+    <div class="eq-bar" style="--d: 0.95s; --h: 77%"></div>
+    <div class="eq-bar" style="--d: 1.37s; --h: 38%"></div>
+    <div class="eq-bar" style="--d: 1.18s; --h: 84%"></div>
+    <div class="eq-bar" style="--d: 0.79s; --h: 58%"></div>
+    <div class="eq-bar" style="--d: 1.36s; --h: 81%"></div>
+    <div class="eq-bar" style="--d: 0.38s; --h: 34%"></div>
+</div>
+""", unsafe_allow_html=True)
+
+st.sidebar.image("assets/logo.png", use_container_width=True)
+
+st.markdown("""
+<style>
 /* ═══════════════════════════════════════════════════════════
    GLASSMORPHISM SIDEBAR
    ═══════════════════════════════════════════════════════════ */

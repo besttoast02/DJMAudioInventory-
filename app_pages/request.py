@@ -50,7 +50,9 @@ if st.session_state.checkout_step == 1:
     st.session_state.chk_event_type = st.selectbox(
         "Event type",
         ["Wedding", "Quinceañera", "Birthday / Party", "Corporate", "Concert / Festival", "Other"],
-        index=["Wedding", "Quinceañera", "Birthday / Party", "Corporate", "Concert / Festival", "Other"].index(st.session_state.get("chk_event_type", "Wedding"))
+        index=["Wedding", "Quinceañera", "Birthday / Party", "Corporate", "Concert / Festival", "Other"].index(
+            st.session_state.get("chk_event_type", st.session_state.get("pkg_event_type", "Wedding"))
+        )
     )
     
     st.session_state.chk_event_name = st.text_input(
@@ -65,7 +67,7 @@ if st.session_state.checkout_step == 1:
     st.session_state.chk_hours = st.number_input(
         "Total service hours requested", 
         min_value=1, max_value=24, 
-        value=st.session_state.get("chk_hours", 5)
+        value=st.session_state.get("chk_hours", st.session_state.get("pkg_total_hours", 5))
     )
     
     # Show multiplier info
@@ -88,18 +90,31 @@ elif st.session_state.checkout_step == 2:
     st.subheader("Step 2: Location & Size")
     
     st.markdown("### Venue Location")
-    st.caption("*(Note: Google Maps Autocomplete integration requires API Key. Standard input used for now)*")
-    st.session_state.chk_venue = st.text_input(
-        "Start typing the venue address...", 
-        value=st.session_state.get("chk_venue", ""),
-        placeholder="123 Main St, Los Angeles, CA"
-    )
+    st.caption("*(Uses Google Maps Autocomplete if GOOGLE_MAPS_API_KEY is in secrets)*")
+    try:
+        from streamlit_google_places_autocomplete import google_places_autocomplete
+        api_key = st.secrets.get("GOOGLE_MAPS_API_KEY", "")
+        if api_key:
+            location = google_places_autocomplete(api_key, default=st.session_state.get("chk_venue", ""))
+            st.session_state.chk_venue = location
+        else:
+            st.session_state.chk_venue = st.text_input(
+                "Start typing the venue address...", 
+                value=st.session_state.get("chk_venue", st.session_state.get("pkg_venue_type", "")),
+                placeholder="123 Main St, Los Angeles, CA"
+            )
+    except ImportError:
+        st.session_state.chk_venue = st.text_input(
+            "Start typing the venue address...", 
+            value=st.session_state.get("chk_venue", st.session_state.get("pkg_venue_type", "")),
+            placeholder="123 Main St, Los Angeles, CA"
+        )
     
     st.markdown("### Event Size")
     st.session_state.chk_guests = st.number_input(
         "Expected guest count", 
         min_value=10, max_value=5000, step=50,
-        value=st.session_state.get("chk_guests", 150)
+        value=st.session_state.get("chk_guests", st.session_state.get("pkg_guest_count", 150))
     )
     
     col1, col2 = st.columns([1, 4])
@@ -179,15 +194,21 @@ elif st.session_state.checkout_step == 5:
     
     # Add optional services if selected
     temp_cart = dict(cart)
+    
+    has_dj_package = any(
+        item.get("barcode") in pkg.DJ_PACKAGES
+        for item in temp_cart.values()
+    )
+    
     if st.session_state.get("chk_add_baile"):
         if pkg.SVC_BAILE not in temp_cart:
             temp_cart[pkg.SVC_BAILE] = {
-                "name": "Baile Sorpresa Custom Mix", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_BAILE, "qty": 1, "rate_daily": 50, "rate_weekend": 50, "rate_hourly": 0, "is_service": True
+                "name": "Baile Sorpresa Custom Mix", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_BAILE, "qty": 1, "rate_daily": 0 if has_dj_package else 50, "rate_weekend": 0 if has_dj_package else 50, "rate_hourly": 0, "is_service": True, "is_hourly": False
             }
     if st.session_state.get("chk_add_vals"):
         if pkg.SVC_VALS not in temp_cart:
             temp_cart[pkg.SVC_VALS] = {
-                "name": "Vals Custom Mix", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_VALS, "qty": 1, "rate_daily": 50, "rate_weekend": 50, "rate_hourly": 0, "is_service": True
+                "name": "Vals Custom Mix", "brand": "DJM Audio", "category": "Services", "barcode": pkg.SVC_VALS, "qty": 1, "rate_daily": 0 if has_dj_package else 50, "rate_weekend": 0 if has_dj_package else 50, "rate_hourly": 0, "is_service": True, "is_hourly": False
             }
 
     equipment_items = {k: v for k, v in temp_cart.items() if not v.get("is_service") and not v.get("package_item")}
@@ -219,6 +240,14 @@ elif st.session_state.checkout_step == 5:
                 continue
                 
             qty = v["qty"]
+            
+            # Flat-rate items (e.g. Packages, Spark Machines, Custom Mixes)
+            if v.get("is_hourly") is False:
+                line = v["rate_daily"] * qty
+                total_services += line
+                st.markdown(f"- {qty}x {v['name']} (Total: ${line:.0f})")
+                continue
+
             # Base hourly rate fallback
             hourly = float(v.get("rate_hourly") or 0)
             if hourly == 0 and float(v.get("rate_daily") or 0) > 0:
@@ -228,7 +257,7 @@ elif st.session_state.checkout_step == 5:
             line = adjusted_hourly * hours * qty
             total_services += line
             
-            st.markdown(f"- {qty}x {v['name']} @ ${adjusted_hourly:.2f}/hr x {hours} hrs (Total: ${line:.0f})")
+            st.markdown(f"- {qty}x {v['name']} (Total: ${line:.0f})")
             
     total = total_equip + total_services
     st.metric("Total Estimate", f"${total:,.0f}")
