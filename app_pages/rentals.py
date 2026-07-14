@@ -1,6 +1,7 @@
 import streamlit as st
 import db
 from datetime import datetime
+import gear_requirements as gr
 
 st.title(":material/event: Rentals")
 
@@ -42,45 +43,94 @@ with tab_pending:
             with c2:
                 st.space("small")
 
-                # ── Approve — inline expander (no popover so widgets work) ──
+                # ── Approve — smart gear suggestion panel ──────────────────
                 with st.expander("✅ Approve", expanded=st.session_state.get(f"expand_approve_{r['id']}", False)):
-                    st.markdown("**Select gear to assign:**")
                     available = db.get_available_items()
                     if not available:
-                        st.warning("No available items")
+                        st.warning("No available items in inventory.")
                     else:
+                        st.markdown("#### Step 1 — Select gear")
                         cats = sorted(set(i["category"] for i in available))
                         selected_ids = []
+                        selected_items_data = []
+
                         for cat in cats:
                             cat_items = [i for i in available if i["category"] == cat]
                             with st.expander(f"{cat} ({len(cat_items)} available)"):
                                 for item in cat_items:
-                                    if st.checkbox(
-                                        f"{item['barcode']} — {item['brand']} {item['name']}",
-                                        key=f"approve_{r['id']}_{item['id']}"
-                                    ):
+                                    label = f"`{item['barcode']}` — {item['brand']} {item['name']}"
+                                    # Show spec sheet inline as help text
+                                    specs = gr.get_item_spec_sheet(item)
+                                    help_txt = "  •  ".join(specs) if specs else None
+                                    checked = st.checkbox(label, key=f"approve_{r['id']}_{item['id']}", help=help_txt)
+                                    if checked:
                                         selected_ids.append(item["id"])
+                                        selected_items_data.append(item)
+
+                        # ── Live Smart Suggestions ──────────────────────────
+                        if selected_items_data:
+                            st.divider()
+                            st.markdown("#### Step 2 — Pack check ✅")
+                            analysis = gr.get_suggestions(selected_items_data, available)
+
+                            # Warnings first
+                            for w in analysis["warnings"]:
+                                st.error(w, icon=":material/error:")
+
+                            if not analysis["suggestions"] and not analysis["warnings"]:
+                                st.success("All required accessories are already selected!", icon=":material/check_circle:")
+
+                            for s in analysis["suggestions"]:
+                                is_advisory = s.get("advisory", False)
+                                icon = ":material/info:" if is_advisory else ":material/warning:"
+                                color = "blue" if is_advisory else "orange"
+
+                                if is_advisory:
+                                    label = f"**Consider:** {s['category']}"
+                                else:
+                                    label = f"**Missing {s['qty_needed']}x {s['category']}** — {s['qty_available']} available"
+
+                                with st.container(border=True):
+                                    hc1, hc2 = st.columns([3, 1])
+                                    with hc1:
+                                        st.markdown(f"{':material/warning:' if not is_advisory else ':material/lightbulb:'} {label}")
+                                        st.caption(s["reason"])
+
+                                    # Quick-select buttons for each matching available item
+                                    if s["items"]:
+                                        with st.expander(f"{'Add' if not is_advisory else 'View'} {s['category']} →"):
+                                            for acc in s["items"]:
+                                                st.checkbox(
+                                                    f"`{acc['barcode']}` {acc['brand']} {acc['name']}",
+                                                    key=f"sugg_{r['id']}_{acc['id']}",
+                                                )
+                                                # Track suggestion selections too
+                                                if st.session_state.get(f"sugg_{r['id']}_{acc['id']}"):
+                                                    if acc["id"] not in selected_ids:
+                                                        selected_ids.append(acc["id"])
 
                         st.divider()
+                        st.markdown("#### Step 3 — Confirm")
+                        if selected_ids:
+                            st.success(f"{len(selected_ids)} items ready to assign", icon=":material/inventory_2:")
                         final_cost = st.number_input(
                             "Final Approved Cost ($)",
                             value=float(r.get("estimated_cost") or 0.0),
                             key=f"cost_{r['id']}"
                         )
                         if st.button("Confirm approval", key=f"confirm_{r['id']}",
-                                     type="primary", icon=":material/gavel:"):
-                            if not selected_ids:
-                                st.error("Select at least one item")
-                            else:
-                                db.approve_rental(r["id"], selected_ids)
-                                db.set_final_cost(r["id"], final_cost)
-                                db.log_activity("Rental approved", f"{r['event_name']} — {r['client_name']} — ${final_cost:.0f}", r["id"])
-                                db.notify(
-                                    f"✅ Approved: {r['event_name']}",
-                                    f"Rental approved for {r['client_name']}\n\nEvent: {r['event_name']}\nDate: {r['event_date']}\nVenue: {r.get('venue', 'TBD')}\nFinal cost: ${final_cost:.0f}\nItems assigned: {len(selected_ids)}"
-                                )
-                                st.success(f"Approved! {len(selected_ids)} items assigned.", icon=":material/check_circle:")
-                                st.rerun()
+                                     type="primary", icon=":material/gavel:",
+                                     disabled=len(selected_ids) == 0):
+                            db.approve_rental(r["id"], selected_ids)
+                            db.set_final_cost(r["id"], final_cost)
+                            db.log_activity("Rental approved", f"{r['event_name']} — {r['client_name']} — ${final_cost:.0f}", r["id"])
+                            db.notify(
+                                f"✅ Approved: {r['event_name']}",
+                                f"Rental approved for {r['client_name']}\n\nEvent: {r['event_name']}\nDate: {r['event_date']}\nVenue: {r.get('venue', 'TBD')}\nFinal cost: ${final_cost:.0f}\nItems assigned: {len(selected_ids)}"
+                            )
+                            st.success(f"Approved! {len(selected_ids)} items assigned.", icon=":material/check_circle:")
+                            st.rerun()
+
 
                 if st.button("Reject", key=f"reject_{r['id']}",
                              icon=":material/close:", use_container_width=True):
