@@ -6,3 +6,10 @@ secondaryBackgroundColor = "#12121a"
 textColor = "#e0e0e8"
 borderColor = "#2a2a3a"
 font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+showSidebarNavigation = true
+
+[ui]
+hideTopBar = true

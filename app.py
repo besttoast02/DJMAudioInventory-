@@ -317,6 +317,21 @@ span[data-testid="stBadge"] {
     font-weight: 500 !important;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   HIDE DEPLOY BUTTON, MENU, AND FOOTER
+   ═══════════════════════════════════════════════════════════ */
+.stDeployButton,
+button[data-testid="stBaseButton-headerNoPadding"],
+#MainMenu,
+header[data-testid="stHeader"] button[kind="header"],
+div[data-testid="stToolbar"],
+div[data-testid="stDecoration"],
+footer,
+footer a {
+    display: none !important;
+    visibility: hidden !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -357,6 +372,18 @@ if st.session_state.is_admin and st.session_state.get("admin_login_time"):
         st.session_state.admin_login_time = None
         st.toast("Session expired. Please log in again.", icon=":material/timer_off:")
 
+# ── Secret admin gate ────────────────────────────────────────
+# Access admin login ONLY via: ?gate=<ADMIN_GATE_CODE>
+# No visible login button for public visitors.
+ADMIN_GATE_CODE = st.secrets.get("ADMIN_GATE_CODE", "3KcWvK9v_kGqEe5H1lwxtOspg7tChhuI")
+query_gate = st.query_params.get("gate", "")
+
+# If gate code matches, flag the session so the login form appears
+if query_gate == ADMIN_GATE_CODE:
+    st.session_state["gate_unlocked"] = True
+    # Clear the gate param from URL so it's not visible/shareable
+    st.query_params.clear()
+
 # ── Sidebar ──────────────────────────────────────────────────
 with st.sidebar:
     st.title(":material/speaker: DJMAudio")
@@ -365,35 +392,40 @@ with st.sidebar:
     st.space("medium")
 
     if not st.session_state.is_admin:
-        with st.popover("Admin login", icon=":material/lock:"):
-            pw = st.text_input("Password", type="password", key="admin_pw")
-            totp_code = st.text_input("2FA Code (Google Authenticator)", type="password", key="admin_2fa")
-            
-            if st.button("Log in", icon=":material/login:"):
-                try:
-                    if pw == st.secrets["ADMIN_PASSWORD"]:
-                        admin_2fa_secret = st.secrets.get("ADMIN_2FA_SECRET")
-                        if admin_2fa_secret:
-                            totp = pyotp.TOTP(admin_2fa_secret)
-                            if totp.verify(totp_code):
+        # Only show login if gate was unlocked via secret URL
+        if st.session_state.get("gate_unlocked", False):
+            with st.popover("Admin login", icon=":material/lock:"):
+                pw = st.text_input("Password", type="password", key="admin_pw")
+                totp_code = st.text_input("2FA Code (Google Authenticator)", type="password", key="admin_2fa")
+                
+                if st.button("Log in", icon=":material/login:"):
+                    try:
+                        if pw == st.secrets["ADMIN_PASSWORD"]:
+                            admin_2fa_secret = st.secrets.get("ADMIN_2FA_SECRET")
+                            if admin_2fa_secret:
+                                totp = pyotp.TOTP(admin_2fa_secret)
+                                if totp.verify(totp_code):
+                                    st.session_state.is_admin = True
+                                    from datetime import datetime, timezone
+                                    st.session_state.admin_login_time = datetime.now(timezone.utc)
+                                    st.rerun()
+                                else:
+                                    st.error("Invalid 2FA code")
+                            else:
                                 st.session_state.is_admin = True
                                 from datetime import datetime, timezone
                                 st.session_state.admin_login_time = datetime.now(timezone.utc)
                                 st.rerun()
-                            else:
-                                st.error("Invalid 2FA code")
                         else:
-                            # Fallback if no 2FA secret is configured
-                            st.session_state.is_admin = True
-                            st.rerun()
-                    else:
-                        st.error("Wrong password")
-                except KeyError:
-                    st.error("ADMIN_PASSWORD not set in secrets")
+                            st.error("Wrong password")
+                    except KeyError:
+                        st.error("ADMIN_PASSWORD not set in secrets")
+        # else: no login visible — public visitors see nothing
     else:
         st.badge("Admin", icon=":material/verified_user:", color="green")
         if st.button("Log out", icon=":material/logout:"):
             st.session_state.is_admin = False
+            st.session_state["gate_unlocked"] = False
             st.rerun()
 
 # ── Navigation ───────────────────────────────────────────────
