@@ -90,19 +90,46 @@ elif st.session_state.checkout_step == 2:
     st.subheader("Step 2: Location & Size")
     
     st.markdown("### Venue Location")
-    st.caption("*(Uses Google Maps Autocomplete if GOOGLE_MAPS_API_KEY is in secrets)*")
+    st.caption("*(Powered by OpenStreetMap)*")
+    
+    # Free Autocomplete using Photon API and streamlit_searchbox
+    def search_venue(searchterm: str):
+        if not searchterm:
+            return []
+        try:
+            import requests
+            res = requests.get(f"https://photon.komoot.io/api/?q={searchterm}&limit=5", timeout=2)
+            if res.status_code == 200:
+                options = []
+                for f in res.json().get("features", []):
+                    props = f.get("properties", {})
+                    parts = []
+                    if "name" in props: parts.append(props["name"])
+                    if "street" in props: 
+                        address = props["street"]
+                        if "housenumber" in props: address = f"{props['housenumber']} {address}"
+                        parts.append(address)
+                    if "city" in props: parts.append(props["city"])
+                    if "state" in props: parts.append(props["state"])
+                    label = ", ".join(parts)
+                    if label:
+                        options.append(label)
+                # Return unique items
+                return list(dict.fromkeys(options))
+        except Exception:
+            pass
+        return []
+        
     try:
-        from streamlit_google_places_autocomplete import google_places_autocomplete
-        api_key = st.secrets.get("GOOGLE_MAPS_API_KEY", "")
-        if api_key:
-            location = google_places_autocomplete(api_key, default=st.session_state.get("chk_venue", ""))
-            st.session_state.chk_venue = location
-        else:
-            st.session_state.chk_venue = st.text_input(
-                "Start typing the venue address...", 
-                value=st.session_state.get("chk_venue", st.session_state.get("pkg_venue_type", "")),
-                placeholder="123 Main St, Los Angeles, CA"
-            )
+        from streamlit_searchbox import st_searchbox
+        selected_venue = st_searchbox(
+            search_venue,
+            key="venue_searchbox",
+            placeholder="Start typing the venue address...",
+            default=st.session_state.get("chk_venue", st.session_state.get("pkg_venue_type", ""))
+        )
+        if selected_venue:
+            st.session_state.chk_venue = selected_venue
     except ImportError:
         st.session_state.chk_venue = st.text_input(
             "Start typing the venue address...", 

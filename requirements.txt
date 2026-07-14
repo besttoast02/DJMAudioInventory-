@@ -13,4 +13,5 @@ openai
 toml
 beautifulsoup4
 rembg
-streamlit-google-places-autocomplete
+streamlit-searchbox
+requests
