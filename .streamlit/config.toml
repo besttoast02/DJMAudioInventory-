@@ -12,4 +12,4 @@ toolbarMode = "minimal"
 showSidebarNavigation = true
 
 [ui]
-hideTopBar = true
+hideTopBar = false
