@@ -9,11 +9,7 @@ st.title("🎤 DJM Audio AI Assistant")
 st.markdown("Talk to our AI assistant to help you build the perfect rental cart! **Hold the mic button or type a message below.**")
 
 # ── Load Voice Component ──────────────────────────────────────
-# Declare the custom component
-_voice_component = components.declare_component(
-    "voice_component",
-    path="assets/voice_component"
-)
+from custom_widgets import _voice_component
 
 # ── Initialize State ──────────────────────────────────────────
 if "messages" not in st.session_state:
