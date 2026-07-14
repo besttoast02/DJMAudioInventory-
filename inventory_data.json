@@ -5,6 +5,7 @@
       "icon": "flare",
       "items": [
         {"name": "Dotz Par TRI LED Wash Light", "brand": "American DJ", "qty": 4, "qty_out": 0, "category": "Lighting", "purchase_price": 90, "current_value": 55, "rate_half_day": 12, "rate_daily": 18, "rate_weekend": 30, "notes": "4x flood/wash lights"},
+        {"name": "Vizi Beam RXONE Mobile Head", "brand": "American DJ", "qty": 2, "qty_out": 0, "category": "Lighting", "purchase_price": 800, "current_value": 600, "rate_half_day": 45, "rate_daily": 70, "rate_weekend": 115, "notes": "Moving head beam light"},
         {"name": "10' Aluminum Truss Segment", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 220, "current_value": 130, "rate_half_day": 25, "rate_daily": 40, "rate_weekend": 65, "notes": ""},
         {"name": "5' Aluminum Truss Segment", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 130, "current_value": 80, "rate_half_day": 15, "rate_daily": 22, "rate_weekend": 38, "notes": ""},
         {"name": "7' Aluminum Truss Segment", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Hardware", "purchase_price": 160, "current_value": 95, "rate_half_day": 18, "rate_daily": 28, "rate_weekend": 45, "notes": ""},
