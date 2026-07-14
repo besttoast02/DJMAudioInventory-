@@ -48,6 +48,31 @@ with col2:
 
 st.divider()
 
+col3, col4 = st.columns(2)
+
+with col3:
+    with st.container(border=True):
+        st.markdown("### 🎧 Monitor Engineering")
+        st.markdown("""
+        Dedicated monitor mixes for performers on stage.
+        
+        **Includes:**
+        - Individual monitor mixes per musician
+        - In-ear monitor (IEM) management
+        - Wedge monitor positioning
+        - Real-time adjustments during performance
+        - Stage patch and input management
+        
+        **Starting at $350 / event**
+        """)
+        if st.button("Request quote", key="mon", type="primary", icon=":material/request_quote:", use_container_width=True):
+            st.switch_page("app_pages/contact.py")
+
+with col4:
+    st.empty()  # Balanced layout
+
+st.divider()
+
 with st.container(border=True):
     st.markdown("### 🏟️ Complete Live Audio Package")
     st.badge("Best Value", color="green")
