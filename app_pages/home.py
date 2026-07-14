@@ -1,39 +1,82 @@
 import streamlit as st
 
-# ── Hero Section ─────────────────────────────────────────────
+# ── Hero Section with Background Video ───────────────────────
 st.markdown("""
 <style>
+/* Make Streamlit's header transparent so the video shows underneath */
+[data-testid="stHeader"] {
+    background: rgba(10, 10, 15, 0.5) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* Background video container fixed to the top */
+#bg-video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 70vh;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+#bg-video-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradient fades from semi-transparent to solid background color to blend with the rest of the page */
+    background: linear-gradient(to bottom, rgba(14, 17, 23, 0.5) 0%, rgba(14, 17, 23, 1) 100%);
+    z-index: 1;
+}
+#bg-video-container video {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+    filter: brightness(0.8);
+}
+
+/* Ensure content sits above the video */
+[data-testid="stMainBlockContainer"] {
+    position: relative;
+    z-index: 2;
+}
+
 .hero-wrapper {
     text-align: center;
-    padding: 3rem 1rem 1rem;
+    padding: 6rem 1rem 3rem;
 }
 .hero-title {
-    font-size: 3.2rem;
+    font-size: 3.5rem;
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1rem;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.8);
 }
 .hero-sub {
-    font-size: 1.2rem;
-    color: rgba(224,224,232,0.8);
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
     max-width: 600px;
     margin: 0 auto 2rem;
     line-height: 1.5;
-}
-.hero-image-container {
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border: 1px solid rgba(197,78,233,0.1);
-}
-.hero-image-container img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    max-height: 450px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 </style>
+
+<div id="bg-video-container">
+    <video autoplay loop muted playsinline>
+        <source src="https://videos.pexels.com/video-files/3163534/3163534-uhd_2560_1440_30fps.mp4" type="video/mp4">
+    </video>
+</div>
 
 <div class="hero-wrapper">
     <h1 class="hero-title">Pro Audio Rental for Live Events in LA.</h1>
@@ -49,12 +92,7 @@ with hc2:
     if st.button("Browse Gear", type="primary", use_container_width=True):
         st.switch_page("app_pages/browse.py")
 
-# Hero Image
-st.markdown("""
-<div class="hero-image-container">
-    <img src="https://images.unsplash.com/photo-1516280440502-869d80d26987?auto=format&fit=crop&w=1200&q=80" alt="Live Event Rig" />
-</div>
-""", unsafe_allow_html=True)
+st.markdown("<div style='height: 4rem;'></div>", unsafe_allow_html=True)
 
 # ── How It Works ─────────────────────────────────────────────
 st.divider()
