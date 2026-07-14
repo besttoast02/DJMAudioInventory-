@@ -79,7 +79,7 @@ async def process_with_llm(user_id: str, user_text: str):
     )
     
     # We use a fast, free model capable of tool calling
-    MODEL_NAME = "google/gemini-2.0-flash-lite-preview-02-05:free"
+    MODEL_NAME = "meta-llama/llama-3.3-70b-instruct:free"
     
     tools = [
         {
