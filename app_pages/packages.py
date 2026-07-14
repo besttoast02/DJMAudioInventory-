@@ -267,8 +267,8 @@ with q1:
         Custom choreography mix for your surprise dance.
         
         **What's included:**
-        - Custom song mashup / remix (3–8 minutes)
-        - Up to 5 songs blended seamlessly
+        - Custom song mashup / remix (under 10 mins recommended)
+        - Unlimited songs (5–10 max recommended)
         - Tempo-matched transitions
         - Sound effects and drops
         - Unlimited revisions before event
