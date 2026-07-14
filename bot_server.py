@@ -96,56 +96,72 @@ async def process_with_llm(user_id: str, user_text: str):
         }
     ]
 
-    try:
-        response = await client.chat.completions.create(
-            model=MODEL_NAME,
-            messages=messages,
-            tools=tools
-        )
-        
-        response_message = response.choices[0].message
-        
-        # Check if model wants to call a tool
-        if response_message.tool_calls:
-            import json
-            messages.append(response_message)
-            for tool_call in response_message.tool_calls:
-                if tool_call.function.name == "get_inventory":
-                    # Call the actual DB
-                    try:
-                        inventory = db.get_available_items()
-                        # Summarize to save tokens
-                        inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i['price']} for i in inventory])
-                    except Exception as e:
-                        inv_str = f"Error fetching inventory: {str(e)}"
-                    
-                    messages.append({
-                        "tool_call_id": tool_call.id,
-                        "role": "tool",
-                        "name": "get_inventory",
-                        "content": inv_str
-                    })
-            
-            # Get final response after tool call
-            second_response = await client.chat.completions.create(
+    # We loop through a list of models to gracefully handle rate limits on the free tier
+    MODELS_TO_TRY = [
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "google/gemma-4-31b-it:free",
+        "nousresearch/hermes-3-llama-3.1-405b:free"
+    ]
+    
+    last_error = None
+    import json
+    
+    for MODEL_NAME in MODELS_TO_TRY:
+        try:
+            response = await client.chat.completions.create(
                 model=MODEL_NAME,
-                messages=messages
+                messages=messages,
+                tools=tools
             )
-            ai_reply = second_response.choices[0].message.content
-        else:
-            ai_reply = response_message.content
-        
-        # Save AI reply
-        conn = sqlite3.connect('bot_memory.db')
-        c = conn.cursor()
-        c.execute("INSERT INTO messages (user_id, role, content) VALUES (?, ?, ?)", (user_id, 'assistant', ai_reply))
-        conn.commit()
-        conn.close()
-        
-        return ai_reply
-    except Exception as e:
-        print("OpenAI Error:", e)
-        return "Sorry, I had trouble thinking of a response."
+            
+            response_message = response.choices[0].message
+            
+            # Check if model wants to call a tool
+            if response_message.tool_calls:
+                messages.append(response_message.model_dump())
+                for tool_call in response_message.tool_calls:
+                    if tool_call.function.name == "get_inventory":
+                        # Call the actual DB
+                        try:
+                            inventory = db.get_available_items()
+                            # Summarize to save tokens
+                            inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0)} for i in inventory])
+                        except Exception as e:
+                            inv_str = f"Error fetching inventory: {str(e)}"
+                        
+                        messages.append({
+                            "tool_call_id": tool_call.id,
+                            "role": "tool",
+                            "name": "get_inventory",
+                            "content": inv_str
+                        })
+                
+                # Get final response after tool call
+                second_response = await client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=messages
+                )
+                ai_reply = second_response.choices[0].message.content
+            else:
+                ai_reply = response_message.content
+            
+            # Save AI reply
+            conn = sqlite3.connect('bot_memory.db')
+            c = conn.cursor()
+            c.execute("INSERT INTO messages (user_id, role, content) VALUES (?, ?, ?)", (user_id, 'assistant', ai_reply))
+            conn.commit()
+            conn.close()
+            
+            return ai_reply
+            
+        except Exception as e:
+            last_error = str(e)
+            if "429" in last_error or "rate-limit" in last_error.lower():
+                continue
+            else:
+                break
+                
+    return "Sorry, I am currently experiencing high traffic and my servers are rate-limited. Please try again in 30 seconds."
 
 
 # 1. Telegram Webhook Endpoint
