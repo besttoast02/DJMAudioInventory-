@@ -192,10 +192,17 @@ with cc2:
         st.switch_page("app_pages/browse.py")
 
 # Footer Trust Info
+st.divider()
+
+fc1, fc2, fc3 = st.columns([2, 3, 2])
+with fc2:
+    st.image("assets/logo_dark.png", use_container_width=True)
+
 st.markdown("""
-<div style="text-align:center; padding: 3rem 0 1rem; color: rgba(224,224,232,0.5); font-size: 0.85rem;">
-    <strong>DJM Audio Productions LLC</strong><br/>
-    Los Angeles, CA · (555) 123-4567<br/><br/>
-    <span style="opacity: 0.6;">© 2025 DJM Audio Productions LLC</span>
+<div style="text-align:center; padding: 1rem 0 3rem; color: rgba(255,255,255,0.9);">
+    <p style="font-size: 2.2rem; margin-top: 0.5rem; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">(626) 506-3824</p>
+    <p style="font-size: 1.4rem; color: #b182ff; font-weight: 600;">djmaudio.com</p>
+    <br/>
+    <span style="opacity: 0.5; font-size: 0.9rem;">Los Angeles, CA · © 2025 DJM Audio Productions LLC</span>
 </div>
 """, unsafe_allow_html=True)
