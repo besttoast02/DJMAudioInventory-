@@ -454,7 +454,6 @@ img[data-testid="stLogo"] {
    ═══════════════════════════════════════════════════════════ */
 .stDeployButton,
 #MainMenu,
-div[data-testid="stToolbar"],
 div[data-testid="stDecoration"],
 .viewerBadge_container,
 .viewerBadge_link,
