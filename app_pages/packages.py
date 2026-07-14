@@ -88,7 +88,7 @@ with q1:
         - Unlimited revisions before event
         - Delivered as high-quality audio file
         
-        **$150 – $300** depending on complexity
+        **Included** with any DJ package · Standalone starting at **$50**
         """)
         if st.button("Request custom mix", key="baile", type="primary", icon=":material/request_quote:", use_container_width=True):
             st.switch_page("app_pages/contact.py")
@@ -107,7 +107,7 @@ with q2:
         - Unlimited revisions before event
         - Delivered as high-quality audio file
         
-        **$100 – $200** depending on complexity
+        **Included** with any DJ package · Standalone starting at **$50**
         """)
         if st.button("Request custom mix", key="vals", type="primary", icon=":material/request_quote:", use_container_width=True):
             st.switch_page("app_pages/contact.py")
