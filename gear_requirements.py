@@ -89,6 +89,12 @@ NAME_KEYWORD_NEEDS = {
 
 # ─── ENGINE ───────────────────────────────────────────────────────────────────
 
+def _is_battery_powered(item: dict) -> bool:
+    """Returns True if item notes or name indicate it's battery powered."""
+    combined = (item.get("notes", "") + " " + item.get("name", "")).lower()
+    return "battery" in combined or "battery powered" in combined
+
+
 def get_suggestions(selected_items: list[dict], all_available: list[dict]) -> dict:
     """
     Given selected_items (list of item dicts with 'category', 'name'),
@@ -126,6 +132,16 @@ def get_suggestions(selected_items: list[dict], all_available: list[dict]) -> di
         for rule_cat, rules in CATEGORY_NEEDS.items():
             if rule_cat.lower() == cat.lower():
                 for need_cat, qty, reason in rules:
+                    # Battery-powered items still need power for long events
+                    if need_cat == "Power" and _is_battery_powered(item):
+                        if "Power" not in needs:
+                            needs["Power"] = {"qty": 0, "reasons": [], "advisory": True}
+                        needs["Power"]["advisory"] = True
+                        needs["Power"]["reasons"].append(
+                            f"⚡ {item.get('name', 'Battery item')}: battery lasts ~4 hrs — "
+                            "pack power cable for events longer than 4 hours"
+                        )
+                        continue
                     if need_cat not in needs:
                         needs[need_cat] = {"qty": 0, "reasons": [], "advisory": False}
                     if qty == 0:
@@ -218,6 +234,13 @@ def get_item_spec_sheet(item: dict) -> list[str]:
     }
     if cat in cat_specs:
         specs.extend(cat_specs[cat])
+
+    # Battery-powered items — override power note
+    if _is_battery_powered(item):
+        # Remove any generic power note and replace with specific rule
+        specs = [s for s in specs if "power cable" not in s.lower() or "battery" in s.lower()]
+        specs.append("Battery powered — ~4 hr runtime on full charge")
+        specs.append("⚡ Pack power cable if event exceeds 4 hours")
 
     # Name-specific extras
     if "subwoofer" in name or "sub" in name:

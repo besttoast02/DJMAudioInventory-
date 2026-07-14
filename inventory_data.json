@@ -11,7 +11,7 @@
         {"name": "6.5' Aluminum Truss Segment", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Hardware", "purchase_price": 150, "current_value": 90, "rate_half_day": 17, "rate_daily": 26, "rate_weekend": 42, "notes": ""},
         {"name": "Electro-Voice Evolve 50 Powered Column PA System", "brand": "Electro-Voice", "qty": 1, "qty_out": 0, "category": "PA Systems", "purchase_price": 2400, "current_value": 1500, "rate_half_day": 130, "rate_daily": 200, "rate_weekend": 320, "notes": "Sub and top column array"},
         {"name": "Chauvet Fog Fury Jett Pro Fog Machine", "brand": "Chauvet", "qty": 1, "qty_out": 0, "category": "Lighting", "purchase_price": 350, "current_value": 210, "rate_half_day": 35, "rate_daily": 55, "rate_weekend": 90, "notes": ""},
-        {"name": "6-Element Hex-Color LED Par Fixture", "brand": "Generic", "qty": 1, "qty_out": 0, "category": "Lighting", "purchase_price": 300, "current_value": 180, "rate_half_day": 30, "rate_daily": 45, "rate_weekend": 75, "notes": ""},
+        {"name": "6-Element Hex-Color LED Par Fixture", "brand": "Generic", "qty": 6, "qty_out": 0, "category": "Lighting", "purchase_price": 300, "current_value": 180, "rate_half_day": 30, "rate_daily": 45, "rate_weekend": 75, "notes": "Battery powered — 6 units. DMX in and out. No power cable needed."},
         {"name": "LED Par Can Wash Light", "brand": "Generic", "qty": 2, "qty_out": 0, "category": "Lighting", "purchase_price": 120, "current_value": 70, "rate_half_day": 15, "rate_daily": 25, "rate_weekend": 40, "notes": ""}
       ]
     },
