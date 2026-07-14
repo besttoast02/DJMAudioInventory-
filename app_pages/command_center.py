@@ -61,6 +61,7 @@ def render_kanban_card(r, show_approve=False, show_complete=False):
         bc1, bc2 = st.columns(2)
         if show_approve:
             if bc1.button("Review", key=f"kanban_review_{r['id']}", use_container_width=True, type="primary"):
+                st.session_state["rentals_tab"] = "pending"
                 st.switch_page("app_pages/rentals.py")
         if show_complete:
             if bc1.button("Mark complete", key=f"kanban_done_{r['id']}", use_container_width=True):

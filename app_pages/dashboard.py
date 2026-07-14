@@ -9,12 +9,20 @@ counts = db.get_item_count()
 pending = db.get_rentals_by_status("pending")
 approved = db.get_rentals_by_status("approved")
 
-c1, c2 = st.columns(2)
+c1, c2, c3, c4 = st.columns(4)
 c1.metric("Total gear", counts["total"], help="Individual tracked items")
 c2.metric("Available", counts["available"])
-c3, c4 = st.columns(2)
 c3.metric("In use", counts["in_use"])
-c4.metric("Pending requests", len(pending))
+c4.metric("Pending requests", len(pending), help="Click to review below")
+
+# Clickable shortcut buttons under the metrics
+mc1, mc2, mc3, mc4 = st.columns(4)
+if mc3.button("→ In use", key="goto_active", use_container_width=True):
+    st.session_state["rentals_tab"] = "active"
+    st.switch_page("app_pages/rentals.py")
+if mc4.button("→ Review requests", key="goto_pending", type="primary", use_container_width=True):
+    st.session_state["rentals_tab"] = "pending"
+    st.switch_page("app_pages/rentals.py")
 
 # ── Seed button (first run) ─────────────────────────────────
 if counts["total"] == 0:
@@ -44,9 +52,12 @@ if pending:
     st.subheader(f":material/pending: Pending requests ({len(pending)})")
     for r in pending:
         with st.container(border=True):
-            st.markdown(f"**{r['event_name']}**")
-            st.caption(f"{r['client_name']} · :material/calendar_today: {r['event_date']} · :material/location_on: {r.get('venue', 'TBD')}")
-            st.page_link("app_pages/rentals.py", label="Review →", icon=":material/arrow_forward:")
+            col_info, col_btn = st.columns([4, 1])
+            col_info.markdown(f"**{r['event_name']}**")
+            col_info.caption(f"{r['client_name']} · :material/calendar_today: {r['event_date']} · :material/location_on: {r.get('venue', 'TBD')}")
+            if col_btn.button("Review →", key=f"dash_review_{r['id']}", type="primary", use_container_width=True):
+                st.session_state["rentals_tab"] = "pending"
+                st.switch_page("app_pages/rentals.py")
 
 # ── Active rentals ───────────────────────────────────────────
 if approved:
@@ -55,8 +66,12 @@ if approved:
     for r in approved:
         with st.container(border=True):
             ri = db.get_rental_items(r["id"])
-            st.markdown(f"**{r['event_name']}**")
-            st.caption(f"{r['client_name']} · :material/calendar_today: {r['event_date']} · :material/location_on: {r.get('venue', 'TBD')} · {len(ri)} items")
+            col_info, col_btn = st.columns([4, 1])
+            col_info.markdown(f"**{r['event_name']}**")
+            col_info.caption(f"{r['client_name']} · :material/calendar_today: {r['event_date']} · :material/location_on: {r.get('venue', 'TBD')} · {len(ri)} items")
+            if col_btn.button("Manage →", key=f"dash_active_{r['id']}", use_container_width=True):
+                st.session_state["rentals_tab"] = "active"
+                st.switch_page("app_pages/rentals.py")
 
 # ── Quick status breakdown by category ───────────────────────
 st.space("medium")
