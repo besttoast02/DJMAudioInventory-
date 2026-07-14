@@ -117,7 +117,8 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
     for idx, (key, info) in enumerate(sorted_items):
         with cols[idx % 3]:
             with st.container(border=True):
-                st.markdown(f"**{info['brand']}** {info['name']}")
+                display_brand = "" if info['brand'].lower() == "generic" else f"**{info['brand']}** "
+                st.markdown(f"{display_brand}{info['name']}")
                 st.badge(f"{info['qty']} available", color="green")
 
                 if info["rate_daily"] > 0:
@@ -340,9 +341,10 @@ if cart:
         total_half += line_half
         total_daily += line_daily
         total_weekend += line_weekend
+        display_brand = "" if item['brand'].lower() == "generic" else f"{item['brand']} "
         cart_rows.append({
             "key": key,
-            "label": f"{item['brand']} {item['name']}",
+            "label": f"{display_brand}{item['name']}",
             "qty": item["qty"],
             "daily": f"${line_daily:.0f}",
             "weekend": f"${line_weekend:.0f}",
