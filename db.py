@@ -159,6 +159,41 @@ def delete_items(item_ids: list[str]):
         sb.table("items").delete().eq("id", iid).execute()
 
 
+# ── Double-booking prevention ────────────────────────────────
+
+def get_booked_counts_for_dates(event_date: str, return_date: str) -> dict[str, int]:
+    """
+    Returns a dict of {item_name: count_booked} for items committed
+    during the given date range (approved rentals whose dates overlap).
+    """
+    sb = get_client()
+    # Get approved/pending rentals that overlap with the requested dates
+    # Overlap: rental.event_date <= requested.return_date AND rental.return_date >= requested.event_date
+    overlapping = (
+        sb.table("rentals")
+        .select("id, event_date, return_date, status")
+        .in_("status", ["approved", "pending"])
+        .lte("event_date", return_date)
+        .gte("return_date", event_date)
+        .execute()
+    )
+
+    if not overlapping.data:
+        return {}
+
+    # Get all item IDs linked to those rentals
+    booked_counts: dict[str, int] = {}
+    for rental in overlapping.data:
+        ri = get_rental_items(rental["id"])
+        for entry in ri:
+            item = entry.get("items", {})
+            if item:
+                name = item.get("name", "")
+                booked_counts[name] = booked_counts.get(name, 0) + 1
+
+    return booked_counts
+
+
 # ── Rentals ──────────────────────────────────────────────────
 
 def get_all_rentals() -> list[dict]:

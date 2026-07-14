@@ -51,6 +51,17 @@ if not db.is_connected():
 # ── Auth state ───────────────────────────────────────────────
 if "is_admin" not in st.session_state:
     st.session_state.is_admin = False
+    st.session_state.admin_login_time = None
+
+# Session timeout (2 hours)
+SESSION_TIMEOUT_SECONDS = 7200
+if st.session_state.is_admin and st.session_state.get("admin_login_time"):
+    from datetime import datetime, timezone
+    elapsed = (datetime.now(timezone.utc) - st.session_state.admin_login_time).total_seconds()
+    if elapsed > SESSION_TIMEOUT_SECONDS:
+        st.session_state.is_admin = False
+        st.session_state.admin_login_time = None
+        st.toast("Session expired. Please log in again.", icon=":material/timer_off:")
 
 # ── Sidebar ──────────────────────────────────────────────────
 with st.sidebar:
@@ -72,6 +83,8 @@ with st.sidebar:
                             totp = pyotp.TOTP(admin_2fa_secret)
                             if totp.verify(totp_code):
                                 st.session_state.is_admin = True
+                                from datetime import datetime, timezone
+                                st.session_state.admin_login_time = datetime.now(timezone.utc)
                                 st.rerun()
                             else:
                                 st.error("Invalid 2FA code")

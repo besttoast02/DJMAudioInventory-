@@ -122,8 +122,10 @@ with st.form("checkout_form", border=True):
     venue = rc4.text_input("Venue / location", placeholder="Hotel ballroom, outdoor venue…", max_chars=200)
 
     rc5, rc6 = st.columns(2)
-    event_date = rc5.date_input("Event date", value=date.today() + timedelta(days=7))
-    return_date = rc6.date_input("Return date", value=date.today() + timedelta(days=9))
+    default_event = st.session_state.get("event_date", date.today() + timedelta(days=7))
+    default_return = st.session_state.get("return_date", date.today() + timedelta(days=9))
+    event_date = rc5.date_input("Event date", value=default_event)
+    return_date = rc6.date_input("Return date", value=default_return)
 
     notes = st.text_area(
         "Additional notes",

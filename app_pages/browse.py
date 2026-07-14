@@ -1,6 +1,6 @@
 import streamlit as st
 import db
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 st.title(":material/search: Rental catalog")
 st.markdown("Browse our gear, add what you need to your cart, and request a quote.")
@@ -9,11 +9,24 @@ st.markdown("Browse our gear, add what you need to your cart, and request a quot
 if "cart" not in st.session_state:
     st.session_state.cart = {}  # {display_key: {name, brand, category, qty, rate_half_day, rate_daily, rate_weekend, max_qty}}
 
+# ── Date picker for availability check ───────────────────────
+st.markdown("##### When is your event?")
+dc1, dc2 = st.columns(2)
+event_date = dc1.date_input("Event date", value=date.today() + timedelta(days=7), key="browse_event_date")
+return_date = dc2.date_input("Return date", value=date.today() + timedelta(days=9), key="browse_return_date")
+
+# Store dates in session for checkout
+st.session_state["event_date"] = event_date
+st.session_state["return_date"] = return_date
+
 items = db.get_available_items()
 
 if not items:
     st.info("No gear available right now. Check back soon!", icon=":material/info:")
     st.stop()
+
+# Get items already booked for these dates
+booked_counts = db.get_booked_counts_for_dates(str(event_date), str(return_date))
 
 # ── Map to public display categories ────────────────────────
 def get_display_category(item: dict) -> str:
@@ -72,6 +85,9 @@ for i in rentable:
             "specs_markdown": i.get("specs_markdown", ""),
         }
     grouped[key]["qty"] += 1
+    # Subtract booked units for the selected dates
+    booked = booked_counts.get(i["name"], 0)
+    grouped[key]["qty"] = max(0, grouped[key]["qty"] - booked)
     # Prefer specs from whichever unit has them
     if not grouped[key]["specs_markdown"] and i.get("specs_markdown"):
         grouped[key]["specs_markdown"] = i["specs_markdown"]
