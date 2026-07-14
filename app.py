@@ -304,10 +304,11 @@ if query_gate == ADMIN_GATE_CODE:
 
 # ── Sidebar ──────────────────────────────────────────────────
 with st.sidebar:
-    st.title(":material/speaker: DJMAudio")
-    st.caption("Inventory & rental manager")
-
-    st.space("medium")
+    # Internal branding only visible to admin
+    if st.session_state.is_admin:
+        st.title(":material/speaker: DJMAudio")
+        st.caption("Inventory & rental manager")
+        st.space("medium")
 
     if not st.session_state.is_admin:
         # Only show login if gate was unlocked via secret URL
