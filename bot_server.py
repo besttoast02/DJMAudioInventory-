@@ -12,11 +12,11 @@ try:
     secrets = toml.load(".streamlit/secrets.toml")
     TELEGRAM_BOT_TOKEN = secrets.get("TELEGRAM_BOT_TOKEN", "")
     TELEGRAM_WEBHOOK_SECRET = secrets.get("TELEGRAM_WEBHOOK_SECRET", "")
-    OPENAI_API_KEY = secrets.get("OPENAI_API_KEY", "")
+    OPENROUTER_API_KEY = secrets.get("OPENROUTER_API_KEY", "")
 except Exception:
     TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
     TELEGRAM_WEBHOOK_SECRET = os.getenv("TELEGRAM_WEBHOOK_SECRET", "")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 
 # Setup SQLite Database for Conversation Memory
 def init_db():
@@ -68,12 +68,18 @@ async def process_with_llm(user_id: str, user_text: str):
     for role, content in reversed(history):
         messages.append({"role": role, "content": content})
     
-    if not OPENAI_API_KEY:
-        return "I'm offline right now (Missing OpenAI API Key). Tell the admin to update secrets.toml!"
+    if not OPENROUTER_API_KEY:
+        return "I'm offline right now (Missing OpenRouter API Key). Tell the admin to update secrets.toml!"
 
-    # Call OpenAI
+    # Call OpenRouter (using OpenAI SDK)
     from openai import AsyncOpenAI
-    client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client = AsyncOpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY,
+    )
+    
+    # We use a fast, free model capable of tool calling
+    MODEL_NAME = "google/gemini-2.0-flash-lite-preview-02-05:free"
     
     tools = [
         {
@@ -92,7 +98,7 @@ async def process_with_llm(user_id: str, user_text: str):
 
     try:
         response = await client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL_NAME,
             messages=messages,
             tools=tools
         )
@@ -122,7 +128,7 @@ async def process_with_llm(user_id: str, user_text: str):
             
             # Get final response after tool call
             second_response = await client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=MODEL_NAME,
                 messages=messages
             )
             ai_reply = second_response.choices[0].message.content
