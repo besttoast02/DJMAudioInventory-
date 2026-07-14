@@ -19,6 +19,10 @@ st.markdown("""
 html, body, [class*="st-"] {
     font-family: 'DM Sans', sans-serif;
 }
+/* Prevent DM Sans from overriding Material Icons */
+.material-symbols-rounded, .material-symbols-outlined, [class*="material-symbols"] {
+    font-family: 'Material Symbols Rounded' !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
