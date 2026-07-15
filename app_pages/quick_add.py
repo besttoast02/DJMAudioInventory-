@@ -215,9 +215,9 @@ if "url_previews" in st.session_state and st.session_state["url_previews"]:
             
             with img_col:
                 if preview.get("cleaned_img"):
-                    st.image(preview["cleaned_img"], use_container_width=True, caption="Background removed")
+                    st.image(preview["cleaned_img"], width="stretch", caption="Background removed")
                 elif preview.get("original_img"):
-                    st.image(preview["original_img"], use_container_width=True, caption="Original")
+                    st.image(preview["original_img"], width="stretch", caption="Original")
                 else:
                     st.info("No image found", icon=":material/image_not_supported:")
             

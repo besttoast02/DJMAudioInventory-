@@ -320,7 +320,7 @@ st.divider()
 
 fc1, fc2, fc3 = st.columns([2, 3, 2])
 with fc2:
-    st.image("assets/logo.png", width=None)
+    st.image("assets/logo.png", width="content")
 
 st.markdown("""
 <div style="text-align:center; padding:1rem 0 3rem; color:rgba(255,255,255,0.9);">
