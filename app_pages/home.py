@@ -189,69 +189,152 @@ st.markdown("""
 <p style="text-align:center; color:rgba(224,224,232,0.5); margin-bottom:1.8rem;">
     Tap any section to explore
 </p>
+
+<style>
+  .glass-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  @media (max-width: 900px) {
+    .glass-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .glass-grid { grid-template-columns: 1fr; }
+  }
+  .glass-card {
+    background: linear-gradient(135deg,
+      rgba(255,255,255,0.10) 0%,
+      rgba(255,255,255,0.04) 100%);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 18px;
+    padding: 1.5rem 1.4rem 1.3rem;
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease,
+                background 0.22s ease, border-color 0.22s ease;
+    box-shadow: 0 4px 28px rgba(0,0,0,0.28),
+                inset 0 1px 0 rgba(255,255,255,0.18);
+    text-decoration: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 40%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,0.09) 0%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 18px 18px 0 0;
+    pointer-events: none;
+  }
+  .glass-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    background: linear-gradient(135deg,
+      rgba(160,100,255,0.22) 0%,
+      rgba(255,255,255,0.08) 100%);
+    border-color: rgba(160,100,255,0.55);
+    box-shadow: 0 12px 40px rgba(130,60,255,0.30),
+                0 0 0 1px rgba(160,100,255,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.22);
+  }
+  .glass-card:active {
+    transform: translateY(-2px) scale(1.005);
+  }
+  .glass-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .glass-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.95);
+    margin: 0 0 0.45rem;
+    letter-spacing: -0.01em;
+  }
+  .glass-desc {
+    font-size: 0.82rem;
+    color: rgba(200,200,220,0.70);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .glass-arrow {
+    display: inline-block;
+    margin-top: 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(180,140,255,0.90);
+    letter-spacing: 0.02em;
+  }
+</style>
+
+<div class="glass-grid">
+  <a class="glass-card" href="?page=dj_services">
+    <span class="glass-icon">🎧</span>
+    <p class="glass-title">DJ Services</p>
+    <p class="glass-desc">Full DJ packages, MC services, and sound production for any event.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=live_audio">
+    <span class="glass-icon">🎙️</span>
+    <p class="glass-title">Live Audio</p>
+    <p class="glass-desc">PA systems, microphones, mixers, and stage sound for live performances.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=packages">
+    <span class="glass-icon">🎉</span>
+    <p class="glass-title">Packages</p>
+    <p class="glass-desc">Curated bundles for weddings, parties, corporate, and festivals.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=extras">
+    <span class="glass-icon">✨</span>
+    <p class="glass-title">Extras</p>
+    <p class="glass-desc">Add-ons: lighting, uplighting, fog, truss, and specialty effects.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=rentals">
+    <span class="glass-icon">🔍</span>
+    <p class="glass-title">Rentals</p>
+    <p class="glass-desc">Browse individual gear by category — speakers, mics, lighting, and more.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=checkout">
+    <span class="glass-icon">🛒</span>
+    <p class="glass-title">Checkout</p>
+    <p class="glass-desc">Review your cart and submit a rental request with your event details.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=ai">
+    <span class="glass-icon">🤖</span>
+    <p class="glass-title">AI Assistant</p>
+    <p class="glass-desc">Chat with our AI to get gear recommendations for your event type and budget.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+  <a class="glass-card" href="?page=contact">
+    <span class="glass-icon">✉️</span>
+    <p class="glass-title">Contact</p>
+    <p class="glass-desc">Reach out directly with questions, custom requests, or last-minute needs.</p>
+    <span class="glass-arrow">Explore →</span>
+  </a>
+</div>
 """, unsafe_allow_html=True)
 
-# Row 1 — 4 cards
-r1c1, r1c2, r1c3, r1c4 = st.columns(4)
-with r1c1:
-    with st.container(border=True):
-        st.markdown("### 🎧 DJ Services")
-        st.caption("Full DJ packages, MC services, and sound production for any event.")
-        if st.button("Explore →", key="nav_dj", use_container_width=True):
-            st.switch_page("app_pages/dj_services.py")
-
-with r1c2:
-    with st.container(border=True):
-        st.markdown("### 🎙️ Live Audio")
-        st.caption("PA systems, microphones, mixers, and stage sound for live performances.")
-        if st.button("Explore →", key="nav_audio", use_container_width=True):
-            st.switch_page("app_pages/live_audio.py")
-
-with r1c3:
-    with st.container(border=True):
-        st.markdown("### 🎉 Packages")
-        st.caption("Curated bundles for weddings, parties, corporate, and festivals.")
-        if st.button("Explore →", key="nav_packages", use_container_width=True):
-            st.switch_page("app_pages/packages.py")
-
-with r1c4:
-    with st.container(border=True):
-        st.markdown("### ✨ Extras")
-        st.caption("Add-ons: lighting, uplighting, fog, truss, and specialty effects.")
-        if st.button("Explore →", key="nav_extras", use_container_width=True):
-            st.switch_page("app_pages/extra_services.py")
-
-st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-
-# Row 2 — 4 cards
-r2c1, r2c2, r2c3, r2c4 = st.columns(4)
-with r2c1:
-    with st.container(border=True):
-        st.markdown("### 🔍 Rentals")
-        st.caption("Browse individual gear by category — speakers, mics, lighting, and more.")
-        if st.button("Explore →", key="nav_browse", use_container_width=True):
-            st.switch_page("app_pages/browse.py")
-
-with r2c2:
-    with st.container(border=True):
-        st.markdown("### 🛒 Checkout")
-        st.caption("Review your cart and submit a rental request with your event details.")
-        if st.button("Explore →", key="nav_checkout", use_container_width=True):
-            st.switch_page("app_pages/request.py")
-
-with r2c3:
-    with st.container(border=True):
-        st.markdown("### 🤖 AI Assistant")
-        st.caption("Chat with our AI to get gear recommendations for your event type and budget.")
-        if st.button("Explore →", key="nav_ai", use_container_width=True):
-            st.switch_page("app_pages/ai_assistant.py")
-
-with r2c4:
-    with st.container(border=True):
-        st.markdown("### ✉️ Contact")
-        st.caption("Reach out directly with questions, custom requests, or last-minute needs.")
-        if st.button("Explore →", key="nav_contact", use_container_width=True):
-            st.switch_page("app_pages/contact.py")
+# Hidden Streamlit buttons — triggered by query param from glass cards
+_qp = st.query_params.get("page", "")
+if _qp == "dj_services":    st.switch_page("app_pages/dj_services.py")
+elif _qp == "live_audio":   st.switch_page("app_pages/live_audio.py")
+elif _qp == "packages":     st.switch_page("app_pages/packages.py")
+elif _qp == "extras":       st.switch_page("app_pages/extra_services.py")
+elif _qp == "rentals":      st.switch_page("app_pages/browse.py")
+elif _qp == "checkout":     st.switch_page("app_pages/request.py")
+elif _qp == "ai":           st.switch_page("app_pages/ai_assistant.py")
+elif _qp == "contact":      st.switch_page("app_pages/contact.py")
 
 st.divider()
 
