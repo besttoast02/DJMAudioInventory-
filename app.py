@@ -31,6 +31,19 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
     font-family: 'Material Symbols Rounded' !important;
 }
 
+/* ── Glass nav cards — kill ALL browser/Streamlit link styles ── */
+a.glass-card,
+a.glass-card:link,
+a.glass-card:visited,
+a.glass-card:hover,
+a.glass-card:focus,
+a.glass-card:active,
+a.glass-card * {
+    text-decoration: none !important;
+    color: inherit !important;
+    -webkit-text-decoration: none !important;
+}
+
 /* ═══════════════════════════════════════════════════════════
    AMBIENT BACKGROUND GLOW — non-interfering, no overlays
    ═══════════════════════════════════════════════════════════ */
