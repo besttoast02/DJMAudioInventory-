@@ -13,9 +13,16 @@ st.set_page_config(
 # ── Branding & Styles ────────────────────────────────────────
 st.logo("assets/logo.png", link="https://djmaudio.com")
 
+# ── Font preload via <link> — avoids render-blocking @import inside <style> ──
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap">
+""", unsafe_allow_html=True)
+
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
+/* DM Sans loaded via <link> preconnect above — avoids render-blocking @import */
 html, body, .stApp {
     font-family: 'DM Sans', sans-serif;
 }
@@ -58,6 +65,15 @@ span.material-symbols-rounded, i, .stIcon, [class*="material-symbols"] {
     animation: eq-bounce 1s infinite alternate ease-in-out;
     animation-delay: var(--d);
     height: var(--h);
+    will-change: height; /* GPU compositing hint */
+}
+
+/* Scope eq-bars to container — hides orphaned divs & limits visible count */
+.eq-bar:not(#bg-eq-container .eq-bar) {
+    display: none !important;
+}
+#bg-eq-container .eq-bar:nth-child(n+21) {
+    display: none !important;
 }
 @keyframes eq-bounce {
     0% { height: 5%; }
@@ -159,7 +175,7 @@ img {
 </div>
 """, unsafe_allow_html=True)
 
-st.sidebar.image("assets/logo.png", use_container_width=True)
+# Logo already rendered via st.logo() above — no duplicate needed
 
 st.markdown("""
 <style>
@@ -322,6 +338,19 @@ hr {
     div[data-testid="stMetric"] [data-testid="stMetricValue"] {
         font-size: 1.3rem !important;
     }
+
+    /* ── GPU relief: disable expensive blur layers on mobile ── */
+    section[data-testid="stSidebar"],
+    div[data-testid="stContainer"],
+    div[data-testid="stMetric"],
+    div[data-testid="stForm"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    /* Slow animations on mobile to cut GPU cycles */
+    .eq-bar {
+        animation-duration: 3s !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -331,6 +360,11 @@ hr {
     button[data-testid="stBaseButton-secondary"] {
         padding: 10px 16px !important;
         font-size: 0.85rem !important;
+    }
+
+    /* Hide EQ bars on phones — removes 70+ DOM nodes + GPU animation cost */
+    #bg-eq-container {
+        display: none !important;
     }
 }
 

@@ -186,47 +186,54 @@ def delete_items(item_ids: list[str]):
 
 # ── Double-booking prevention ────────────────────────────────
 
+@st.cache_data(ttl=60)
 def get_booked_counts_for_dates(event_date: str, return_date: str) -> dict[str, int]:
     """
     Returns a dict of {item_name: count_booked} for items committed
     during the given date range (approved rentals whose dates overlap).
+    Uses 2 queries instead of N+1 for performance.
     """
     sb = get_client()
-    # Get approved/pending rentals that overlap with the requested dates
-    # Overlap: rental.event_date <= requested.return_date AND rental.return_date >= requested.event_date
+    # Query 1: Get IDs of overlapping approved/pending rentals
     overlapping = (
         sb.table("rentals")
-        .select("id, event_date, return_date, status")
+        .select("id")
         .in_("status", ["approved", "pending"])
         .lte("event_date", return_date)
         .gte("return_date", event_date)
         .execute()
     )
-
     if not overlapping.data:
         return {}
 
-    # Get all item IDs linked to those rentals
-    booked_counts: dict[str, int] = {}
-    for rental in overlapping.data:
-        ri = get_rental_items(rental["id"])
-        for entry in ri:
-            item = entry.get("items", {})
-            if item:
-                name = item.get("name", "")
-                booked_counts[name] = booked_counts.get(name, 0) + 1
+    rental_ids = [r["id"] for r in overlapping.data]
 
+    # Query 2: Batch fetch ALL items for those rentals in ONE call (no loop!)
+    items_res = (
+        sb.table("rental_items")
+        .select("item_id, items(name)")
+        .in_("rental_id", rental_ids)
+        .execute()
+    )
+    booked_counts: dict[str, int] = {}
+    for entry in items_res.data:
+        item = entry.get("items", {})
+        if item:
+            name = item.get("name", "")
+            booked_counts[name] = booked_counts.get(name, 0) + 1
     return booked_counts
 
 
 # ── Rentals ──────────────────────────────────────────────────
 
+@st.cache_data(ttl=60)
 def get_all_rentals() -> list[dict]:
     sb = get_client()
     res = sb.table("rentals").select("*").order("created_at", desc=True).execute()
     return res.data
 
 
+@st.cache_data(ttl=60)
 def get_rentals_by_status(status: str) -> list[dict]:
     sb = get_client()
     res = sb.table("rentals").select("*").eq("status", status).order("event_date").execute()
@@ -265,6 +272,8 @@ def create_rental(event_name: str, client_name: str, client_phone: str,
         "estimated_cost": estimated_cost,
     }
     res = sb.table("rentals").insert(data).execute()
+    get_all_rentals.clear()
+    get_rentals_by_status.clear()
     return res.data[0] if res.data else {}
 
 
@@ -272,6 +281,9 @@ def create_rental(event_name: str, client_name: str, client_phone: str,
 def update_rental_status(rental_id: str, status: str):
     sb = get_client()
     sb.table("rentals").update({"status": status}).eq("id", rental_id).execute()
+    get_all_rentals.clear()
+    get_rentals_by_status.clear()
+    get_booked_counts_for_dates.clear()
 
 
 # ── Rental Items (junction) ──────────────────────────────────
@@ -282,6 +294,7 @@ def link_items_to_rental(rental_id: str, item_ids: list[str]):
     sb.table("rental_items").insert(rows).execute()
 
 
+@st.cache_data(ttl=60)
 def get_rental_items(rental_id: str) -> list[dict]:
     sb = get_client()
     res = sb.table("rental_items").select("item_id, items(*)").eq("rental_id", rental_id).execute()
@@ -370,6 +383,7 @@ def set_final_cost(rental_id: str, final_cost: float):
 
 
 # Employees
+@st.cache_data(ttl=120)
 def get_employees() -> list:
     sb = get_client()
     res = sb.table("employees").select("*").order("name").execute()
@@ -411,6 +425,7 @@ def get_time_logs_for_rental(rental_id: str) -> list:
     res = sb.table("time_logs").select("*, employees(*)").eq("rental_id", rental_id).execute()
     return res.data
 
+@st.cache_data(ttl=60)
 def get_all_time_logs() -> list:
     sb = get_client()
     res = sb.table("time_logs").select("*, employees(*), rentals(event_name)").order("logged_date", desc=True).execute()
@@ -433,6 +448,7 @@ def get_payments_for_rental(rental_id: str) -> list:
     res = sb.table("contractor_payments").select("*, employees(*)").eq("rental_id", rental_id).execute()
     return res.data
 
+@st.cache_data(ttl=60)
 def get_all_payments() -> list:
     sb = get_client()
     res = sb.table("contractor_payments").select("*, employees(*), rentals(event_name)").order("payment_date", desc=True).execute()
@@ -455,6 +471,7 @@ def create_discount_code(code: str, percent_off: int, max_uses: int = 0, expires
     sb.table("discount_codes").insert(row).execute()
 
 
+@st.cache_data(ttl=120)
 def get_all_discount_codes() -> list:
     sb = get_client()
     res = sb.table("discount_codes").select("*").order("created_at", desc=True).execute()
@@ -512,6 +529,7 @@ def create_todo(title: str, due_date: str = None, rental_id: str = None):
     sb.table("todos").insert(row).execute()
 
 
+@st.cache_data(ttl=30)
 def get_todos(show_done: bool = False) -> list:
     sb = get_client()
     q = sb.table("todos").select("*, rentals(event_name)").order("created_at", desc=True)
@@ -545,6 +563,7 @@ def log_activity(action: str, detail: str = None, rental_id: str = None):
         pass  # Don't break the app if logging fails
 
 
+@st.cache_data(ttl=30)
 def get_recent_activity(limit: int = 15) -> list:
     sb = get_client()
     res = sb.table("activity_log").select("*").order("created_at", desc=True).limit(limit).execute()
@@ -646,6 +665,7 @@ def get_maintenance_for_item(item_id: str) -> list:
     return res.data
 
 
+@st.cache_data(ttl=120)
 def get_all_maintenance() -> list:
     sb = get_client()
     res = sb.table("maintenance_log").select("*, items(name, barcode, brand)").order("created_at", desc=True).limit(50).execute()
@@ -669,6 +689,7 @@ def get_feedback_for_rental(rental_id: str) -> list:
     return res.data
 
 
+@st.cache_data(ttl=120)
 def get_all_feedback() -> list:
     sb = get_client()
     res = sb.table("feedback").select("*, rentals(event_name, client_name)").order("created_at", desc=True).execute()
@@ -902,6 +923,7 @@ def create_deadline(entity: str, title: str, category: str, due_date: str,
     }).execute()
 
 
+@st.cache_data(ttl=120)
 def get_deadlines(show_completed: bool = False) -> list:
     sb = get_client()
     q = sb.table("compliance_deadlines").select("*").order("due_date")

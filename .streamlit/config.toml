@@ -7,6 +7,14 @@ textColor = "#e0e0e8"
 borderColor = "#2a2a3a"
 font = "sans serif"
 
+[server]
+# Performance: serve static assets with proper cache headers
+enableStaticServing = true
+# Limit upload payload — reduces unnecessary overhead for this app
+maxUploadSize = 10
+# Compress responses (gzip) — reduces transfer size for slow connections
+enableWebsocketCompression = true
+
 [client]
 toolbarMode = "minimal"
 showSidebarNavigation = true

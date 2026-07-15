@@ -54,7 +54,7 @@ try:
                         "quiet_zone": 2,
                     })
                     buf.seek(0)
-                    st.image(buf, use_container_width=True)
+                    st.image(buf, width=None)
                     st.caption(f"{item['brand']} {item['name']}")
 
 except ImportError:

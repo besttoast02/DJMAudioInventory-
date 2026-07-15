@@ -20,7 +20,12 @@ except Exception:
 
 # Setup SQLite Database for Conversation Memory
 def init_db():
-    conn = sqlite3.connect('bot_memory.db')
+    db_path = os.getenv("DATABASE_PATH", "bot_memory.db")
+    # Ensure database directory exists if a path is specified
+    db_dir = os.path.dirname(db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+    conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS messages (
@@ -34,6 +39,10 @@ def init_db():
     conn.commit()
     conn.close()
 
+def get_db_connection():
+    db_path = os.getenv("DATABASE_PATH", "bot_memory.db")
+    return sqlite3.connect(db_path)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
@@ -44,11 +53,13 @@ app = FastAPI(lifespan=lifespan)
 # Telegram Helper
 async def send_telegram_message(chat_id: str, text: str):
     if not TELEGRAM_BOT_TOKEN:
-        print("Missing TELEGRAM_BOT_TOKEN")
+        print("Missing TELEGRAM_BOT_TOKEN", flush=True)
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    print(f"Sending message to chat_id {chat_id}: {text[:50]}...", flush=True)
     async with httpx.AsyncClient() as client:
-        await client.post(url, json={"chat_id": chat_id, "text": text})
+        res = await client.post(url, json={"chat_id": chat_id, "text": text})
+        print(f"Telegram API response: {res.status_code} {res.text}", flush=True)
 
 # OpenAI LLM Pipeline
 async def process_with_llm(user_id: str, user_text: str):
@@ -76,6 +87,7 @@ async def process_with_llm(user_id: str, user_text: str):
     client = AsyncOpenAI(
         base_url="https://openrouter.ai/api/v1",
         api_key=OPENROUTER_API_KEY,
+        timeout=10.0
     )
     
     # We use a fast, free model capable of tool calling
@@ -86,10 +98,10 @@ async def process_with_llm(user_id: str, user_text: str):
 
     # We loop through a list of models to gracefully handle rate limits on the free tier
     MODELS_TO_TRY = [
+        "google/gemini-2.5-flash",
+        "meta-llama/llama-3.3-70b-instruct",
         "meta-llama/llama-3.3-70b-instruct:free",
-        "qwen/qwen3-next-80b-a3b-instruct:free",
-        "meta-llama/llama-3.2-3b-instruct:free",
-        "nousresearch/hermes-3-llama-3.1-405b:free"
+        "meta-llama/llama-3.2-3b-instruct:free"
     ]
     
     last_error = None
@@ -161,7 +173,7 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks, 
             ai_reply = await process_with_llm(cid, txt)
             await send_telegram_message(cid, ai_reply)
         except Exception as e:
-            print("Pipeline error:", e)
+            print("Pipeline error:", e, flush=True)
             await send_telegram_message(cid, "Sorry, I'm experiencing high traffic right now and couldn't process your request.")
 
     background_tasks.add_task(process_and_reply, chat_id, text)
