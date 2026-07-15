@@ -194,11 +194,11 @@ st.markdown("""
   .glass-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 1.4rem;
+    margin-bottom: 1.4rem;
   }
   @media (max-width: 900px) {
-    .glass-grid { grid-template-columns: repeat(2, 1fr); }
+    .glass-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   }
   @media (max-width: 500px) {
     .glass-grid { grid-template-columns: 1fr; }
@@ -210,17 +210,26 @@ st.markdown("""
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 18px;
-    padding: 1.5rem 1.4rem 1.3rem;
+    border-radius: 22px;
+    padding: 2rem 1.8rem 1.7rem;
     cursor: pointer;
     transition: transform 0.22s ease, box-shadow 0.22s ease,
                 background 0.22s ease, border-color 0.22s ease;
     box-shadow: 0 4px 28px rgba(0,0,0,0.28),
                 inset 0 1px 0 rgba(255,255,255,0.18);
-    text-decoration: none;
+    text-decoration: none !important;
+    color: inherit;
     display: block;
     position: relative;
     overflow: hidden;
+  }
+  .glass-card,
+  .glass-card:link,
+  .glass-card:visited,
+  .glass-card:hover,
+  .glass-card:active {
+    text-decoration: none !important;
+    color: inherit;
   }
   .glass-card::before {
     content: '';
@@ -246,22 +255,24 @@ st.markdown("""
     transform: translateY(-2px) scale(1.005);
   }
   .glass-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    font-size: 2.4rem;
+    margin-bottom: 0.8rem;
     display: block;
   }
   .glass-title {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: rgba(255,255,255,0.95);
-    margin: 0 0 0.45rem;
+    color: rgba(255,255,255,0.97);
+    margin: 0 0 0.6rem;
     letter-spacing: -0.01em;
+    text-decoration: none !important;
   }
   .glass-desc {
-    font-size: 0.82rem;
-    color: rgba(200,200,220,0.70);
-    line-height: 1.5;
+    font-size: 0.88rem;
+    color: rgba(200,200,220,0.72);
+    line-height: 1.65;
     margin: 0;
+    text-decoration: none !important;
   }
   .glass-arrow {
     display: inline-block;
