@@ -72,6 +72,7 @@ Completed a comprehensive performance and speed optimization pass across the Nex
 
 5. **Image Optimizations**:
    - Standardized remote image quality from `q=80` to `q=75` across all landing templates ([weddings](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/weddings/page.tsx), [event-sound](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/event-sound/page.tsx), [event-lighting](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/event-lighting/page.tsx), [dj-mc-services](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/dj-mc-services/page.tsx), [live-performances](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/live-performances/page.tsx), [private-events](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/private-events/page.tsx), [corporate-events](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/corporate-events/page.tsx)).
+   - Converted [Hero.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/sections/Hero.tsx) to a client component with a client-side background slideshow that changes the active background image every 60 seconds (1 minute) with a smooth cross-fade transition, resolving the "moving background" requirement.
    - Added solid slate blur placeholders (`placeholder="blur"`) in [Hero.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/sections/Hero.tsx), [CaseStudies.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/sections/CaseStudies.tsx), and [ServicePageTemplate.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/templates/ServicePageTemplate.tsx).
    - Added `loading="lazy"` explicitly to below-the-fold case study items.
 
@@ -79,4 +80,8 @@ Completed a comprehensive performance and speed optimization pass across the Nex
    - Completely uninstalled the unused dependency `framer-motion` to shave off bundle weight.
    - Cleared ESLint unescaped entity warnings in [reviews/page.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/reviews/page.tsx), admin forms, and fixed reassignment warnings.
    - Verified compile and build successfully locally.
+
+7. **Git Synchronization**:
+   - Committed and successfully pushed all optimizations, server-side data isolation changes, and the Hero static image rotator to the `v2-frontend` branch on GitHub to trigger the Render rebuild.
+
 
