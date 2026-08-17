@@ -316,11 +316,46 @@ st.divider()
 st.subheader(":material/photo_library: Event Setup Gallery")
 st.markdown("Photos and videos from our past events — see what we bring to the table.")
 
-st.info(
-    "Gallery coming soon! We're collecting our best event photos and setup shots. "
-    "In the meantime, check out our Instagram or contact us to see examples.",
-    icon=":material/photo_camera:"
-)
+import db
+
+@st.fragment
+def render_setups_gallery():
+    setups = db.get_setups()
+
+    if not setups:
+        st.info(
+            "Gallery coming soon! We're collecting our best event photos and setup shots. "
+            "In the meantime, check out our Instagram or contact us to see examples.",
+            icon=":material/photo_camera:"
+        )
+    else:
+        # Display in a grid
+        cols = st.columns(3)
+        for idx, setup in enumerate(setups):
+            with cols[idx % 3]:
+                with st.container(border=True):
+                    st.markdown(f"#### {setup.get('title', 'Setup')}")
+                    if setup.get("main_image"):
+                        st.markdown(
+                            f'<div style="text-align: center;"><img src="{setup["main_image"]}" style="max-width:100%; height:auto; max-height:200px; border-radius:8px;" loading="lazy"></div>',
+                            unsafe_allow_html=True
+                        )
+                    st.markdown(f"<div style='margin-top: 1rem; color: rgba(224,224,232,0.8);'>{setup.get('description', '')}</div>", unsafe_allow_html=True)
+                    
+                    equip_list = setup.get("equipment_list", [])
+                    if equip_list:
+                        with st.expander("View Equipment Included"):
+                            for eq in equip_list:
+                                st.markdown(f"- {eq}")
+                st.markdown(f"**Total Setup Value: ${setup.get('total_price', 0):,.0f}**")
+                
+                base_pkg = setup.get("base_package")
+                if base_pkg and base_pkg in pkg.PACKAGES:
+                    if st.button("Customize this base package", key=f"setup_{setup['id']}", use_container_width=True):
+                        st.session_state["active_pkg"] = base_pkg
+                        st.rerun()
+
+render_setups_gallery()
 
 # ── Cart summary if items exist ──────────────────────────────
 cart = st.session_state.get("cart", {})

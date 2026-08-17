@@ -74,8 +74,18 @@ async def process_with_llm(user_id: str, user_text: str):
     history = c.fetchall()
     conn.close()
     
+    # Get setups to inject as context
+    import json
+    try:
+        setups = db.get_setups()
+        setups_str = ""
+        if setups:
+            setups_str = "You can also suggest these real-world setup examples (show them the image URL so they can see it): " + json.dumps(setups)
+    except Exception:
+        setups_str = ""
+
     # Reorder history (oldest first)
-    messages = [{"role": "system", "content": "You are the DJM Audio AI Assistant. Help customers build rental carts by answering questions about AV gear."}]
+    messages = [{"role": "system", "content": f"You are the DJM Audio AI Assistant. Help customers build rental carts by answering questions about AV gear. {setups_str}"}]
     for role, content in reversed(history):
         messages.append({"role": role, "content": content})
     
@@ -152,7 +162,9 @@ async def process_with_llm(user_id: str, user_text: str):
 @app.post("/api/telegram/webhook")
 async def telegram_webhook(request: Request, background_tasks: BackgroundTasks, x_telegram_bot_api_secret_token: str = Header(None)):
     # Validate Secret
-    if TELEGRAM_WEBHOOK_SECRET and x_telegram_bot_api_secret_token != TELEGRAM_WEBHOOK_SECRET:
+    if not TELEGRAM_WEBHOOK_SECRET:
+        raise HTTPException(status_code=500, detail="Server misconfiguration: Webhook secret missing")
+    if x_telegram_bot_api_secret_token != TELEGRAM_WEBHOOK_SECRET:
         raise HTTPException(status_code=401, detail="Unauthorized")
         
     update = await request.json()

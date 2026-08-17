@@ -133,13 +133,10 @@ st.markdown("""
     z-index: 2;
 }
 
-/* Mobile: remove blur, slow anim */
+/* Mobile: remove blur, hide heavy anims */
 @media (max-width: 768px) {
     .hero-wrapper { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-    .heq { animation-duration: 3s !important; }
-}
-@media (max-width: 480px) {
-    #bg-eq-home { display: none !important; }
+    #bg-eq-home, .heq { display: none !important; animation: none !important; }
 }
 </style>
 

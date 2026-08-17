@@ -1152,3 +1152,41 @@ Generated: {datetime.now().strftime('%B %d, %Y')}"""
     pdf.cell(95, 8, "Danger Beats Rep: ________________________", ln=True)
 
     return pdf.output()
+
+# ── Setups / Examples ────────────────────────────────────────
+
+import os
+import json
+
+@st.cache_data(ttl=300)
+def get_setups() -> list[dict]:
+    setups = []
+    base_dir = "static/setups"
+    if not os.path.exists(base_dir):
+        return setups
+        
+    for setup_id in os.listdir(base_dir):
+        setup_dir = os.path.join(base_dir, setup_id)
+        if os.path.isdir(setup_dir):
+            meta_path = os.path.join(setup_dir, "meta.json")
+            if os.path.exists(meta_path):
+                try:
+                    with open(meta_path, "r") as f:
+                        meta = json.load(f)
+                        meta["id"] = setup_id
+                        
+                        # Find main image
+                        if os.path.exists(os.path.join(setup_dir, "main.jpg")):
+                            meta["main_image"] = f"/app/static/setups/{setup_id}/main.jpg"
+                        elif os.path.exists(os.path.join(setup_dir, "main.png")):
+                            meta["main_image"] = f"/app/static/setups/{setup_id}/main.png"
+                        elif os.path.exists(os.path.join(setup_dir, "main.webp")):
+                            meta["main_image"] = f"/app/static/setups/{setup_id}/main.webp"
+                        else:
+                            meta["main_image"] = None
+                            
+                        setups.append(meta)
+                except Exception as e:
+                    print(f"Error loading setup {setup_id}: {e}")
+                    
+    return setups

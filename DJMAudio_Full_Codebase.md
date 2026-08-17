@@ -4368,9 +4368,9 @@ st.caption("*Final pricing confirmed after review. Rates may vary for multi-day 
 # ── Client info form ─────────────────────────────────────────
 st.divider()
 
-# Honeypot — invisible field to catch bots
-honeypot_css = """<div style="position:absolute;left:-9999px;"><input id="hp_field" /></div>"""
-st.markdown(honeypot_css, unsafe_allow_html=True)
+# Decoy — invisible field to catch bots
+decoy_css = """<div style="position:absolute;left:-9999px;"><input id="hp_field" /></div>"""
+st.markdown(decoy_css, unsafe_allow_html=True)
 hp_val = st.text_input("Company website", key="hp_website", label_visibility="collapsed")
 
 with st.form("checkout_form", border=True):
@@ -4414,7 +4414,7 @@ with st.form("checkout_form", border=True):
     submitted = st.form_submit_button("Submit Rental Request", icon=":material/send:", type="primary", use_container_width=True)
 
     if submitted:
-        # ── Honeypot check ───────────────────────────────────
+        # ── Decoy check ───────────────────────────────────
         if hp_val:
             st.error("Something went wrong. Please try again.", icon=":material/error:")
             st.stop()

@@ -18,6 +18,13 @@ st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap">
+<script>
+    // Enforce strict mobile viewport to prevent zoom delay and layout shifts
+    const meta = document.createElement('meta');
+    meta.name = "viewport";
+    meta.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0";
+    document.getElementsByTagName('head')[0].appendChild(meta);
+</script>
 """, unsafe_allow_html=True)
 
 st.markdown("""
@@ -116,75 +123,6 @@ img {
     <div class="eq-bar" style="--d: 0.93s; --h: 77%"></div>
     <div class="eq-bar" style="--d: 1.14s; --h: 88%"></div>
     <div class="eq-bar" style="--d: 0.91s; --h: 80%"></div>
-    <div class="eq-bar" style="--d: 1.28s; --h: 78%"></div>
-    <div class="eq-bar" style="--d: 1.1s; --h: 100%"></div>
-    <div class="eq-bar" style="--d: 0.48s; --h: 73%"></div>
-    <div class="eq-bar" style="--d: 0.65s; --h: 100%"></div>
-    <div class="eq-bar" style="--d: 1.5s; --h: 100%"></div>
-    <div class="eq-bar" style="--d: 1.36s; --h: 91%"></div>
-    <div class="eq-bar" style="--d: 1.66s; --h: 74%"></div>
-    <div class="eq-bar" style="--d: 1.76s; --h: 92%"></div>
-    <div class="eq-bar" style="--d: 0.88s; --h: 85%"></div>
-    <div class="eq-bar" style="--d: 1.49s; --h: 100%"></div>
-    <div class="eq-bar" style="--d: 0.51s; --h: 90%"></div>
-    <div class="eq-bar" style="--d: 1.39s; --h: 95%"></div>
-    <div class="eq-bar" style="--d: 0.88s; --h: 91%"></div>
-    <div class="eq-bar" style="--d: 1.23s; --h: 72%"></div>
-    <div class="eq-bar" style="--d: 0.24s; --h: 71%"></div>
-    <div class="eq-bar" style="--d: 0.38s; --h: 75%"></div>
-    <div class="eq-bar" style="--d: 1.79s; --h: 65%"></div>
-    <div class="eq-bar" style="--d: 0.87s; --h: 66%"></div>
-    <div class="eq-bar" style="--d: 0.66s; --h: 87%"></div>
-    <div class="eq-bar" style="--d: 1.43s; --h: 99%"></div>
-    <div class="eq-bar" style="--d: 1.26s; --h: 73%"></div>
-    <div class="eq-bar" style="--d: 1.79s; --h: 58%"></div>
-    <div class="eq-bar" style="--d: 1.33s; --h: 61%"></div>
-    <div class="eq-bar" style="--d: 0.22s; --h: 66%"></div>
-    <div class="eq-bar" style="--d: 1.18s; --h: 52%"></div>
-    <div class="eq-bar" style="--d: 1.7s; --h: 55%"></div>
-    <div class="eq-bar" style="--d: 1.78s; --h: 85%"></div>
-    <div class="eq-bar" style="--d: 1.29s; --h: 99%"></div>
-    <div class="eq-bar" style="--d: 1.02s; --h: 82%"></div>
-    <div class="eq-bar" style="--d: 1.11s; --h: 90%"></div>
-    <div class="eq-bar" style="--d: 0.62s; --h: 61%"></div>
-    <div class="eq-bar" style="--d: 0.28s; --h: 75%"></div>
-    <div class="eq-bar" style="--d: 1.59s; --h: 92%"></div>
-    <div class="eq-bar" style="--d: 1.18s; --h: 59%"></div>
-    <div class="eq-bar" style="--d: 1.34s; --h: 95%"></div>
-    <div class="eq-bar" style="--d: 1.56s; --h: 89%"></div>
-    <div class="eq-bar" style="--d: 0.46s; --h: 43%"></div>
-    <div class="eq-bar" style="--d: 1.63s; --h: 59%"></div>
-    <div class="eq-bar" style="--d: 0.7s; --h: 70%"></div>
-    <div class="eq-bar" style="--d: 0.26s; --h: 60%"></div>
-    <div class="eq-bar" style="--d: 1.32s; --h: 66%"></div>
-    <div class="eq-bar" style="--d: 1.31s; --h: 62%"></div>
-    <div class="eq-bar" style="--d: 1.7s; --h: 44%"></div>
-    <div class="eq-bar" style="--d: 0.29s; --h: 73%"></div>
-    <div class="eq-bar" style="--d: 0.4s; --h: 30%"></div>
-    <div class="eq-bar" style="--d: 0.48s; --h: 68%"></div>
-    <div class="eq-bar" style="--d: 0.66s; --h: 52%"></div>
-    <div class="eq-bar" style="--d: 1.23s; --h: 62%"></div>
-    <div class="eq-bar" style="--d: 1.32s; --h: 50%"></div>
-    <div class="eq-bar" style="--d: 1.73s; --h: 64%"></div>
-    <div class="eq-bar" style="--d: 0.74s; --h: 53%"></div>
-    <div class="eq-bar" style="--d: 0.32s; --h: 54%"></div>
-    <div class="eq-bar" style="--d: 1.65s; --h: 50%"></div>
-    <div class="eq-bar" style="--d: 0.45s; --h: 51%"></div>
-</div>
-    <div class="eq-bar" style="--d: 0.31s; --h: 84%"></div>
-    <div class="eq-bar" style="--d: 0.79s; --h: 43%"></div>
-    <div class="eq-bar" style="--d: 0.4s; --h: 45%"></div>
-    <div class="eq-bar" style="--d: 0.95s; --h: 77%"></div>
-    <div class="eq-bar" style="--d: 1.37s; --h: 38%"></div>
-    <div class="eq-bar" style="--d: 1.18s; --h: 84%"></div>
-    <div class="eq-bar" style="--d: 0.79s; --h: 58%"></div>
-    <div class="eq-bar" style="--d: 1.36s; --h: 81%"></div>
-    <div class="eq-bar" style="--d: 0.38s; --h: 34%"></div>
-    <div class="eq-bar" style="--d: 1.12s; --h: 65%"></div>
-    <div class="eq-bar" style="--d: 0.55s; --h: 90%"></div>
-    <div class="eq-bar" style="--d: 1.82s; --h: 20%"></div>
-    <div class="eq-bar" style="--d: 0.64s; --h: 55%"></div>
-    <div class="eq-bar" style="--d: 1.25s; --h: 70%"></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -196,9 +134,7 @@ st.markdown("""
    GLASSMORPHISM SIDEBAR
    ═══════════════════════════════════════════════════════════ */
 section[data-testid="stSidebar"] {
-    background: rgba(12, 12, 20, 0.92) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
+    background: rgba(12, 12, 20, 0.98) !important;
     border-right: 1px solid rgba(197,78,233,0.2) !important;
 }
 
@@ -217,9 +153,7 @@ section[data-testid="stSidebar"] .stPageLink:hover {
 div[data-testid="stVerticalBlock"] > div[data-testid="stContainer"] {
     border: 1px solid rgba(197,78,233,0.2) !important;
     border-radius: 12px !important;
-    background: rgba(18, 18, 26, 0.82) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    background: rgba(18, 18, 26, 0.95) !important;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -261,12 +195,10 @@ button[data-testid="stBaseButton-secondary"]:hover {
    METRICS (KPI cards)
    ═══════════════════════════════════════════════════════════ */
 div[data-testid="stMetric"] {
-    background: rgba(18, 18, 26, 0.75);
+    background: rgba(18, 18, 26, 0.95);
     border: 1px solid rgba(197,78,233,0.2);
     border-radius: 12px;
     padding: 16px 20px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     transition: all 0.3s ease;
 }
 
@@ -297,9 +229,7 @@ div[data-testid="stForm"] {
     border: 1px solid rgba(197,78,233,0.25) !important;
     border-radius: 14px !important;
     padding: 24px !important;
-    background: rgba(18, 18, 26, 0.75) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    background: rgba(18, 18, 26, 0.95) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -360,9 +290,10 @@ hr {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
     }
-    /* Slow animations on mobile to cut GPU cycles */
-    .eq-bar {
-        animation-duration: 3s !important;
+    /* Completely disable heavy GPU animations on mobile to save battery and boost FPS */
+    #bg-eq-container, .eq-bar {
+        display: none !important;
+        animation: none !important;
     }
 }
 
@@ -626,33 +557,64 @@ with st.sidebar:
         if st.session_state.get("gate_unlocked", False):
             st.divider()
             st.caption(":material/lock: Admin login")
-            pw = st.text_input("Password", type="password", key="admin_pw")
-            totp_code = st.text_input("2FA code", type="password", key="admin_2fa",
-                                      placeholder="Google Authenticator")
+            
+            import json
+            import time
+            LOCKOUT_FILE = ".admin_lockout.json"
 
-            if st.button("Log in", icon=":material/login:", type="primary",
-                         key="admin_login_btn"):
+            def get_lockout_state():
                 try:
-                    if pw == ADMIN_PASSWORD:
-                        admin_2fa_secret = db.get_secret("ADMIN_2FA_SECRET")
-                        if admin_2fa_secret:
-                            totp = pyotp.TOTP(admin_2fa_secret)
-                            if totp.verify(totp_code):
+                    with open(LOCKOUT_FILE, "r") as f:
+                        return json.load(f)
+                except (FileNotFoundError, json.JSONDecodeError):
+                    return {"attempts": 0, "locked_until": 0}
+
+            def update_lockout_state(attempts, locked_until=0):
+                with open(LOCKOUT_FILE, "w") as f:
+                    json.dump({"attempts": attempts, "locked_until": locked_until}, f)
+
+            lockout_state = get_lockout_state()
+            current_time = time.time()
+
+            if lockout_state["locked_until"] > current_time:
+                minutes_left = int((lockout_state["locked_until"] - current_time) / 60) + 1
+                st.error(f"Too many failed attempts. Try again in {minutes_left} minutes.")
+            else:
+                pw = st.text_input("Password", type="password", key="admin_pw")
+                totp_code = st.text_input("2FA code", type="password", key="admin_2fa",
+                                          placeholder="Google Authenticator")
+
+                if st.button("Log in", icon=":material/login:", type="primary",
+                             key="admin_login_btn"):
+                    try:
+                        if pw == ADMIN_PASSWORD:
+                            admin_2fa_secret = db.get_secret("ADMIN_2FA_SECRET")
+                            if admin_2fa_secret:
+                                totp = pyotp.TOTP(admin_2fa_secret)
+                                if totp.verify(totp_code):
+                                    update_lockout_state(0, 0)
+                                    st.session_state.is_admin = True
+                                    st.session_state.admin_login_time = datetime.now(timezone.utc)
+                                    st.query_params["admin_token"] = _make_admin_token()
+                                    st.rerun()
+                                else:
+                                    attempts = lockout_state["attempts"] + 1
+                                    locked_until = current_time + 900 if attempts >= 5 else 0
+                                    update_lockout_state(attempts, locked_until)
+                                    st.error("Invalid 2FA code")
+                            else:
+                                update_lockout_state(0, 0)
                                 st.session_state.is_admin = True
                                 st.session_state.admin_login_time = datetime.now(timezone.utc)
                                 st.query_params["admin_token"] = _make_admin_token()
                                 st.rerun()
-                            else:
-                                st.error("Invalid 2FA code")
                         else:
-                            st.session_state.is_admin = True
-                            st.session_state.admin_login_time = datetime.now(timezone.utc)
-                            st.query_params["admin_token"] = _make_admin_token()
-                            st.rerun()
-                    else:
-                        st.error("Wrong password")
-                except KeyError:
-                    st.error("ADMIN_PASSWORD not set in secrets")
+                            attempts = lockout_state["attempts"] + 1
+                            locked_until = current_time + 900 if attempts >= 5 else 0
+                            update_lockout_state(attempts, locked_until)
+                            st.error("Wrong password")
+                    except KeyError:
+                        st.error("ADMIN_PASSWORD not set in secrets")
         # else: nothing visible — public sees only the title
     else:
         st.divider()
@@ -665,31 +627,36 @@ with st.sidebar:
 
     # ── Sidebar Cart (Visible to Public & Admin) ───────────────
     st.divider()
-    cart = st.session_state.get("cart", {})
-    if cart:
-        st.subheader(f":material/shopping_cart: Cart ({len(cart)})")
-        cart_total_items = sum(item.get("qty", 1) for item in cart.values())
-        st.caption(f"{cart_total_items} item(s) added")
-        
-        for key, item in list(cart.items()):
-            qty = item.get("qty", 1)
-            brand = f"{item['brand']} " if item.get('brand', '').lower() != 'generic' else ""
-            c_name, c_del = st.columns([0.8, 0.2])
-            c_name.markdown(f"**{qty}x** {brand}{item['name']}")
-            if c_del.button("✖", key=f"rm_cart_{key}", help="Remove"):
-                del st.session_state.cart[key]
-                st.rerun()
+    
+    @st.fragment
+    def sidebar_cart():
+        cart = st.session_state.get("cart", {})
+        if cart:
+            st.subheader(f":material/shopping_cart: Cart ({len(cart)})")
+            cart_total_items = sum(item.get("qty", 1) for item in cart.values())
+            st.caption(f"{cart_total_items} item(s) added")
             
-        st.write("")
-        b1, b2 = st.columns(2)
-        if b1.button("🗑️ Empty", use_container_width=True, key="empty_cart_btn"):
-            st.session_state.cart = {}
-            st.rerun()
-        if b2.button("Checkout →", type="primary", use_container_width=True, key="sidebar_checkout_btn"):
-            st.switch_page("app_pages/request.py")
-    else:
-        st.subheader(":material/shopping_cart: Cart")
-        st.caption("Your cart is empty.")
+            for key, item in list(cart.items()):
+                qty = item.get("qty", 1)
+                brand = f"{item['brand']} " if item.get('brand', '').lower() != 'generic' else ""
+                c_name, c_del = st.columns([0.8, 0.2])
+                c_name.markdown(f"**{qty}x** {brand}{item['name']}")
+                if c_del.button("✖", key=f"rm_cart_{key}", help="Remove"):
+                    del st.session_state.cart[key]
+                    st.rerun()
+                
+            st.write("")
+            b1, b2 = st.columns(2)
+            if b1.button("🗑️ Empty", use_container_width=True, key="empty_cart_btn"):
+                st.session_state.cart = {}
+                st.rerun()
+            if b2.button("Checkout →", type="primary", use_container_width=True, key="sidebar_checkout_btn"):
+                st.switch_page("app_pages/request.py")
+        else:
+            st.subheader(":material/shopping_cart: Cart")
+            st.caption("Your cart is empty.")
+
+    sidebar_cart()
 
 
 # ── Navigation ───────────────────────────────────────────────
@@ -714,6 +681,7 @@ admin_pages = [
     st.Page("app_pages/contracts.py", title="Contracts", icon=":material/description:"),
     st.Page("app_pages/scan.py", title="Scan In/Out", icon=":material/qr_code_scanner:"),
     st.Page("app_pages/calendar_view.py", title="Calendar", icon=":material/calendar_month:"),
+    st.Page("app_pages/admin_setups.py", title="Setup Examples", icon=":material/photo_library:"),
     st.Page("app_pages/analytics.py", title="Analytics", icon=":material/analytics:"),
     st.Page("app_pages/compliance.py", title="Compliance", icon=":material/verified:"),
     st.Page("app_pages/maintenance.py", title="Maintenance", icon=":material/build:"),

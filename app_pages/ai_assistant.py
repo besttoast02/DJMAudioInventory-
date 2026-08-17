@@ -143,13 +143,19 @@ if user_text:
                     try:
                         inventory = db.get_available_items()
                         inv_str = json.dumps([{"name": i['name'], "cat": i['category'], "price": i.get('rate_daily', 0), "barcode": i['barcode']} for i in inventory])
+                        
+                        setups = db.get_setups()
+                        setups_str = ""
+                        if setups:
+                            setups_str = "You can also suggest these real-world setup examples (show them the image URL so they can see it): " + json.dumps(setups)
                     except Exception as e:
                         inv_str = f"Database error: {e}"
+                        setups_str = ""
                         
                     # Prepend system prompt to the messages sent to LLM (hidden from UI)
                     system_prompt = {
                         "role": "system",
-                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them."
+                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them. {setups_str}"
                     }
                     temp_messages.insert(0, system_prompt)
                     

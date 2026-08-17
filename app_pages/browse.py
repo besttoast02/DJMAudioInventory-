@@ -117,70 +117,81 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
 
     for idx, (key, info) in enumerate(sorted_items):
         with cols[idx % 3]:
-            with st.container(border=True):
-                display_brand = "" if info['brand'].lower() == "generic" else f"**{info['brand']}** "
-                st.markdown(f"#### {display_brand}{info['name']}")
-                
-                # Image
-                import os
-                safe_name = info['name'].replace(" ", "_").replace("/", "_")
-                img_path = f"assets/inventory_images/{safe_name}.png"
-                if os.path.exists(img_path):
-                    img_col1, img_col2, img_col3 = st.columns([1, 2, 1])
-                    try:
-                        img_col2.image(img_path, use_container_width=True)
-                    except Exception:
-                        pass
+            @st.fragment
+            def render_item_card(k=key, i=info):
+                with st.container(border=True):
+                    display_brand = "" if i['brand'].lower() == "generic" else f"**{i['brand']}** "
+                    st.markdown(f"#### {display_brand}{i['name']}")
+                    
+                    # Image - load statically instead of base64
+                    import os
+                    safe_name = i['name'].replace(" ", "_").replace("/", "_")
+                    
+                    # Check both .png and .jpg, since static contains both
+                    if os.path.exists(f"static/inventory_images/{safe_name}.png"):
+                        ext = ".png"
+                    elif os.path.exists(f"static/inventory_images/{safe_name}.jpg"):
+                        ext = ".jpg"
+                    else:
+                        ext = None
 
-                st.badge(f"{info['qty']} available", color="green")
+                    if ext:
+                        st.markdown(
+                            f'<div style="text-align: center;"><img src="/app/static/inventory_images/{safe_name}{ext}" style="max-width:100%; height:auto; max-height:200px; border-radius:8px;" loading="lazy"></div>',
+                            unsafe_allow_html=True
+                        )
 
-                if info["rate_daily"] > 0:
-                    st.markdown(
-                        f"<div style='margin: 0.5rem 0 1rem; color: rgba(224,224,232,0.8);'>"
-                        f"½ day: <strong>${info['rate_half_day']:.0f}</strong> · "
-                        f"Daily: <strong>${info['rate_daily']:.0f}</strong> · "
-                        f"Wknd: <strong>${info['rate_weekend']:.0f}</strong>"
-                        f"</div>",
-                        unsafe_allow_html=True
+                    st.badge(f"{i['qty']} available", color="green")
+
+                    if i["rate_daily"] > 0:
+                        st.markdown(
+                            f"<div style='margin: 0.5rem 0 1rem; color: rgba(224,224,232,0.8);'>"
+                            f"½ day: <strong>${i['rate_half_day']:.0f}</strong> · "
+                            f"Daily: <strong>${i['rate_daily']:.0f}</strong> · "
+                            f"Wknd: <strong>${i['rate_weekend']:.0f}</strong>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                    
+                    if i.get("specs_markdown"):
+                        with st.popover("View Specs & Details", use_container_width=True):
+                            st.markdown(i["specs_markdown"])
+
+
+                    # Cart controls
+                    in_cart = st.session_state.cart.get(k, {}).get("qty", 0)
+                    max_avail = i["qty"]
+
+                    c1, c2 = st.columns([1, 2])
+                    qty_sel = c1.number_input(
+                        "Qty", min_value=0, max_value=max_avail,
+                        value=in_cart, key=f"qty_{k}", label_visibility="collapsed"
                     )
-                
-                if info.get("specs_markdown"):
-                    with st.popover("View Specs & Details", use_container_width=True):
-                        st.markdown(info["specs_markdown"])
+                    
+                    # Dynamic button text
+                    btn_text = "Update Cart" if in_cart > 0 else "Add to Rental"
+                    if c2.button(btn_text, key=f"add_{k}", use_container_width=True, type="primary"):
+                        if qty_sel > 0:
+                            st.session_state.cart[k] = {
+                                "name": i["name"],
+                                "brand": i["brand"],
+                                "category": i["display_cat"],
+                                "qty": qty_sel,
+                                "rate_half_day": i["rate_half_day"],
+                                "rate_daily": i["rate_daily"],
+                                "rate_weekend": i["rate_weekend"],
+                                "max_qty": max_avail,
+                            }
+                            st.toast("🛒 Cart updated!", icon="✅")
+                            st.rerun()
+                        elif k in st.session_state.cart:
+                            del st.session_state.cart[k]
+                            st.rerun()
 
+                    if in_cart > 0:
+                        st.info(f"✅ {in_cart} added to request")
 
-                # Cart controls
-                in_cart = st.session_state.cart.get(key, {}).get("qty", 0)
-                max_avail = info["qty"]
-
-                c1, c2 = st.columns([1, 2])
-                qty_sel = c1.number_input(
-                    "Qty", min_value=0, max_value=max_avail,
-                    value=in_cart, key=f"qty_{key}", label_visibility="collapsed"
-                )
-                
-                # Dynamic button text
-                btn_text = "Update Cart" if in_cart > 0 else "Add to Rental"
-                if c2.button(btn_text, key=f"add_{key}", use_container_width=True, type="primary"):
-                    if qty_sel > 0:
-                        st.session_state.cart[key] = {
-                            "name": info["name"],
-                            "brand": info["brand"],
-                            "category": info["display_cat"],
-                            "qty": qty_sel,
-                            "rate_half_day": info["rate_half_day"],
-                            "rate_daily": info["rate_daily"],
-                            "rate_weekend": info["rate_weekend"],
-                            "max_qty": max_avail,
-                        }
-                        st.toast("🛒 Cart updated!", icon="✅")
-                        st.rerun()
-                    elif key in st.session_state.cart:
-                        del st.session_state.cart[key]
-                        st.rerun()
-
-                if in_cart > 0:
-                    st.info(f"✅ {in_cart} added to request")
+            render_item_card()
 
 # ── Drum Mic Kits ────────────────────────────────────────────
 if filt in ("All", "Mic Kits"):
