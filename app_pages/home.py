@@ -118,15 +118,9 @@ st.markdown("""
     width: clamp(10px, 2vw, 28px);
     background: linear-gradient(to top, rgba(217,70,239,0.5), rgba(59,130,246,0.9));
     border-radius: 4px 4px 0 0;
-    animation: heq-bounce 1s infinite alternate cubic-bezier(0.4,0,0.2,1);
-    animation-delay: var(--d);
     height: var(--h);
-    will-change: height;
     z-index: 0;
-}
-@keyframes heq-bounce {
-    0%   { height: 10%; }
-    100% { height: var(--h); }
+    transition: height 0.8s ease-in-out;
 }
 [data-testid="stMainBlockContainer"] {
     position: relative;
@@ -136,32 +130,48 @@ st.markdown("""
 /* Mobile: remove blur, hide heavy anims */
 @media (max-width: 768px) {
     .hero-wrapper { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-    #bg-eq-home, .heq { display: none !important; animation: none !important; }
+    #bg-eq-home, .heq { display: none !important; }
 }
 </style>
 
 <div id="bg-eq-home">
-    <div class="heq" style="--d:1.49s;--h:35%"></div>
-    <div class="heq" style="--d:0.31s;--h:84%"></div>
-    <div class="heq" style="--d:0.79s;--h:43%"></div>
-    <div class="heq" style="--d:0.40s;--h:45%"></div>
-    <div class="heq" style="--d:0.95s;--h:77%"></div>
-    <div class="heq" style="--d:1.37s;--h:38%"></div>
-    <div class="heq" style="--d:1.18s;--h:84%"></div>
-    <div class="heq" style="--d:0.79s;--h:58%"></div>
-    <div class="heq" style="--d:1.36s;--h:81%"></div>
-    <div class="heq" style="--d:0.38s;--h:34%"></div>
-    <div class="heq" style="--d:0.95s;--h:66%"></div>
-    <div class="heq" style="--d:0.53s;--h:78%"></div>
-    <div class="heq" style="--d:1.23s;--h:55%"></div>
-    <div class="heq" style="--d:1.25s;--h:69%"></div>
-    <div class="heq" style="--d:0.17s;--h:35%"></div>
-    <div class="heq" style="--d:1.10s;--h:63%"></div>
-    <div class="heq" style="--d:1.45s;--h:84%"></div>
-    <div class="heq" style="--d:1.38s;--h:48%"></div>
-    <div class="heq" style="--d:1.17s;--h:77%"></div>
-    <div class="heq" style="--d:0.15s;--h:49%"></div>
+    <div class="heq" style="--h:35%"></div>
+    <div class="heq" style="--h:84%"></div>
+    <div class="heq" style="--h:43%"></div>
+    <div class="heq" style="--h:45%"></div>
+    <div class="heq" style="--h:77%"></div>
+    <div class="heq" style="--h:38%"></div>
+    <div class="heq" style="--h:84%"></div>
+    <div class="heq" style="--h:58%"></div>
+    <div class="heq" style="--h:81%"></div>
+    <div class="heq" style="--h:34%"></div>
+    <div class="heq" style="--h:66%"></div>
+    <div class="heq" style="--h:78%"></div>
+    <div class="heq" style="--h:55%"></div>
+    <div class="heq" style="--h:69%"></div>
+    <div class="heq" style="--h:35%"></div>
+    <div class="heq" style="--h:63%"></div>
+    <div class="heq" style="--h:84%"></div>
+    <div class="heq" style="--h:48%"></div>
+    <div class="heq" style="--h:77%"></div>
+    <div class="heq" style="--h:49%"></div>
 </div>
+
+<script>
+(function() {
+    function randomizeBars() {
+        const bars = document.querySelectorAll('.heq');
+        bars.forEach(bar => {
+            const randomHeight = Math.floor(Math.random() * 75) + 15; // random height between 15% and 90%
+            bar.style.height = randomHeight + '%';
+        });
+    }
+    // Randomize once on load after elements are in DOM
+    setTimeout(randomizeBars, 500);
+    // Randomize every 60 seconds (1 minute)
+    setInterval(randomizeBars, 60000);
+})();
+</script>
 
 <div class="hero-wrapper">
     <h1 class="hero-title">Pro Audio & Lighting Rental<br>for Live Events in LA.</h1>
