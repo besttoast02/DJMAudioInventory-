@@ -82,10 +82,8 @@ a.glass-card * {
     max-width: 1.5vw;
     background: linear-gradient(to top, rgba(217,70,239,0.15), rgba(59,130,246,0.3));
     border-radius: 4px 4px 0 0;
-    animation: eq-bounce 1s infinite alternate ease-in-out;
-    animation-delay: var(--d);
     height: var(--h);
-    will-change: height; /* GPU compositing hint */
+    transition: height 0.8s ease-in-out;
 }
 
 /* Scope eq-bars to container — hides orphaned divs & limits visible count */
@@ -94,10 +92,6 @@ a.glass-card * {
 }
 #bg-eq-container .eq-bar:nth-child(n+21) {
     display: none !important;
-}
-@keyframes eq-bounce {
-    0% { height: 5%; }
-    100% { height: var(--h); }
 }
 
 /* Ensure main content is above background */
@@ -113,17 +107,33 @@ img {
 </style>
 
 <div id="bg-eq-container">
-    <div class="eq-bar" style="--d: 0.18s; --h: 47%"></div>
-    <div class="eq-bar" style="--d: 1.11s; --h: 91%"></div>
-    <div class="eq-bar" style="--d: 0.19s; --h: 54%"></div>
-    <div class="eq-bar" style="--d: 0.16s; --h: 52%"></div>
-    <div class="eq-bar" style="--d: 0.68s; --h: 99%"></div>
-    <div class="eq-bar" style="--d: 0.81s; --h: 79%"></div>
-    <div class="eq-bar" style="--d: 1.05s; --h: 83%"></div>
-    <div class="eq-bar" style="--d: 0.93s; --h: 77%"></div>
-    <div class="eq-bar" style="--d: 1.14s; --h: 88%"></div>
-    <div class="eq-bar" style="--d: 0.91s; --h: 80%"></div>
+    <div class="eq-bar" style="--h: 47%"></div>
+    <div class="eq-bar" style="--h: 91%"></div>
+    <div class="eq-bar" style="--h: 54%"></div>
+    <div class="eq-bar" style="--h: 52%"></div>
+    <div class="eq-bar" style="--h: 99%"></div>
+    <div class="eq-bar" style="--h: 79%"></div>
+    <div class="eq-bar" style="--h: 83%"></div>
+    <div class="eq-bar" style="--h: 77%"></div>
+    <div class="eq-bar" style="--h: 88%"></div>
+    <div class="eq-bar" style="--h: 80%"></div>
 </div>
+
+<script>
+(function() {
+    function randomizeAppBars() {
+        const bars = document.querySelectorAll('.eq-bar');
+        bars.forEach(bar => {
+            const randomHeight = Math.floor(Math.random() * 85) + 10; // random height between 10% and 95%
+            bar.style.height = randomHeight + '%';
+        });
+    }
+    // Randomize once on load
+    setTimeout(randomizeAppBars, 500);
+    // Randomize every 60 seconds (1 minute)
+    setInterval(randomizeAppBars, 60000);
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # Logo already rendered via st.logo() above — no duplicate needed
