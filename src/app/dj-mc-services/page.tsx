@@ -11,7 +11,7 @@ export default function DjMcPage() {
     <ServicePageTemplate
       title="DJ & MC Services"
       description="Professional entertainment, seamless mixing, and expert crowd engagement."
-      heroImage="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=2000"
+      heroImage="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=75&w=2000"
       benefits={[
         "Custom curated playlists based on your preferences",
         "Professional MC announcements for timelines and formalities",

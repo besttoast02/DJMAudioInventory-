@@ -11,7 +11,7 @@ export default function LivePerformancesPage() {
     <ServicePageTemplate
       title="Live Performances & Concerts"
       description="FOH mixing, monitor engineering, and full PA setups for live bands and outdoor concerts."
-      heroImage="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=2000"
+      heroImage="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=75&w=2000"
       benefits={[
         "Multi-channel digital mixing consoles",
         "Wedge monitors and IEM (In-Ear Monitor) support",

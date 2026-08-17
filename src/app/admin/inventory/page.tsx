@@ -1,11 +1,11 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import Link from "next/link";
 import { Plus, Package, QrCode } from "lucide-react";
 
 export const revalidate = 0;
 
 export default async function AdminInventoryPage() {
-  const { data: assets, error } = await supabase
+  const { data: assets, error } = await supabaseAdmin
     .from("assets")
     .select(`
       id,

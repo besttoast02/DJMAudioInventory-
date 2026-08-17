@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ClientChatbot } from "@/components/layout/ClientChatbot";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 
 export const metadata: Metadata = {
@@ -72,6 +72,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://mawtrnbjfwxqwcdijbzy.supabase.co" />
+      </head>
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         <script
           type="application/ld+json"

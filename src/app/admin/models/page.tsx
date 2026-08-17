@@ -1,11 +1,11 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import Link from "next/link";
 import { Plus, Package } from "lucide-react";
 
 export const revalidate = 0;
 
 export default async function AdminModelsPage() {
-  const { data: models, error } = await supabase
+  const { data: models, error } = await supabaseAdmin
     .from("product_models")
     .select(`
       id,

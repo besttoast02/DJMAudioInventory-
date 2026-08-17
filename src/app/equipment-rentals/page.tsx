@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { RentalGrid } from "@/components/rentals/RentalGrid";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const revalidate = 60;
 
 export default async function EquipmentRentalsPage() {
   // Fetch available rentable items from new Layer C catalog
-  const { data: catalogItems, error } = await supabase
+  const { data: catalogItems, error } = await supabaseAdmin
     .from("catalog_items")
     .select(`
       id,

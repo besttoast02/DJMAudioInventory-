@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 // Helper to safely get the Org ID, usually from env or a single row
 const ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
@@ -31,7 +31,7 @@ Client Notes: ${notes}
     `.trim();
 
     // 1. Create the Client
-    const { data: clientData, error: clientError } = await supabase
+    const { data: clientData, error: clientError } = await supabaseAdmin
       .from('clients')
       .insert({
         organization_id: ORG_ID,
@@ -49,7 +49,7 @@ Client Notes: ${notes}
     const clientId = clientData.id;
 
     // Create Client Contact
-    await supabase.from('client_contacts').insert({
+    await supabaseAdmin.from('client_contacts').insert({
       client_id: clientId,
       first_name: clientName.split(' ')[0] || '',
       last_name: clientName.split(' ').slice(1).join(' ') || '',
@@ -59,7 +59,7 @@ Client Notes: ${notes}
     });
 
     // 2. Insert into event_requests
-    const { data: requestData, error: requestError } = await supabase
+    const { data: requestData, error: requestError } = await supabaseAdmin
       .from('event_requests')
       .insert({
         organization_id: ORG_ID,
@@ -82,7 +82,7 @@ Client Notes: ${notes}
     const requestId = requestData.id;
 
     // 3. Create Estimate and Version
-    const { data: estimateData } = await supabase
+    const { data: estimateData } = await supabaseAdmin
       .from('estimates')
       .insert({
         organization_id: ORG_ID,
@@ -92,7 +92,7 @@ Client Notes: ${notes}
       .select().single();
       
     if (estimateData) {
-      const { data: versionData } = await supabase
+      const { data: versionData } = await supabaseAdmin
         .from('estimate_versions')
         .insert({
           estimate_id: estimateData.id,
@@ -114,7 +114,7 @@ Client Notes: ${notes}
           sort_order: idx
         }));
 
-        await supabase.from('estimate_lines').insert(linesToInsert);
+        await supabaseAdmin.from('estimate_lines').insert(linesToInsert);
       }
     }
 

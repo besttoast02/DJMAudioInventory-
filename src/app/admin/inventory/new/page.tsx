@@ -146,7 +146,7 @@ export default function NewInventoryAssetPage() {
               </select>
             )}
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              Can't find the model? You need to create a new Product Model first.
+              Can&apos;t find the model? You need to create a new Product Model first.
             </p>
           </div>
 

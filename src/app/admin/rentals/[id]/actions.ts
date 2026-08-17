@@ -1,10 +1,10 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { revalidatePath } from "next/cache";
 
 export async function updateRentalStatus(rentalId: number, status: string) {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from("rentals")
     .update({ status })
     .eq("id", rentalId);
@@ -18,7 +18,7 @@ export async function updateRentalStatus(rentalId: number, status: string) {
   // and changed all associated `items` back to "available".
   if (status === "returned") {
     // 1. Get all rental_items for this rental
-    const { data: rentalItems } = await supabase
+    const { data: rentalItems } = await supabaseAdmin
       .from("rental_items")
       .select("item_id")
       .eq("rental_id", rentalId);
@@ -27,7 +27,7 @@ export async function updateRentalStatus(rentalId: number, status: string) {
       const itemIds = rentalItems.map(ri => ri.item_id);
       
       // 2. Update items table to set status = 'available'
-      await supabase
+      await supabaseAdmin
         .from("items")
         .update({ status: "available" })
         .in("id", itemIds);
@@ -36,7 +36,7 @@ export async function updateRentalStatus(rentalId: number, status: string) {
 
   if (status === "approved") {
     // 1. Get all rental_items
-    const { data: rentalItems } = await supabase
+    const { data: rentalItems } = await supabaseAdmin
       .from("rental_items")
       .select("item_id")
       .eq("rental_id", rentalId);
@@ -45,7 +45,7 @@ export async function updateRentalStatus(rentalId: number, status: string) {
       const itemIds = rentalItems.map(ri => ri.item_id);
       
       // 2. Update items table to set status = 'rented'
-      await supabase
+      await supabaseAdmin
         .from("items")
         .update({ status: "rented" })
         .in("id", itemIds);

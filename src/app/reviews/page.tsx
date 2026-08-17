@@ -47,7 +47,7 @@ export default function ReviewsPage() {
             Client <span className="text-blue-600 dark:text-blue-500">Love</span> & Results
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Don't just take our word for it. See what our clients are saying and explore real examples of how we bring events to life.
+            Don&apos;t just take our word for it. See what our clients are saying and explore real examples of how we bring events to life.
           </p>
         </div>
       </section>
@@ -67,7 +67,7 @@ export default function ReviewsPage() {
                   ))}
                 </div>
                 <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed flex-grow italic mb-8">
-                  "{review.content}"
+                  &ldquo;{review.content}&rdquo;
                 </p>
                 <div>
                   <h4 className="font-bold text-gray-900 dark:text-white text-lg">{review.name}</h4>

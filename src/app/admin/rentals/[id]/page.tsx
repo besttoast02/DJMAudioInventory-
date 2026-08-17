@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { format } from "date-fns";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -7,7 +7,7 @@ import { RentalActions } from "./RentalActions";
 export const revalidate = 0;
 
 export default async function RentalDetailPage({ params }: { params: { id: string } }) {
-  const { data: rental, error } = await supabase
+  const { data: rental, error } = await supabaseAdmin
     .from("rentals")
     .select(`
       *,

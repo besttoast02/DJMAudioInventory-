@@ -578,7 +578,7 @@ export default function EditProductModelPage({ params }: { params: Promise<{ id:
                     placeholder="https://manufacturer.com/manual.pdf"
                     className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 dark:text-white shadow-sm"
                   />
-                  <p className="text-xs text-gray-500 mt-2">Link to the manufacturer's manual or documentation.</p>
+                  <p className="text-xs text-gray-500 mt-2">Link to the manufacturer&apos;s manual or documentation.</p>
                 </div>
               </div>
             </div>

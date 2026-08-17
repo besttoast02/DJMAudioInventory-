@@ -1,21 +1,46 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Phone } from "lucide-react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+
+const BACKGROUND_IMAGES = [
+  "https://images.unsplash.com/photo-1470229722913-7c090be5c5a4?auto=format&fit=crop&q=75&w=2000", // DJ Setup and Lighting
+  "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=75&w=2000", // Dancefloor/Crowd
+  "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=75&w=2000", // Live Performance/Event Lighting
+  "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&q=75&w=2000"  // Event/Stage Setup
+];
 
 export function Hero() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % BACKGROUND_IMAGES.length);
+    }, 60000); // 60,000 ms = 1 minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="relative w-full min-h-[85vh] flex items-center justify-center bg-gray-950 overflow-hidden">
-      {/* Background Image Placeholder */}
+      {/* Background Image Slideshow */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-900/80 to-transparent z-10" />
-        <Image
-          src="https://images.unsplash.com/photo-1470229722913-7c090be5c5a4?auto=format&fit=crop&q=80&w=2000"
-          alt="DJ Setup and Lighting"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover opacity-50"
-        />
+        {BACKGROUND_IMAGES.map((src, index) => (
+          <Image
+            key={src}
+            src={src}
+            alt="Event Sound and Lighting Background"
+            fill
+            priority={index === 0}
+            sizes="100vw"
+            className={`object-cover transition-opacity duration-1000 ${
+              index === currentImageIndex ? "opacity-50" : "opacity-0"
+            }`}
+          />
+        ))}
       </div>
 
       <div className="container mx-auto px-4 relative z-20">

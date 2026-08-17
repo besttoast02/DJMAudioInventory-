@@ -11,7 +11,7 @@ export default function EventSoundPage() {
     <ServicePageTemplate
       title="Event Sound & PA Systems"
       description="Crystal clear audio reinforcement for live bands, corporate panels, ceremonies, and speeches."
-      heroImage="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=2000"
+      heroImage="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=75&w=2000"
       benefits={[
         "Premium JBL and QSC active speakers and subwoofers",
         "Shure wireless microphones (handheld and lapel)",

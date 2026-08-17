@@ -11,7 +11,7 @@ export default function WeddingsPage() {
     <ServicePageTemplate
       title="Wedding Receptions & Ceremonies"
       description="Flawless audio for your ceremony and an unforgettable party for your reception."
-      heroImage="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=2000"
+      heroImage="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=75&w=2000"
       benefits={[
         "Separate, discreet sound system for the ceremony",
         "Wireless lapel microphones for the officiant and vows",

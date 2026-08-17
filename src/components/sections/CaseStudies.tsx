@@ -9,7 +9,7 @@ const CASE_STUDIES = [
     attendance: "August 2025",
     description:
       "Provided robust sound reinforcement for the LAPD Hollenbeck division's National Night Out. Ensured clear public address audio across the large outdoor space for community leaders and live entertainment.",
-    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&q=75&w=800",
   },
   {
     title: "St. Louis of France Parish Fiesta",
@@ -17,7 +17,7 @@ const CASE_STUDIES = [
     attendance: "May 2026",
     description:
       "Delivered full weekend production for the annual parish fiesta. Handled live band mixing, DJ entertainment between sets, and a comprehensive PA system to cover the entire festival grounds.",
-    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=75&w=800",
   },
 ];
 
@@ -46,6 +46,9 @@ export function CaseStudies() {
                   alt={study.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzFlMjkzYiIvPjwvc3ZnPg=="
+                  loading="lazy"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>

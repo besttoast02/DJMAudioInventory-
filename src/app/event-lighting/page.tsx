@@ -11,7 +11,7 @@ export default function EventLightingPage() {
     <ServicePageTemplate
       title="Event Lighting"
       description="Uplighting, dance floor lighting, and moving heads to completely transform your venue."
-      heroImage="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=2000"
+      heroImage="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=75&w=2000"
       benefits={[
         "Wireless, battery-powered LED uplighting (any color)",
         "Intelligent moving head lights for the dance floor",

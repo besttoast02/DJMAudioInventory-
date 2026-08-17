@@ -11,7 +11,7 @@ export default function PrivateEventsPage() {
     <ServicePageTemplate
       title="Private Parties & Birthdays"
       description="Turn your backyard or rented venue into a nightclub experience."
-      heroImage="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=2000"
+      heroImage="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=75&w=2000"
       benefits={[
         "Club-style DJ mixing for high-energy dance floors",
         "Subwoofers to bring the bass to any space",

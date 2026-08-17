@@ -1,11 +1,11 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { format } from "date-fns";
 import Link from "next/link";
 
 export const revalidate = 0;
 
 export default async function AdminRentalsPage() {
-  const { data: rentals, error } = await supabase
+  const { data: rentals, error } = await supabaseAdmin
     .from("events")
     .select("*, clients(name)")
     .order("created_at", { ascending: false });

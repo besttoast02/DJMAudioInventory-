@@ -141,7 +141,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
     // Check if item already exists in components
     const existingIndex = components.findIndex(c => (c.catalog_items?.id || c.catalog_item_id) === newItemId);
     
-    let newComponents = [...components];
+    const newComponents = [...components];
     
     if (existingIndex >= 0) {
       newComponents[existingIndex].quantity += newItemQty;
@@ -289,7 +289,7 @@ export default function EditPackagePage({ params }: { params: Promise<{ id: stri
             components.map((comp) => {
               const item = comp.catalog_items;
               let label = item?.name || "Unknown Item";
-              let subtitle = item?.item_type === "rental_product" ? "Rental Product" : item?.item_type === "labor_service" ? "Labor Service" : "Item";
+              const subtitle = item?.item_type === "rental_product" ? "Rental Product" : item?.item_type === "labor_service" ? "Labor Service" : "Item";
               
               if (item?.item_type === "rental_product" && item?.rental_products?.[0]?.product_models) {
                 const model = item.rental_products[0].product_models;

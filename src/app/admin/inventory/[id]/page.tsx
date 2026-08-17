@@ -693,7 +693,7 @@ export default function EditInventoryAssetPage({ params }: { params: Promise<{ i
 
                 <div className="mt-8 p-6 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Physical Condition & Degradation</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Calculated heuristically based on the unit's age relative to its useful life, multiplied by the current manually assessed condition grade.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Calculated heuristically based on the unit&apos;s age relative to its useful life, multiplied by the current manually assessed condition grade.</p>
                   
                   <div className="flex items-center space-x-6">
                     <div className="flex-1">
@@ -909,7 +909,7 @@ export default function EditInventoryAssetPage({ params }: { params: Promise<{ i
                         placeholder="https://manufacturer.com/manual.pdf"
                         className="w-full px-4 py-3 bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 dark:text-white shadow-sm"
                       />
-                      <p className="text-xs text-gray-500 mt-2">Link to the manufacturer's manual or documentation.</p>
+                      <p className="text-xs text-gray-500 mt-2">Link to the manufacturer&apos;s manual or documentation.</p>
                     </div>
                   </div>
                 </div>

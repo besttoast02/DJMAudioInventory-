@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { format } from "date-fns";
 import Link from "next/link";
 import { ArrowRight, Clock, CheckCircle, Package } from "lucide-react";
@@ -8,8 +8,8 @@ export const revalidate = 0; // Always dynamic
 export default async function AdminDashboardPage() {
   // Fetch high-level stats
   const [rentalsRes, itemsRes] = await Promise.all([
-    supabase.from("rentals").select("*").order("created_at", { ascending: false }).limit(10),
-    supabase.from("items").select("id", { count: 'exact', head: true })
+    supabaseAdmin.from("rentals").select("*").order("created_at", { ascending: false }).limit(10),
+    supabaseAdmin.from("items").select("id", { count: 'exact', head: true })
   ]);
 
   const rentals = rentalsRes.data || [];
