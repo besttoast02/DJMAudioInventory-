@@ -39,3 +39,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / utility scripts & data
+/dump_inventory.js
+/generate_seed.js
+/seed_items.js
+/test-schema.js
+/test-supabase-query.js
+/test-ui.js
+/test-use-chat.js
+/test-usechat.js
+/list_users.js
+/inventory_dump.json
+/logs/
+/project_developer_log.md
+/src/proxy.ts.bak
+
