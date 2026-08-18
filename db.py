@@ -66,8 +66,16 @@ def is_offline() -> bool:
     if _offline_checked:
         return _offline_mode
         
-    url = get_secret("SUPABASE_URL", "")
-    key = get_secret("SUPABASE_KEY", "")
+    # Contingency 1: Force Online Mode override via env var or secrets
+    if get_secret("FORCE_ONLINE") in ("True", "true", True):
+        _offline_mode = False
+        _offline_checked = True
+        return False
+        
+    # Contingency 2: Fallback names for Supabase URL & Key
+    url = get_secret("SUPABASE_URL") or get_secret("NEXT_PUBLIC_SUPABASE_URL", "")
+    key = get_secret("SUPABASE_KEY") or get_secret("SUPABASE_SERVICE_ROLE_KEY") or get_secret("NEXT_PUBLIC_SUPABASE_ANON_KEY", "")
+    
     if not url or not key:
         _offline_mode = True
         _offline_checked = True
@@ -79,7 +87,7 @@ def is_offline() -> bool:
             "apikey": key,
             "Authorization": f"Bearer {key}"
         }
-        with httpx.Client(timeout=3.0) as client:
+        with httpx.Client(timeout=10.0) as client:
             resp = client.get(f"{url_clean}/rest/v1/", headers=headers)
             if resp.status_code < 500:
                 _offline_mode = False
@@ -198,8 +206,8 @@ def _get_offline_items() -> list[dict]:
 
 @st.cache_resource
 def get_client() -> Client:
-    url = get_secret("SUPABASE_URL", "")
-    key = get_secret("SUPABASE_KEY", "")
+    url = get_secret("SUPABASE_URL") or get_secret("NEXT_PUBLIC_SUPABASE_URL", "")
+    key = get_secret("SUPABASE_KEY") or get_secret("SUPABASE_SERVICE_ROLE_KEY") or get_secret("NEXT_PUBLIC_SUPABASE_ANON_KEY", "")
     if not url or not key:
         return None
     try:
@@ -211,7 +219,8 @@ def get_client() -> Client:
 
 
 def is_connected() -> bool:
-    return bool(get_secret("SUPABASE_URL"))
+    url = get_secret("SUPABASE_URL") or get_secret("NEXT_PUBLIC_SUPABASE_URL")
+    return bool(url)
 
 
 # ── Items ────────────────────────────────────────────────────
