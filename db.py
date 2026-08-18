@@ -43,12 +43,17 @@ def get_prefix(category: str) -> str:
 
 
 def get_secret(key, default=None):
+    val = None
     if key in os.environ:
-        return os.environ[key]
-    try:
-        return st.secrets.get(key, default)
-    except Exception:
-        return default
+        val = os.environ[key]
+    else:
+        try:
+            val = st.secrets.get(key, default)
+        except Exception:
+            val = default
+    if isinstance(val, str):
+        return val.strip().strip('"').strip("'")
+    return val
 
 
 _offline_checked = False
@@ -69,13 +74,14 @@ def is_offline() -> bool:
         return True
         
     try:
+        url_clean = url.rstrip('/')
         headers = {
             "apikey": key,
             "Authorization": f"Bearer {key}"
         }
         with httpx.Client(timeout=3.0) as client:
-            resp = client.get(f"{url}/rest/v1/items?limit=1", headers=headers)
-            if resp.status_code in (200, 201, 204, 400, 401, 403, 404):
+            resp = client.get(f"{url_clean}/rest/v1/", headers=headers)
+            if resp.status_code < 500:
                 _offline_mode = False
             else:
                 _offline_mode = True
@@ -194,8 +200,11 @@ def _get_offline_items() -> list[dict]:
 def get_client() -> Client:
     url = get_secret("SUPABASE_URL", "")
     key = get_secret("SUPABASE_KEY", "")
+    if not url or not key:
+        return None
     try:
-        return create_client(url, key)
+        url_clean = url.rstrip('/')
+        return create_client(url_clean, key)
     except Exception as e:
         print(f"Failed to create Supabase client: {e}")
         return None

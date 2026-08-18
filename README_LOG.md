@@ -45,3 +45,19 @@ Successfully committed and synchronized all local inventory system changes to th
    - Configured `app.py` to check `db.is_offline()` and display a prominent warning banner at the top of the viewport when running offline.
 5. **Compilation Verification**:
    - Ran `python3 -m py_compile db.py app.py` to verify syntactical correctness and zero compilation warnings.
+
+---
+
+## August 18, 2026 (Supabase Connection Check Bug Fix)
+
+### Actions Taken:
+1. **Robust Secret Cleaning (`db.py`)**:
+   - Refactored `get_secret()` to strip surrounding whitespaces and literal double/single quotes around retrieved environment variables, preventing malformed hostnames from failing DNS resolution on Render.
+2. **Postgrest Root Check & Loose Status Detection (`db.py`)**:
+   - Updated `is_offline()` to query the API schema root (`/rest/v1/`) which is guaranteed to exist as long as the server is up.
+   - Replaced specific status checks with a general `resp.status_code < 500` validation. This guarantees that if the server responds with authorization errors (e.g. 401/403) or redirects (e.g. 307), it is correctly identified as online.
+3. **URL Trailing Slash Trimming (`db.py`)**:
+   - Explicitly stripped trailing slashes from the cleaned URL in both `is_offline()` and `get_client()` to prevent double-slash formatting issues during HTTP requests.
+4. **Git Commit & Push**:
+   - Committed and pushed changes successfully to the `main` branch on GitHub.
+
