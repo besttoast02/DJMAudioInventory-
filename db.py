@@ -7,6 +7,8 @@ import streamlit as st
 from supabase import create_client, Client
 import json
 import os
+import uuid
+import httpx
 
 # ── Category → barcode prefix mapping ────────────────────────
 CATEGORY_PREFIXES = {
@@ -49,11 +51,154 @@ def get_secret(key, default=None):
         return default
 
 
+_offline_checked = False
+_offline_mode = False
+_cached_offline_items = None
+
+
+def is_offline() -> bool:
+    global _offline_checked, _offline_mode
+    if _offline_checked:
+        return _offline_mode
+        
+    url = get_secret("SUPABASE_URL", "")
+    key = get_secret("SUPABASE_KEY", "")
+    if not url or not key:
+        _offline_mode = True
+        _offline_checked = True
+        return True
+        
+    try:
+        headers = {
+            "apikey": key,
+            "Authorization": f"Bearer {key}"
+        }
+        with httpx.Client(timeout=3.0) as client:
+            resp = client.get(f"{url}/rest/v1/items?limit=1", headers=headers)
+            if resp.status_code in (200, 201, 204, 400, 401, 403, 404):
+                _offline_mode = False
+            else:
+                _offline_mode = True
+    except Exception as e:
+        print(f"Supabase connection check failed. Running in Offline Mode: {e}")
+        _offline_mode = True
+        
+    _offline_checked = True
+    return _offline_mode
+
+
+def _get_offline_items() -> list[dict]:
+    global _cached_offline_items
+    if _cached_offline_items is not None:
+        return _cached_offline_items
+        
+    json_path = "inventory_data.json"
+    if not os.path.exists(json_path):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        json_path = os.path.join(script_dir, "inventory_data.json")
+        
+    items = []
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+            
+            counters = {}
+            for case in data.get("cases", []):
+                case_name = case.get("name", "Unknown Case")
+                for raw_item in case.get("items", []):
+                    cat = raw_item.get("category", "General")
+                    prefix = get_prefix(cat)
+                    qty = raw_item.get("qty", 1)
+                    
+                    if qty <= 0:
+                        continue
+                        
+                    for _ in range(qty):
+                        if prefix not in counters:
+                            counters[prefix] = 0
+                        counters[prefix] += 1
+                        barcode = f"DJM-{prefix}-{counters[prefix]:04d}"
+                        
+                        item_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"offline-{barcode}"))
+                        rentable = cat not in ADDON_CATEGORIES
+                        
+                        items.append({
+                            "id": item_id,
+                            "barcode": barcode,
+                            "name": raw_item.get("name", ""),
+                            "brand": raw_item.get("brand", "Generic"),
+                            "category": cat,
+                            "storage_case": case_name,
+                            "status": "available",
+                            "notes": raw_item.get("notes", ""),
+                            "purchase_price": float(raw_item.get("purchase_price", 0)),
+                            "current_value": float(raw_item.get("current_value", 0)),
+                            "rate_hourly": float(raw_item.get("rate_hourly", 0)),
+                            "rate_half_day": float(raw_item.get("rate_half_day", 0)),
+                            "rate_daily": float(raw_item.get("rate_daily", 0)),
+                            "rate_weekend": float(raw_item.get("rate_weekend", 0)),
+                            "rentable": rentable,
+                            "specs_markdown": raw_item.get("specs_markdown", "")
+                        })
+        except Exception as e:
+            print(f"Error loading offline inventory data: {e}")
+            
+    # Append services from package_config
+    try:
+        import package_config as pkg
+        services_to_add = [
+            {"barcode": pkg.PKG_DJ_PARTY, "name": "DJ — Party Package (5hr)", "rate_daily": 750.0, "rate_weekend": 1200.0, "rate_half_day": 375.0, "rate_hourly": 0.0},
+            {"barcode": pkg.PKG_DJ_WEDDING, "name": "DJ — Wedding Package (5hr)", "rate_daily": 1200.0, "rate_weekend": 2000.0, "rate_half_day": 600.0, "rate_hourly": 0.0},
+            {"barcode": pkg.PKG_DJ_CORPORATE, "name": "DJ — Corporate Package (5hr)", "rate_daily": 1500.0, "rate_weekend": 2500.0, "rate_half_day": 750.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_FOH, "name": "FOH Engineer", "rate_daily": 0.0, "rate_weekend": 0.0, "rate_half_day": 0.0, "rate_hourly": 50.0},
+            {"barcode": pkg.SVC_MONITOR, "name": "Monitor Engineer", "rate_daily": 0.0, "rate_weekend": 0.0, "rate_half_day": 0.0, "rate_hourly": 35.0},
+            {"barcode": pkg.SVC_POST_EP, "name": "EP Post-Production (Stereo Master)", "rate_daily": 150.0, "rate_weekend": 150.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_POST_ALBUM, "name": "Album Post-Production (Stereo Master)", "rate_daily": 450.0, "rate_weekend": 450.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_LIGHTING, "name": "Lighting Service (Package & Operator)", "rate_daily": 250.0, "rate_weekend": 250.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_ROBOT, "name": "LED Robot Show (45min–1hr)", "rate_daily": 300.0, "rate_weekend": 300.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_VALS, "name": "Vals Custom Mix", "rate_daily": 50.0, "rate_weekend": 50.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_BAILE, "name": "Baile Sorpresa Custom Mix", "rate_daily": 50.0, "rate_weekend": 50.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": pkg.SVC_PLANNING, "name": "Full Event Timeline Planning", "rate_daily": 100.0, "rate_weekend": 100.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+            {"barcode": "DJM-SVC-DELIVERY", "name": "Delivery & Setup", "rate_daily": 100.0, "rate_weekend": 100.0, "rate_half_day": 0.0, "rate_hourly": 0.0},
+        ]
+        
+        for svc in services_to_add:
+            svc_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"offline-{svc['barcode']}"))
+            items.append({
+                "id": svc_id,
+                "barcode": svc["barcode"],
+                "name": svc["name"],
+                "brand": "DJM Audio",
+                "category": "Services",
+                "storage_case": "N/A",
+                "status": "available",
+                "notes": "",
+                "purchase_price": 0.0,
+                "current_value": 0.0,
+                "rate_hourly": svc["rate_hourly"],
+                "rate_half_day": svc["rate_half_day"],
+                "rate_daily": svc["rate_daily"],
+                "rate_weekend": svc["rate_weekend"],
+                "rentable": True,
+                "specs_markdown": ""
+            })
+    except Exception as e:
+        print(f"Error appending offline services: {e}")
+        
+    _cached_offline_items = items
+    return _cached_offline_items
+
+
 @st.cache_resource
 def get_client() -> Client:
     url = get_secret("SUPABASE_URL", "")
     key = get_secret("SUPABASE_KEY", "")
-    return create_client(url, key)
+    try:
+        return create_client(url, key)
+    except Exception as e:
+        print(f"Failed to create Supabase client: {e}")
+        return None
 
 
 def is_connected() -> bool:
@@ -64,6 +209,8 @@ def is_connected() -> bool:
 
 @st.cache_data(ttl=300)
 def get_all_items() -> list[dict]:
+    if is_offline():
+        return _get_offline_items()
     sb = get_client()
     res = sb.table("items").select("*").order("barcode").execute()
     return res.data
@@ -71,6 +218,8 @@ def get_all_items() -> list[dict]:
 
 @st.cache_data(ttl=300)
 def get_items_by_status(status: str) -> list[dict]:
+    if is_offline():
+        return [i for i in _get_offline_items() if i.get("status") == status]
     sb = get_client()
     res = sb.table("items").select("*").eq("status", status).order("barcode").execute()
     return res.data
@@ -83,6 +232,8 @@ def get_available_items() -> list[dict]:
 @st.cache_data(ttl=300)
 def get_services() -> list[dict]:
     """Get all service items (category = 'Services')."""
+    if is_offline():
+        return [i for i in _get_offline_items() if i.get("category") == "Services" and i.get("status") == "available"]
     sb = get_client()
     res = sb.table("items").select("*").eq("category", "Services").eq("status", "available").order("barcode").execute()
     return res.data
@@ -105,11 +256,10 @@ def add_item(barcode: str, name: str, brand: str, category: str, storage_case: s
              notes: str = "", purchase_price: float = 0, current_value: float = 0,
              rate_hourly: float = 0, rate_half_day: float = 0, rate_daily: float = 0, rate_weekend: float = 0,
              rentable: bool | None = None) -> dict:
-    sb = get_client()
-    # Auto-determine rentable from category if not explicitly set
     if rentable is None:
         rentable = category not in ADDON_CATEGORIES
     data = {
+        "id": str(uuid.uuid4()),
         "barcode": barcode,
         "name": name,
         "brand": brand,
@@ -125,12 +275,25 @@ def add_item(barcode: str, name: str, brand: str, category: str, storage_case: s
         "rate_weekend": rate_weekend,
         "rentable": rentable,
     }
+    if is_offline():
+        _get_offline_items().append(data)
+        st.cache_data.clear()
+        return [data]
+    sb = get_client()
     res = sb.table("items").insert(data).execute()
     st.cache_data.clear()
     return res.data
 
 
 def update_item(item_id: str, updates: dict) -> dict:
+    if is_offline():
+        items = _get_offline_items()
+        for i in items:
+            if i["id"] == item_id:
+                i.update(updates)
+                st.cache_data.clear()
+                return [i]
+        return []
     sb = get_client()
     res = sb.table("items").update(updates).eq("id", item_id).execute()
     st.cache_data.clear()
@@ -141,14 +304,28 @@ def batch_update_items(updates: list[dict]):
     """Update multiple items. Uses bulk upsert for efficiency."""
     if not updates:
         return
+    if is_offline():
+        items = _get_offline_items()
+        by_id = {u["id"]: u for u in updates if "id" in u}
+        for i in items:
+            if i["id"] in by_id:
+                i.update(by_id[i["id"]])
+        st.cache_data.clear()
+        return
     sb = get_client()
-    # PostgREST supports upserting an array of dicts if they include the primary key ('id')
     sb.table("items").upsert(updates).execute()
     st.cache_data.clear()
 
 
 def update_items_status(item_ids: list[str], status: str):
     if not item_ids:
+        return
+    if is_offline():
+        items = _get_offline_items()
+        for i in items:
+            if i["id"] in item_ids:
+                i["status"] = status
+        st.cache_data.clear()
         return
     sb = get_client()
     sb.table("items").update({"status": status}).in_("id", item_ids).execute()
@@ -157,6 +334,18 @@ def update_items_status(item_ids: list[str], status: str):
 
 def get_next_barcode(category: str) -> str:
     prefix = get_prefix(category)
+    if is_offline():
+        matching = [i for i in _get_offline_items() if i["barcode"].startswith(f"DJM-{prefix}-")]
+        if matching:
+            sorted_matching = sorted(matching, key=lambda x: x["barcode"])
+            last = sorted_matching[-1]["barcode"]
+            try:
+                num = int(last.split("-")[-1]) + 1
+            except ValueError:
+                num = 1
+        else:
+            num = 1
+        return f"DJM-{prefix}-{num:04d}"
     sb = get_client()
     res = sb.table("items").select("barcode").like("barcode", f"DJM-{prefix}-%").order("barcode", desc=True).limit(1).execute()
     if res.data:
@@ -171,6 +360,14 @@ def get_next_barcode(category: str) -> str:
 
 
 def delete_item(item_id: str):
+    if is_offline():
+        items = _get_offline_items()
+        for idx, i in enumerate(items):
+            if i["id"] == item_id:
+                items.pop(idx)
+                break
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("items").delete().eq("id", item_id).execute()
     st.cache_data.clear()
@@ -179,20 +376,22 @@ def delete_item(item_id: str):
 def delete_items(item_ids: list[str]):
     if not item_ids:
         return
-    sb = get_client()
-    sb.table("items").delete().in_("id", item_ids).execute()
-    st.cache_data.clear()
-
-
-# ── Double-booking prevention ────────────────────────────────
-
-@st.cache_data(ttl=60)
+    if is_offline():
+        items = _get_offline_items()
+        new_items = [i for i in items if i["id"] not in item_ids]
+        global _cached_offline_items
+        _cached_offline_items = new_items
+        st.cache_data.clear()
+        return
+    sb@st.cache_data(ttl=60)
 def get_booked_counts_for_dates(event_date: str, return_date: str) -> dict[str, int]:
     """
     Returns a dict of {item_name: count_booked} for items committed
     during the given date range (approved rentals whose dates overlap).
     Uses 2 queries instead of N+1 for performance.
     """
+    if is_offline():
+        return {}
     sb = get_client()
     # Query 1: Get IDs of overlapping approved/pending rentals
     overlapping = (
@@ -224,10 +423,173 @@ def get_booked_counts_for_dates(event_date: str, return_date: str) -> dict[str, 
     return booked_counts
 
 
+_global_offline_rentals = []
+_global_offline_rental_items = []
+
+
+def _get_offline_rentals() -> list[dict]:
+    try:
+        if "offline_rentals" not in st.session_state:
+            st.session_state["offline_rentals"] = []
+        return st.session_state["offline_rentals"]
+    except Exception:
+        global _global_offline_rentals
+        return _global_offline_rentals
+
+
+def _get_offline_rental_items() -> list[dict]:
+    try:
+        if "offline_rental_items" not in st.session_state:
+            st.session_state["offline_rental_items"] = []
+        return st.session_state["offline_rental_items"]
+    except Exception:
+        global _global_offline_rental_items
+        return _global_offline_rental_items
+
+
+_global_offline_employees = []
+_global_offline_assignments = []
+_global_offline_time_logs = []
+_global_offline_payments = []
+_global_offline_discounts = []
+_global_offline_todos = []
+_global_offline_activity = []
+_global_offline_maintenance = []
+_global_offline_feedback = []
+_global_offline_waivers = []
+_global_offline_deadlines = []
+
+
+def _get_offline_employees() -> list:
+    import package_config as pkg
+    try:
+        if "offline_employees" not in st.session_state:
+            st.session_state["offline_employees"] = [
+                {"id": pkg.OWNER_ID, "name": pkg.OWNER_NAME, "role": "admin", "phone": "123-456-7890", "email": "info@djmaudio.com"}
+            ]
+        return st.session_state["offline_employees"]
+    except Exception:
+        global _global_offline_employees
+        if not _global_offline_employees:
+            _global_offline_employees = [
+                {"id": pkg.OWNER_ID, "name": pkg.OWNER_NAME, "role": "admin", "phone": "123-456-7890", "email": "info@djmaudio.com"}
+            ]
+        return _global_offline_employees
+
+
+def _get_offline_assignments() -> list:
+    try:
+        if "offline_assignments" not in st.session_state:
+            st.session_state["offline_assignments"] = []
+        return st.session_state["offline_assignments"]
+    except Exception:
+        global _global_offline_assignments
+        return _global_offline_assignments
+
+
+def _get_offline_time_logs() -> list:
+    try:
+        if "offline_time_logs" not in st.session_state:
+            st.session_state["offline_time_logs"] = []
+        return st.session_state["offline_time_logs"]
+    except Exception:
+        global _global_offline_time_logs
+        return _global_offline_time_logs
+
+
+def _get_offline_payments() -> list:
+    try:
+        if "offline_payments" not in st.session_state:
+            st.session_state["offline_payments"] = []
+        return st.session_state["offline_payments"]
+    except Exception:
+        global _global_offline_payments
+        return _global_offline_payments
+
+
+def _get_offline_discounts() -> list:
+    try:
+        if "offline_discounts" not in st.session_state:
+            st.session_state["offline_discounts"] = [
+                {"id": "discount-1", "code": "WELCOME10", "percent_off": 10, "max_uses": 0, "times_used": 0, "active": True, "created_at": "2026-08-17T00:00:00"}
+            ]
+        return st.session_state["offline_discounts"]
+    except Exception:
+        global _global_offline_discounts
+        if not _global_offline_discounts:
+            _global_offline_discounts = [
+                {"id": "discount-1", "code": "WELCOME10", "percent_off": 10, "max_uses": 0, "times_used": 0, "active": True, "created_at": "2026-08-17T00:00:00"}
+            ]
+        return _global_offline_discounts
+
+
+def _get_offline_todos() -> list:
+    try:
+        if "offline_todos" not in st.session_state:
+            st.session_state["offline_todos"] = []
+        return st.session_state["offline_todos"]
+    except Exception:
+        global _global_offline_todos
+        return _global_offline_todos
+
+
+def _get_offline_activity() -> list:
+    try:
+        if "offline_activity" not in st.session_state:
+            st.session_state["offline_activity"] = []
+        return st.session_state["offline_activity"]
+    except Exception:
+        global _global_offline_activity
+        return _global_offline_activity
+
+
+def _get_offline_maintenance() -> list:
+    try:
+        if "offline_maintenance" not in st.session_state:
+            st.session_state["offline_maintenance"] = []
+        return st.session_state["offline_maintenance"]
+    except Exception:
+        global _global_offline_maintenance
+        return _global_offline_maintenance
+
+
+def _get_offline_feedback() -> list:
+    try:
+        if "offline_feedback" not in st.session_state:
+            st.session_state["offline_feedback"] = []
+        return st.session_state["offline_feedback"]
+    except Exception:
+        global _global_offline_feedback
+        return _global_offline_feedback
+
+
+def _get_offline_waivers() -> list:
+    try:
+        if "offline_waivers" not in st.session_state:
+            st.session_state["offline_waivers"] = []
+        return st.session_state["offline_waivers"]
+    except Exception:
+        global _global_offline_waivers
+        return _global_offline_waivers
+
+
+def _get_offline_deadlines() -> list:
+    try:
+        if "offline_deadlines" not in st.session_state:
+            st.session_state["offline_deadlines"] = []
+        return st.session_state["offline_deadlines"]
+    except Exception:
+        global _global_offline_deadlines
+        return _global_offline_deadlines
+
+
+
 # ── Rentals ──────────────────────────────────────────────────
 
 @st.cache_data(ttl=60)
 def get_all_rentals() -> list[dict]:
+    if is_offline():
+        return _get_offline_rentals()
     sb = get_client()
     res = sb.table("rentals").select("*").order("created_at", desc=True).execute()
     return res.data
@@ -235,6 +597,8 @@ def get_all_rentals() -> list[dict]:
 
 @st.cache_data(ttl=60)
 def get_rentals_by_status(status: str) -> list[dict]:
+    if is_offline():
+        return [r for r in _get_offline_rentals() if r.get("status") == status]
     sb = get_client()
     res = sb.table("rentals").select("*").eq("status", status).order("event_date").execute()
     return res.data
@@ -245,6 +609,8 @@ def check_recent_requests(client_phone: str, max_requests: int = 5, hours: int =
     Returns True if the client has NOT exceeded the max_requests limit
     within the specified hours.
     """
+    if is_offline():
+        return True
     sb = get_client()
     from datetime import datetime, timedelta
     cutoff = (datetime.utcnow() - timedelta(hours=hours)).isoformat()
@@ -259,26 +625,50 @@ def check_recent_requests(client_phone: str, max_requests: int = 5, hours: int =
 def create_rental(event_name: str, client_name: str, client_phone: str,
                   event_date: str, return_date: str, venue: str, notes: str,
                   estimated_cost: float = 0) -> dict:
-    sb = get_client()
+    from datetime import datetime
     data = {
+        "id": str(uuid.uuid4()),
         "event_name": event_name,
         "client_name": client_name,
         "client_phone": client_phone,
-        "event_date": event_date,
-        "return_date": return_date,
+        "event_date": str(event_date),
+        "return_date": str(return_date) if return_date else None,
         "venue": venue,
         "status": "pending",
         "notes": notes,
         "estimated_cost": estimated_cost,
+        "created_at": datetime.now().isoformat(),
     }
+    if is_offline():
+        _get_offline_rentals().append(data)
+        try:
+            get_all_rentals.clear()
+            get_rentals_by_status.clear()
+        except Exception:
+            pass
+        return data
+    sb = get_client()
+    data.pop("id", None)
+    data.pop("created_at", None)
     res = sb.table("rentals").insert(data).execute()
     get_all_rentals.clear()
     get_rentals_by_status.clear()
     return res.data[0] if res.data else {}
 
 
-
 def update_rental_status(rental_id: str, status: str):
+    if is_offline():
+        for r in _get_offline_rentals():
+            if r["id"] == rental_id:
+                r["status"] = status
+                break
+        try:
+            get_all_rentals.clear()
+            get_rentals_by_status.clear()
+            get_booked_counts_for_dates.clear()
+        except Exception:
+            pass
+        return
     sb = get_client()
     sb.table("rentals").update({"status": status}).eq("id", rental_id).execute()
     get_all_rentals.clear()
@@ -289,6 +679,18 @@ def update_rental_status(rental_id: str, status: str):
 # ── Rental Items (junction) ──────────────────────────────────
 
 def link_items_to_rental(rental_id: str, item_ids: list[str]):
+    if is_offline():
+        current_items = _get_offline_items()
+        items_by_id = {i["id"]: i for i in current_items}
+        for iid in item_ids:
+            if iid in items_by_id:
+                _get_offline_rental_items().append({
+                    "id": str(uuid.uuid4()),
+                    "rental_id": rental_id,
+                    "item_id": iid,
+                    "items": items_by_id[iid]
+                })
+        return
     sb = get_client()
     rows = [{"rental_id": rental_id, "item_id": iid} for iid in item_ids]
     sb.table("rental_items").insert(rows).execute()
@@ -296,12 +698,22 @@ def link_items_to_rental(rental_id: str, item_ids: list[str]):
 
 @st.cache_data(ttl=60)
 def get_rental_items(rental_id: str) -> list[dict]:
+    if is_offline():
+        return [ri for ri in _get_offline_rental_items() if ri.get("rental_id") == rental_id]
     sb = get_client()
     res = sb.table("rental_items").select("item_id, items(*)").eq("rental_id", rental_id).execute()
     return res.data
 
 
 def unlink_rental_items(rental_id: str):
+    if is_offline():
+        remaining = [ri for ri in _get_offline_rental_items() if ri.get("rental_id") != rental_id]
+        global _global_offline_rental_items
+        try:
+            st.session_state["offline_rental_items"] = remaining
+        except Exception:
+            _global_offline_rental_items = remaining
+        return
     sb = get_client()
     sb.table("rental_items").delete().eq("rental_id", rental_id).execute()
 
@@ -378,6 +790,12 @@ def seed_from_json(json_path: str) -> int:
 # ── Phase 2: Estimates, Employees, and Labor Tracking ────────
 
 def set_final_cost(rental_id: str, final_cost: float):
+    if is_offline():
+        for r in _get_offline_rentals():
+            if r["id"] == rental_id:
+                r["final_cost"] = final_cost
+                break
+        return
     sb = get_client()
     sb.table("rentals").update({"final_cost": final_cost}).eq("id", rental_id).execute()
 
@@ -385,17 +803,40 @@ def set_final_cost(rental_id: str, final_cost: float):
 # Employees
 @st.cache_data(ttl=120)
 def get_employees() -> list:
+    if is_offline():
+        return _get_offline_employees()
     sb = get_client()
     res = sb.table("employees").select("*").order("name").execute()
     return res.data
 
+
 def add_employee(name: str, role: str, phone: str = "", email: str = ""):
+    if is_offline():
+        _get_offline_employees().append({
+            "id": str(uuid.uuid4()),
+            "name": name,
+            "role": role,
+            "phone": phone,
+            "email": email,
+            "created_at": datetime.now().isoformat()
+        })
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("employees").insert({"name": name, "role": role, "phone": phone, "email": email}).execute()
 
 
 # Rental Assignments
 def assign_employee(rental_id: str, employee_id: str, role_for_event: str):
+    if is_offline():
+        _get_offline_assignments().append({
+            "id": str(uuid.uuid4()),
+            "rental_id": rental_id,
+            "employee_id": employee_id,
+            "role_for_event": role_for_event,
+            "created_at": datetime.now().isoformat()
+        })
+        return
     sb = get_client()
     sb.table("rental_assignments").insert({
         "rental_id": rental_id,
@@ -403,7 +844,14 @@ def assign_employee(rental_id: str, employee_id: str, role_for_event: str):
         "role_for_event": role_for_event
     }).execute()
 
+
 def get_assignments_for_rental(rental_id: str) -> list:
+    if is_offline():
+        matching = [a for a in _get_offline_assignments() if a.get("rental_id") == rental_id]
+        emp_by_id = {e["id"]: e for e in _get_offline_employees()}
+        for a in matching:
+            a["employees"] = emp_by_id.get(a["employee_id"], {})
+        return matching
     sb = get_client()
     res = sb.table("rental_assignments").select("*, employees(*)").eq("rental_id", rental_id).execute()
     return res.data
@@ -411,6 +859,18 @@ def get_assignments_for_rental(rental_id: str) -> list:
 
 # Time Logs
 def log_time(rental_id: str, employee_id: str, hours: float, task: str, logged_date: str):
+    if is_offline():
+        _get_offline_time_logs().append({
+            "id": str(uuid.uuid4()),
+            "rental_id": rental_id,
+            "employee_id": employee_id,
+            "hours": hours,
+            "task_description": task,
+            "logged_date": logged_date,
+            "created_at": datetime.now().isoformat()
+        })
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("time_logs").insert({
         "rental_id": rental_id,
@@ -420,13 +880,29 @@ def log_time(rental_id: str, employee_id: str, hours: float, task: str, logged_d
         "logged_date": logged_date
     }).execute()
 
+
 def get_time_logs_for_rental(rental_id: str) -> list:
+    if is_offline():
+        matching = [l for l in _get_offline_time_logs() if l.get("rental_id") == rental_id]
+        emp_by_id = {e["id"]: e for e in _get_offline_employees()}
+        for l in matching:
+            l["employees"] = emp_by_id.get(l["employee_id"], {})
+        return matching
     sb = get_client()
     res = sb.table("time_logs").select("*, employees(*)").eq("rental_id", rental_id).execute()
     return res.data
 
+
 @st.cache_data(ttl=60)
 def get_all_time_logs() -> list:
+    if is_offline():
+        matching = list(_get_offline_time_logs())
+        emp_by_id = {e["id"]: e for e in _get_offline_employees()}
+        rentals_by_id = {r["id"]: r for r in _get_offline_rentals()}
+        for l in matching:
+            l["employees"] = emp_by_id.get(l["employee_id"], {})
+            l["rentals"] = {"event_name": rentals_by_id.get(l["rental_id"], {}).get("event_name", "Unknown Event")}
+        return matching
     sb = get_client()
     res = sb.table("time_logs").select("*, employees(*), rentals(event_name)").order("logged_date", desc=True).execute()
     return res.data
@@ -434,6 +910,18 @@ def get_all_time_logs() -> list:
 
 # Contractor Payments
 def log_payment(rental_id: str, employee_id: str, amount: float, payment_date: str, notes: str):
+    if is_offline():
+        _get_offline_payments().append({
+            "id": str(uuid.uuid4()),
+            "rental_id": rental_id,
+            "employee_id": employee_id,
+            "amount": amount,
+            "payment_date": payment_date,
+            "notes": notes,
+            "created_at": datetime.now().isoformat()
+        })
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("contractor_payments").insert({
         "rental_id": rental_id,
@@ -443,13 +931,29 @@ def log_payment(rental_id: str, employee_id: str, amount: float, payment_date: s
         "notes": notes
     }).execute()
 
+
 def get_payments_for_rental(rental_id: str) -> list:
+    if is_offline():
+        matching = [p for p in _get_offline_payments() if p.get("rental_id") == rental_id]
+        emp_by_id = {e["id"]: e for e in _get_offline_employees()}
+        for p in matching:
+            p["employees"] = emp_by_id.get(p["employee_id"], {})
+        return matching
     sb = get_client()
     res = sb.table("contractor_payments").select("*, employees(*)").eq("rental_id", rental_id).execute()
     return res.data
 
+
 @st.cache_data(ttl=60)
 def get_all_payments() -> list:
+    if is_offline():
+        matching = list(_get_offline_payments())
+        emp_by_id = {e["id"]: e for e in _get_offline_employees()}
+        rentals_by_id = {r["id"]: r for r in _get_offline_rentals()}
+        for p in matching:
+            p["employees"] = emp_by_id.get(p["employee_id"], {})
+            p["rentals"] = {"event_name": rentals_by_id.get(p["rental_id"], {}).get("event_name", "Unknown Event")}
+        return matching
     sb = get_client()
     res = sb.table("contractor_payments").select("*, employees(*), rentals(event_name)").order("payment_date", desc=True).execute()
     return res.data
@@ -458,21 +962,33 @@ def get_all_payments() -> list:
 # ── Discount Codes ───────────────────────────────────────────
 
 def create_discount_code(code: str, percent_off: int, max_uses: int = 0, expires_at: str = None):
-    sb = get_client()
     row = {
+        "id": str(uuid.uuid4()),
         "code": code.strip().upper(),
         "percent_off": percent_off,
         "max_uses": max_uses,
         "times_used": 0,
         "active": True,
+        "created_at": datetime.now().isoformat()
     }
     if expires_at:
         row["expires_at"] = expires_at
+        
+    if is_offline():
+        _get_offline_discounts().append(row)
+        st.cache_data.clear()
+        return
+        
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
     sb.table("discount_codes").insert(row).execute()
 
 
 @st.cache_data(ttl=120)
 def get_all_discount_codes() -> list:
+    if is_offline():
+        return _get_offline_discounts()
     sb = get_client()
     res = sb.table("discount_codes").select("*").order("created_at", desc=True).execute()
     return res.data
@@ -480,15 +996,30 @@ def get_all_discount_codes() -> list:
 
 def validate_discount_code(code: str) -> dict | None:
     """Returns the discount row if valid, else None."""
+    if is_offline():
+        matches = [d for d in _get_offline_discounts() if d["code"] == code.strip().upper() and d["active"]]
+        if not matches:
+            return None
+        row = matches[0]
+        if row["max_uses"] > 0 and row["times_used"] >= row["max_uses"]:
+            return None
+        if row.get("expires_at"):
+            from datetime import datetime, timezone
+            try:
+                exp = datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00"))
+                if datetime.now(timezone.utc) > exp:
+                    return None
+            except Exception:
+                pass
+        return row
+        
     sb = get_client()
     res = sb.table("discount_codes").select("*").eq("code", code.strip().upper()).eq("active", True).execute()
     if not res.data:
         return None
     row = res.data[0]
-    # Check max uses (0 = unlimited)
     if row["max_uses"] > 0 and row["times_used"] >= row["max_uses"]:
         return None
-    # Check expiry
     if row.get("expires_at"):
         from datetime import datetime, timezone
         try:
@@ -502,17 +1033,38 @@ def validate_discount_code(code: str) -> dict | None:
 
 def use_discount_code(code_id: str):
     """Increment times_used by 1."""
+    if is_offline():
+        for d in _get_offline_discounts():
+            if d["id"] == code_id:
+                d["times_used"] += 1
+                break
+        return
     sb = get_client()
     row = sb.table("discount_codes").select("times_used").eq("id", code_id).execute().data[0]
     sb.table("discount_codes").update({"times_used": row["times_used"] + 1}).eq("id", code_id).execute()
 
 
 def toggle_discount_code(code_id: str, active: bool):
+    if is_offline():
+        for d in _get_offline_discounts():
+            if d["id"] == code_id:
+                d["active"] = active
+                break
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("discount_codes").update({"active": active}).eq("id", code_id).execute()
 
 
 def delete_discount_code(code_id: str):
+    if is_offline():
+        discounts = _get_offline_discounts()
+        for idx, d in enumerate(discounts):
+            if d["id"] == code_id:
+                discounts.pop(idx)
+                break
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("discount_codes").delete().eq("id", code_id).execute()
 
@@ -520,17 +1072,39 @@ def delete_discount_code(code_id: str):
 # ── Todos ────────────────────────────────────────────────────
 
 def create_todo(title: str, due_date: str = None, rental_id: str = None):
-    sb = get_client()
-    row = {"title": title, "done": False}
+    row = {
+        "id": str(uuid.uuid4()),
+        "title": title,
+        "done": False,
+        "created_at": datetime.now().isoformat()
+    }
     if due_date:
         row["due_date"] = due_date
     if rental_id:
         row["rental_id"] = rental_id
+        
+    if is_offline():
+        _get_offline_todos().append(row)
+        st.cache_data.clear()
+        return
+        
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
     sb.table("todos").insert(row).execute()
 
 
 @st.cache_data(ttl=30)
 def get_todos(show_done: bool = False) -> list:
+    if is_offline():
+        matching = list(_get_offline_todos())
+        if not show_done:
+            matching = [t for t in matching if not t["done"]]
+        rentals_by_id = {r["id"]: r for r in _get_offline_rentals()}
+        for t in matching:
+            t["rentals"] = {"event_name": rentals_by_id.get(t.get("rental_id"), {}).get("event_name", "Unknown Event")}
+        return matching
+        
     sb = get_client()
     q = sb.table("todos").select("*, rentals(event_name)").order("created_at", desc=True)
     if not show_done:
@@ -539,11 +1113,26 @@ def get_todos(show_done: bool = False) -> list:
 
 
 def toggle_todo(todo_id: str, done: bool):
+    if is_offline():
+        for t in _get_offline_todos():
+            if t["id"] == todo_id:
+                t["done"] = done
+                break
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("todos").update({"done": done}).eq("id", todo_id).execute()
 
 
 def delete_todo(todo_id: str):
+    if is_offline():
+        todos = _get_offline_todos()
+        for idx, t in enumerate(todos):
+            if t["id"] == todo_id:
+                todos.pop(idx)
+                break
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("todos").delete().eq("id", todo_id).execute()
 
@@ -551,12 +1140,24 @@ def delete_todo(todo_id: str):
 # ── Activity Log ─────────────────────────────────────────────
 
 def log_activity(action: str, detail: str = None, rental_id: str = None):
-    sb = get_client()
-    row = {"action": action}
+    row = {
+        "id": str(uuid.uuid4()),
+        "action": action,
+        "created_at": datetime.now().isoformat()
+    }
     if detail:
         row["detail"] = detail
     if rental_id:
         row["rental_id"] = rental_id
+        
+    if is_offline():
+        _get_offline_activity().append(row)
+        st.cache_data.clear()
+        return
+        
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
     try:
         sb.table("activity_log").insert(row).execute()
     except Exception:
@@ -565,6 +1166,9 @@ def log_activity(action: str, detail: str = None, rental_id: str = None):
 
 @st.cache_data(ttl=30)
 def get_recent_activity(limit: int = 15) -> list:
+    if is_offline():
+        act = sorted(_get_offline_activity(), key=lambda x: x["created_at"], reverse=True)
+        return act[:limit]
     sb = get_client()
     res = sb.table("activity_log").select("*").order("created_at", desc=True).limit(limit).execute()
     return res.data
@@ -650,16 +1254,28 @@ def notify(subject: str, body: str):
 # ── Maintenance Log ──────────────────────────────────────────
 
 def log_maintenance(item_id: str, action: str, notes: str = "", cost: float = 0):
-    sb = get_client()
-    sb.table("maintenance_log").insert({
+    row = {
+        "id": str(uuid.uuid4()),
         "item_id": item_id,
         "action": action,
         "notes": notes,
         "cost": cost,
-    }).execute()
+        "created_at": datetime.now().isoformat()
+    }
+    if is_offline():
+        _get_offline_maintenance().append(row)
+        st.cache_data.clear()
+        return
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
+    sb.table("maintenance_log").insert(row).execute()
 
 
 def get_maintenance_for_item(item_id: str) -> list:
+    if is_offline():
+        matching = [m for m in _get_offline_maintenance() if m["item_id"] == item_id]
+        return sorted(matching, key=lambda x: x["created_at"], reverse=True)
     sb = get_client()
     res = sb.table("maintenance_log").select("*").eq("item_id", item_id).order("created_at", desc=True).execute()
     return res.data
@@ -667,6 +1283,17 @@ def get_maintenance_for_item(item_id: str) -> list:
 
 @st.cache_data(ttl=120)
 def get_all_maintenance() -> list:
+    if is_offline():
+        matching = list(_get_offline_maintenance())
+        items_by_id = {i["id"]: i for i in _get_offline_items()}
+        for m in matching:
+            item_info = items_by_id.get(m["item_id"], {})
+            m["items"] = {
+                "name": item_info.get("name", "Unknown Item"),
+                "barcode": item_info.get("barcode", "N/A"),
+                "brand": item_info.get("brand", "Generic")
+            }
+        return matching
     sb = get_client()
     res = sb.table("maintenance_log").select("*, items(name, barcode, brand)").order("created_at", desc=True).limit(50).execute()
     return res.data
@@ -675,15 +1302,26 @@ def get_all_maintenance() -> list:
 # ── Feedback ─────────────────────────────────────────────────
 
 def submit_feedback(rental_id: str, rating: int, comment: str = ""):
-    sb = get_client()
-    sb.table("feedback").insert({
+    row = {
+        "id": str(uuid.uuid4()),
         "rental_id": rental_id,
         "rating": rating,
         "comment": comment,
-    }).execute()
+        "created_at": datetime.now().isoformat()
+    }
+    if is_offline():
+        _get_offline_feedback().append(row)
+        st.cache_data.clear()
+        return
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
+    sb.table("feedback").insert(row).execute()
 
 
 def get_feedback_for_rental(rental_id: str) -> list:
+    if is_offline():
+        return [f for f in _get_offline_feedback() if f["rental_id"] == rental_id]
     sb = get_client()
     res = sb.table("feedback").select("*").eq("rental_id", rental_id).execute()
     return res.data
@@ -691,6 +1329,16 @@ def get_feedback_for_rental(rental_id: str) -> list:
 
 @st.cache_data(ttl=120)
 def get_all_feedback() -> list:
+    if is_offline():
+        matching = list(_get_offline_feedback())
+        rentals_by_id = {r["id"]: r for r in _get_offline_rentals()}
+        for f in matching:
+            rental_info = rentals_by_id.get(f["rental_id"], {})
+            f["rentals"] = {
+                "event_name": rental_info.get("event_name", "Unknown Event"),
+                "client_name": rental_info.get("client_name", "Unknown Client")
+            }
+        return matching
     sb = get_client()
     res = sb.table("feedback").select("*, rentals(event_name, client_name)").order("created_at", desc=True).execute()
     return res.data
@@ -699,16 +1347,27 @@ def get_all_feedback() -> list:
 # ── Waivers ──────────────────────────────────────────────────
 
 def save_waiver(rental_id: str, client_name: str, signature_data: str, waiver_text: str):
-    sb = get_client()
-    sb.table("waivers").insert({
+    row = {
+        "id": str(uuid.uuid4()),
         "rental_id": rental_id,
         "client_name": client_name,
         "signature_data": signature_data,
         "waiver_text": waiver_text,
-    }).execute()
+        "created_at": datetime.now().isoformat()
+    }
+    if is_offline():
+        _get_offline_waivers().append(row)
+        return
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
+    sb.table("waivers").insert(row).execute()
 
 
 def get_waiver_for_rental(rental_id: str) -> dict | None:
+    if is_offline():
+        matching = [w for w in _get_offline_waivers() if w["rental_id"] == rental_id]
+        return matching[0] if matching else None
     sb = get_client()
     res = sb.table("waivers").select("*").eq("rental_id", rental_id).execute()
     return res.data[0] if res.data else None
@@ -718,6 +1377,15 @@ def get_waiver_for_rental(rental_id: str) -> dict | None:
 
 def checkin_item(item_id: str, rental_id: str = None):
     """Mark item as returned/available."""
+    if is_offline():
+        items = _get_offline_items()
+        for i in items:
+            if i["id"] == item_id:
+                i["status"] = "available"
+                break
+        log_activity("Gear checked in", f"Item returned to inventory (Offline)", rental_id)
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("items").update({"status": "available"}).eq("id", item_id).execute()
     log_activity("Gear checked in", f"Item returned to inventory", rental_id)
@@ -725,12 +1393,27 @@ def checkin_item(item_id: str, rental_id: str = None):
 
 def checkout_item(item_id: str, rental_id: str = None):
     """Mark item as deployed/in_use."""
+    if is_offline():
+        items = _get_offline_items()
+        for i in items:
+            if i["id"] == item_id:
+                i["status"] = "in_use"
+                break
+        log_activity("Gear checked out", f"Item deployed for event (Offline)", rental_id)
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("items").update({"status": "in_use"}).eq("id", item_id).execute()
     log_activity("Gear checked out", f"Item deployed for event", rental_id)
 
 
 def get_item_by_barcode(barcode: str) -> dict | None:
+    if is_offline():
+        items = _get_offline_items()
+        for i in items:
+            if i["barcode"] == barcode:
+                return i
+        return None
     sb = get_client()
     res = sb.table("items").select("*").eq("barcode", barcode).execute()
     return res.data[0] if res.data else None
@@ -818,7 +1501,7 @@ def generate_invoice_pdf(rental: dict, items: list) -> bytes:
         "Thank you for choosing DJM Audio! Payment is due upon delivery. "
         "All equipment must be returned in the same condition. "
         "Late returns will be charged at the daily rate. "
-        "Contact: djmaudiopro@gmail.com"
+        "Contact: info@djmaudio.com"
     )
 
     return pdf.output()
@@ -912,19 +1595,33 @@ def send_feedback_request_email(rental: dict):
 
 def create_deadline(entity: str, title: str, category: str, due_date: str,
                     recurrence_months: int = None, notes: str = ""):
-    sb = get_client()
-    sb.table("compliance_deadlines").insert({
+    row = {
+        "id": str(uuid.uuid4()),
         "entity": entity,
         "title": title,
         "category": category,
         "due_date": due_date,
         "recurrence_months": recurrence_months,
         "notes": notes,
-    }).execute()
+        "created_at": datetime.now().isoformat()
+    }
+    if is_offline():
+        _get_offline_deadlines().append(row)
+        st.cache_data.clear()
+        return
+    sb = get_client()
+    row.pop("id", None)
+    row.pop("created_at", None)
+    sb.table("compliance_deadlines").insert(row).execute()
 
 
 @st.cache_data(ttl=120)
 def get_deadlines(show_completed: bool = False) -> list:
+    if is_offline():
+        matching = list(_get_offline_deadlines())
+        if not show_completed:
+            matching = [d for d in matching if d.get("completed_at") is None]
+        return sorted(matching, key=lambda x: x["due_date"])
     sb = get_client()
     q = sb.table("compliance_deadlines").select("*").order("due_date")
     if not show_completed:
@@ -934,6 +1631,26 @@ def get_deadlines(show_completed: bool = False) -> list:
 
 def complete_deadline(deadline_id: str):
     from datetime import datetime, timezone
+    if is_offline():
+        for d in _get_offline_deadlines():
+            if d["id"] == deadline_id:
+                d["completed_at"] = datetime.now(timezone.utc).isoformat()
+                if d.get("recurrence_months"):
+                    from dateutil.relativedelta import relativedelta
+                    next_date = (datetime.fromisoformat(d["due_date"]) +
+                                 relativedelta(months=d["recurrence_months"])).date()
+                    create_deadline(
+                        entity=d["entity"],
+                        title=d["title"],
+                        category=d["category"],
+                        due_date=str(next_date),
+                        recurrence_months=d["recurrence_months"],
+                        notes=d.get("notes", ""),
+                    )
+                break
+        st.cache_data.clear()
+        return
+        
     sb = get_client()
     sb.table("compliance_deadlines").update(
         {"completed_at": datetime.now(timezone.utc).isoformat()}
@@ -958,6 +1675,14 @@ def complete_deadline(deadline_id: str):
 
 
 def delete_deadline(deadline_id: str):
+    if is_offline():
+        deadlines = _get_offline_deadlines()
+        for idx, d in enumerate(deadlines):
+            if d["id"] == deadline_id:
+                deadlines.pop(idx)
+                break
+        st.cache_data.clear()
+        return
     sb = get_client()
     sb.table("compliance_deadlines").delete().eq("id", deadline_id).execute()
 

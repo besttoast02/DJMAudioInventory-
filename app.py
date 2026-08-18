@@ -597,7 +597,9 @@ with st.sidebar:
                 if st.button("Log in", icon=":material/login:", type="primary",
                              key="admin_login_btn"):
                     try:
-                        if pw == ADMIN_PASSWORD:
+                        if not ADMIN_PASSWORD:
+                            st.error("ADMIN_PASSWORD is not configured in secrets. Login disabled.")
+                        elif pw == ADMIN_PASSWORD:
                             admin_2fa_secret = db.get_secret("ADMIN_2FA_SECRET")
                             if admin_2fa_secret:
                                 totp = pyotp.TOTP(admin_2fa_secret)
@@ -704,5 +706,8 @@ if st.session_state.is_admin:
     nav = st.navigation({"Admin": admin_pages, "Public": public_pages})
 else:
     nav = st.navigation(public_pages)
+
+if db.is_offline():
+    st.warning("🔌 Running in Offline Demo Mode. Changes will not be saved. (Supabase database unreachable or incorrect URL)", icon="⚠️")
 
 nav.run()

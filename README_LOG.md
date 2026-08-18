@@ -26,3 +26,22 @@ Successfully committed and synchronized all local inventory system changes to th
 2. **Git Commit & Push**:
    - Committed the updates: `"feat: make app layout spectrum equalizer bars static and randomize every minute"`
    - Pushed successfully to the `main` branch on GitHub.
+
+---
+
+## August 17, 2026 (Supabase Connection Failure & Offline Fallback Resolution)
+
+### Actions Taken:
+1. **Connectivity Check & Detection (`db.py`)**:
+   - Added `is_offline() -> bool` helper that runs a lightweight GET request using `httpx` to `{url}/rest/v1/items?limit=1` with a `3.0s` timeout. If the request fails or DNS returns NXDOMAIN, it catches the exception and flags the app as offline.
+   - Handled Supabase client creation failure in `get_client()` gracefully.
+2. **Local Fallback Data Generation (`db.py`)**:
+   - Implemented `_get_offline_items()` to parse `inventory_data.json` and generate individual physical gear items with generated mock barcodes and UUIDs.
+   - Appended predefined services from `package_config.py` to the offline items array under the `"Services"` category.
+3. **Offline In-Memory Database Simulation (`db.py`)**:
+   - Wrapped all read query functions (e.g. `get_all_items`, `get_available_items`, `get_services`, `get_rental_items`, etc.) to filter and return local data.
+   - Wrapped write/update/delete operations for items, rentals, assignments, payments, and discount codes to manipulate in-memory arrays stored in `st.session_state` (or global lists). This enables full checkout request submissions and catalog interaction without a live database.
+4. **Offline Demo Status Banner (`app.py`)**:
+   - Configured `app.py` to check `db.is_offline()` and display a prominent warning banner at the top of the viewport when running offline.
+5. **Compilation Verification**:
+   - Ran `python3 -m py_compile db.py app.py` to verify syntactical correctness and zero compilation warnings.
