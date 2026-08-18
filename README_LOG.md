@@ -61,3 +61,18 @@ Successfully committed and synchronized all local inventory system changes to th
 4. **Git Commit & Push**:
    - Committed and pushed changes successfully to the `main` branch on GitHub.
 
+---
+
+## August 18, 2026 (Force Online & Fallback Credentials Contingencies)
+
+### Actions Taken:
+1. **Force Online Mode Override (`db.py`)**:
+   - Added support for a `FORCE_ONLINE` environment variable. If set to `True` (or `"True"`), it immediately overrides the database connectivity checks and forces the application to run in online database mode.
+2. **Support for Alternative Environment Variable Names (`db.py`)**:
+   - Refactored `is_offline()`, `get_client()`, and `is_connected()` to fall back to Next.js standard credential keys (`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`) if `SUPABASE_URL` and `SUPABASE_KEY` are not configured in the Streamlit Render environment variables.
+3. **Request Timeout Increased (`db.py`)**:
+   - Increased the HTTP Client connection check timeout from `3.0s` to `10.0s` to prevent slow DNS resolutions or cold-starting database containers from causing false-positive offline triggers on Render.
+4. **Git Commit & Push**:
+   - Committed and pushed the changes successfully to the `main` branch on GitHub to trigger Render's auto-deployment.
+
+
