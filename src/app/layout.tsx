@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ClientChatbot } from "@/components/layout/ClientChatbot";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -74,7 +75,6 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
-        <link rel="preconnect" href="https://mawtrnbjfwxqwcdijbzy.supabase.co" />
       </head>
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
         <script
@@ -87,6 +87,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <ClientChatbot />
+        <CookieConsent />
       </body>
     </html>
   );

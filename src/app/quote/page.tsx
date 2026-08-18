@@ -16,7 +16,7 @@ export default function QuotePage() {
     eventDate: "",
     eventType: "",
     venue: "",
-    guestCount: "",
+    guestCount: "Under 50",
     setting: "Indoor",
     services: [] as string[],
     clientName: "",
@@ -122,8 +122,9 @@ export default function QuotePage() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b dark:border-slate-800 pb-2">1. Event Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Event Date *</label>
+                    <label htmlFor="eventDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Event Date *</label>
                     <input 
+                      id="eventDate"
                       type="date" 
                       required 
                       value={formData.eventDate}
@@ -132,8 +133,9 @@ export default function QuotePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Event Type *</label>
+                    <label htmlFor="eventType" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Event Type *</label>
                     <select 
+                      id="eventType"
                       required 
                       value={formData.eventType}
                       onChange={(e) => setFormData({...formData, eventType: e.target.value})}
@@ -148,8 +150,9 @@ export default function QuotePage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Venue or City *</label>
+                    <label htmlFor="venue" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Venue or City *</label>
                     <input 
+                      id="venue"
                       type="text" 
                       placeholder="e.g. Langham Pasadena" 
                       required 
@@ -159,8 +162,9 @@ export default function QuotePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Estimated Guest Count</label>
+                    <label htmlFor="guestCount" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Estimated Guest Count</label>
                     <select 
+                      id="guestCount"
                       value={formData.guestCount}
                       onChange={(e) => setFormData({...formData, guestCount: e.target.value})}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 outline-none dark:[&>option]:bg-slate-900"
@@ -173,8 +177,9 @@ export default function QuotePage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Setting</label>
+                    <label htmlFor="setting" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Setting</label>
                     <select 
+                      id="setting"
                       value={formData.setting}
                       onChange={(e) => setFormData({...formData, setting: e.target.value})}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 outline-none dark:[&>option]:bg-slate-900"
@@ -210,8 +215,9 @@ export default function QuotePage() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b dark:border-slate-800 pb-2">3. Contact Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">First & Last Name *</label>
+                    <label htmlFor="clientName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">First & Last Name *</label>
                     <input 
+                      id="clientName"
                       type="text" 
                       required 
                       value={formData.clientName}
@@ -220,8 +226,9 @@ export default function QuotePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone Number *</label>
+                    <label htmlFor="clientPhone" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone Number *</label>
                     <input 
+                      id="clientPhone"
                       type="tel" 
                       required 
                       value={formData.clientPhone}
@@ -230,8 +237,9 @@ export default function QuotePage() {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email Address *</label>
+                    <label htmlFor="clientEmail" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email Address *</label>
                     <input 
+                      id="clientEmail"
                       type="email" 
                       required 
                       value={formData.clientEmail}
@@ -240,8 +248,9 @@ export default function QuotePage() {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Optional Details / Questions</label>
+                    <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Optional Details / Questions</label>
                     <textarea 
+                      id="notes"
                       rows={4} 
                       value={formData.notes}
                       onChange={(e) => setFormData({...formData, notes: e.target.value})}

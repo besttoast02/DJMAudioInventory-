@@ -6,7 +6,8 @@ import { RentalActions } from "./RentalActions";
 
 export const revalidate = 0;
 
-export default async function RentalDetailPage({ params }: { params: { id: string } }) {
+export default async function RentalDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const { data: rental, error } = await supabaseAdmin
     .from("rentals")
     .select(`
@@ -22,7 +23,7 @@ export default async function RentalDetailPage({ params }: { params: { id: strin
         )
       )
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !rental) {

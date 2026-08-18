@@ -52,7 +52,7 @@ export default function NewInventoryAssetPage() {
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       // Wait, we need an organization_id. Hardcoding for MVP since this is a single org.
-      const ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+      const ORG_ID = '61306565-9c0b-4ef8-bb6d-6bb9bd380a11';
 
       // 1. Insert Asset
       const { data: assetData, error: assetError } = await supabase

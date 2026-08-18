@@ -84,4 +84,41 @@ Completed a comprehensive performance and speed optimization pass across the Nex
 7. **Git Synchronization**:
    - Committed and successfully pushed all optimizations, server-side data isolation changes, and the Hero static image rotator to the `v2-frontend` branch on GitHub to trigger the Render rebuild.
 
+---
 
+## August 18, 2026 (Fix Compilation Errors & Optimize Navigation)
+
+### Changes Implemented:
+
+1. **Syntax Fixes in Core Pages**:
+   - Resolved TSX compiler issues in [privacy/page.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/privacy/page.tsx) and [terms/page.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/terms/page.tsx) by replacing escaped quote symbols (`\"`) with standard double quotes (`"`).
+
+2. **Next.js 16 Compatibility in Admin Dynamic Routes**:
+   - Updated [rentals/[id]/page.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/admin/rentals/%5Bid%5D/page.tsx) to resolve dynamic route parameter values as a Promise (`Promise<{ id: string }>`), executing `await params` prior to fetching rental details from Supabase. This aligns with standard App Router requirements.
+
+3. **Rental Catalog Navigation Speed Improvement**:
+   - Modified [RentalGrid.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/rentals/RentalGrid.tsx) to set all inventory categories to be expanded by default on page load.
+   - Implemented a clean "Expand All / Collapse All" toggle button at the top right of the equipment rentals grid, reducing interaction friction and improving user experience.
+
+4. **Production Build & Compiler Verification**:
+   - Ran `npx tsc --noEmit` and verified that the entire codebase typechecks successfully with no errors.
+   - Executed `npm run build` and verified that Next.js successfully compiles and bundles all static and dynamic pages.
+
+---
+
+## August 18, 2026 (Speed Optimization & Consumer Legal Compliance)
+
+Completed client-side bundle speed optimization and integrated legal compliance pages for consumer protection.
+
+### Changes Implemented:
+1. **Chatbot Dynamic Deferral**:
+   - Refactored [ClientChatbot.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/layout/ClientChatbot.tsx) to render the Floating Action Button (FAB) statically.
+   - Replaced the Lucide-React `MessageCircle` icon in the layout path with a lightweight inline SVG to avoid loading Lucide dependencies on initial render.
+   - Modified [Chatbot.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/layout/Chatbot.tsx) to accept `isOpen` and `onClose` props, removing internal state and FAB rendering.
+   - Deferred importing/rendering of the Chatbot chunk until clicked. Configured background prefetching of the Chatbot bundle on FAB hover (`onMouseEnter`) or touch (`onTouchStart`).
+2. **Consumer Compliance Pages**:
+   - Created [accessibility/page.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/accessibility/page.tsx) for ADA / WCAG 2.1 AA digital accessibility standards conformance statement.
+   - Created [cancellation-policy/page.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/app/cancellation-policy/page.tsx) detailing event retainers, cancellation schedules, dry-hire cancellations, weather rules, and Force Majeure.
+   - Updated [Footer.tsx](file:///Users/JairDavalos/Downloads/djmaudio-projects-package/Web_Applications/djm-frontend-v2/src/components/layout/Footer.tsx) to add links to the new compliance pages.
+3. **Build Validation**:
+   - Verified compilation via `npx tsc --noEmit` and completed successful Next.js production build (`npm run build`).

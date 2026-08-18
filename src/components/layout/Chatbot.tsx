@@ -6,8 +6,12 @@ import { useState, useRef, useEffect } from "react";
 
 import { DefaultChatTransport } from 'ai';
 
-export function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatbotProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function Chatbot({ isOpen, onClose }: ChatbotProps) {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({ api: "/api/assistant" }),
   });
@@ -22,17 +26,6 @@ export function Chatbot() {
 
   return (
     <>
-      {/* Floating Action Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-blue-600 text-white rounded-full shadow-2xl hover:bg-blue-700 transition-all z-50 animate-bounce hover:animate-none group"
-          aria-label="Chat with AI Assistant"
-        >
-          <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform" />
-        </button>
-      )}
-
       {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden border border-gray-100 dark:border-slate-800 flex-shrink-0 animate-in slide-in-from-bottom-8">
@@ -46,8 +39,8 @@ export function Chatbot() {
               <p className="text-blue-100 text-xs">Available 24/7</p>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
-              className="text-blue-100 hover:text-white transition-colors"
+              onClick={onClose}
+              className="text-blue-100 hover:text-white transition-colors cursor-pointer"
             >
               <MinusCircle className="w-5 h-5" />
             </button>

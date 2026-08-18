@@ -51,8 +51,8 @@ export default function NewProductModelPage() {
 
     try {
       // Hardcoded ORG_ID and STANDARD_RATE_CARD_ID for MVP
-      const ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
-      const STANDARD_RATE_CARD_ID = 'r1eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+      const ORG_ID = '61306565-9c0b-4ef8-bb6d-6bb9bd380a11';
+      const STANDARD_RATE_CARD_ID = '31316565-9c0b-4ef8-bb6d-6bb9bd380a11';
 
       // 1. Insert Product Model
       const { data: modelData, error: modelError } = await supabase

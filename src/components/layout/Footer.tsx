@@ -63,11 +63,13 @@ export function Footer() {
         </div>
       </div>
       
-      <div className="container mx-auto px-4 mt-16 pt-8 border-t border-gray-200 dark:border-slate-800 text-sm text-gray-500 dark:text-gray-400 flex flex-col md:flex-row justify-between items-center">
+      <div className="container mx-auto px-4 mt-16 pt-8 border-t border-gray-200 dark:border-slate-800 text-sm text-gray-500 dark:text-gray-400 flex flex-col md:flex-row justify-between items-center gap-4">
         <p>© {new Date().getFullYear()} DJM Audio Productions. All rights reserved.</p>
-        <div className="flex space-x-4 mt-4 md:mt-0">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 md:mt-0 justify-center">
           <Link href="/privacy" className="hover:text-blue-500 transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-blue-500 transition-colors">Terms of Service</Link>
+          <Link href="/accessibility" className="hover:text-blue-500 transition-colors">Accessibility</Link>
+          <Link href="/cancellation-policy" className="hover:text-blue-500 transition-colors">Cancellation & Refund Policy</Link>
         </div>
       </div>
     </footer>

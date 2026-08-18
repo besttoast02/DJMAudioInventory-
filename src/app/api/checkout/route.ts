@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 // Helper to safely get the Org ID, usually from env or a single row
-const ORG_ID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+const ORG_ID = '61306565-9c0b-4ef8-bb6d-6bb9bd380a11';
 
 export async function POST(req: Request) {
   try {
