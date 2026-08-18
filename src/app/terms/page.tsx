@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | DJM Audio Productions",
-  description: "Read the Terms of Service of DJM Audio Productions outlining agreements for quote requests, equipment rentals, event production services, and governing laws.",
+  title: "Terms of Service | DJM Audio Productions, LLC",
+  description: "Read the Terms of Service of DJM Audio Productions, LLC outlining agreements for quote requests, equipment rentals, event production services, and governing laws.",
 };
 
 export default function TermsPage() {
@@ -27,7 +27,7 @@ export default function TermsPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Acceptance of Terms</h2>
             <p className="leading-relaxed">
-              By accessing and using the website of DJM Audio Productions (the "Site"), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our Site or request services.
+              By accessing and using the website of DJM Audio Productions, LLC (the "Site"), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our Site or request services.
             </p>
           </div>
 
@@ -65,7 +65,7 @@ export default function TermsPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Limitation of Liability</h2>
             <p className="leading-relaxed">
-              DJM Audio Productions shall not be held liable for any indirect, incidental, or consequential damages resulting from the use of our services or equipment failure. In all circumstances, our maximum liability is strictly limited to the total fees paid by the client for that specific booking.
+              DJM Audio Productions, LLC shall not be held liable for any indirect, incidental, or consequential damages resulting from the use of our services or equipment failure. In all circumstances, our maximum liability is strictly limited to the total fees paid by the client for that specific booking.
             </p>
           </div>
 
@@ -82,7 +82,7 @@ export default function TermsPage() {
               For any questions regarding these Terms of Service, please contact us at:
             </p>
             <p className="mt-4 font-semibold text-gray-900 dark:text-white">
-              DJM Audio Productions<br />
+              DJM Audio Productions, LLC<br />
               Email: <a href="mailto:info@djmaudio.com" className="text-blue-600 hover:underline">info@djmaudio.com</a><br />
               Phone: (626) 506-3824
             </p>

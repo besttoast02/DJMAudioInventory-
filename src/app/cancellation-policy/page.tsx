@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cancellation & Refund Policy | DJM Audio Productions",
-  description: "Read the Booking, Cancellation, and Refund Policy of DJM Audio Productions governing our event production services and gear dry-hire rentals.",
+  title: "Cancellation & Refund Policy | DJM Audio Productions, LLC",
+  description: "Read the Booking, Cancellation, and Refund Policy of DJM Audio Productions, LLC governing our event production services and gear dry-hire rentals.",
 };
 
 export default function CancellationPolicyPage() {

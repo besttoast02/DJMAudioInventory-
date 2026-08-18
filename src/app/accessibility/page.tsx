@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Accessibility Statement | DJM Audio Productions",
-  description: "Read the Accessibility Statement of DJM Audio Productions detailing our commitment and conformance to WCAG 2.1 AA accessibility guidelines.",
+  title: "Accessibility Statement | DJM Audio Productions, LLC",
+  description: "Read the Accessibility Statement of DJM Audio Productions, LLC detailing our commitment and conformance to WCAG 2.1 AA accessibility guidelines.",
 };
 
 export default function AccessibilityPage() {
@@ -27,7 +27,7 @@ export default function AccessibilityPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Our Commitment</h2>
             <p className="leading-relaxed">
-              DJM Audio Productions is committed to ensuring digital accessibility for all users, including individuals with disabilities. We strive to continually improve the accessibility of our website (including <a href="https://www.djmaudio.com" className="text-blue-600 hover:underline">djmaudio.com</a>) and our booking workflow to provide a seamless experience for everyone, regardless of ability.
+              DJM Audio Productions, LLC is committed to ensuring digital accessibility for all users, including individuals with disabilities. We strive to continually improve the accessibility of our website (including <a href="https://www.djmaudio.com" className="text-blue-600 hover:underline">djmaudio.com</a>) and our booking workflow to provide a seamless experience for everyone, regardless of ability.
             </p>
           </div>
 
@@ -65,7 +65,7 @@ export default function AccessibilityPage() {
               Despite our efforts, some areas of the website may still present accessibility limitations. If you encounter any barriers, have questions, or require assistance with any part of our site (including cart selection or quote submission), please contact us:
             </p>
             <p className="mt-4 font-semibold text-gray-900 dark:text-white">
-              DJM Audio Productions<br />
+              DJM Audio Productions, LLC<br />
               Email: <a href="mailto:info@djmaudio.com" className="text-blue-600 hover:underline">info@djmaudio.com</a><br />
               Phone: (626) 506-3824
             </p>

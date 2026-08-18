@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DJM Audio Productions",
-  description: "Read the Privacy Policy of DJM Audio Productions to understand how we collect, use, and protect your personal information in accordance with California (CCPA/CalOPPA) and US privacy regulations.",
+  title: "Privacy Policy | DJM Audio Productions, LLC",
+  description: "Read the Privacy Policy of DJM Audio Productions, LLC to understand how we collect, use, and protect your personal information in accordance with California (CCPA/CalOPPA) and US privacy regulations.",
 };
 
 export default function PrivacyPage() {
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Introduction</h2>
             <p className="leading-relaxed">
-              DJM Audio Productions ("we," "us," or "our") respects your privacy and is committed to protecting the personal data you share with us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website (including <a href="https://www.djmaudio.com" className="text-blue-600 hover:underline">djmaudio.com</a>) and use our online booking, catalog selection, and event consultation services.
+              DJM Audio Productions, LLC ("we," "us," or "our") respects your privacy and is committed to protecting the personal data you share with us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website (including <a href="https://www.djmaudio.com" className="text-blue-600 hover:underline">djmaudio.com</a>) and use our online booking, catalog selection, and event consultation services.
             </p>
           </div>
 
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
               If you have any questions or concerns about this Privacy Policy or our data handling practices, please contact us at:
             </p>
             <p className="mt-4 font-semibold text-gray-900 dark:text-white">
-              DJM Audio Productions<br />
+              DJM Audio Productions, LLC<br />
               Email: <a href="mailto:info@djmaudio.com" className="text-blue-600 hover:underline">info@djmaudio.com</a><br />
               Phone: (626) 506-3824
             </p>
