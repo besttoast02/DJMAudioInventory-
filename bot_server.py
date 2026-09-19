@@ -61,6 +61,35 @@ async def send_telegram_message(chat_id: str, text: str):
         res = await client.post(url, json={"chat_id": chat_id, "text": text})
         print(f"Telegram API response: {res.status_code} {res.text}", flush=True)
 
+async def send_telegram_photo(chat_id: str, photo_bytes: bytes, caption: str = ""):
+    if not TELEGRAM_BOT_TOKEN:
+        return
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
+    files = {"photo": ("qrcode.png", photo_bytes, "image/png")}
+    data = {"chat_id": chat_id, "caption": caption}
+    async with httpx.AsyncClient() as client:
+        await client.post(url, data=data, files=files)
+
+async def process_qr_request(chat_id: str):
+    import qrcode
+    import io
+    url_to_encode = "https://djmaudio.com/song_request"
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url_to_encode)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    photo_bytes = buf.getvalue()
+    
+    await send_telegram_photo(chat_id, photo_bytes, "🎵 Scan to request a song!\n\nLink: https://djmaudio.com/song_request")
+
 # OpenAI LLM Pipeline
 async def process_with_llm(user_id: str, user_text: str):
     # Save user message
@@ -176,7 +205,11 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks, 
         return {"ok": True}
 
     if text in ["/start", "/help"]:
-        background_tasks.add_task(send_telegram_message, chat_id, "Welcome to DJM Audio! I'm your AI assistant. Tell me what kind of event you're throwing, and I'll help you build an AV equipment cart.")
+        background_tasks.add_task(send_telegram_message, chat_id, "Welcome to DJM Audio! I'm your AI assistant. Tell me what kind of event you're throwing, and I'll help you build an AV equipment cart.\n\nUse /qr to get a printable QR code for the Song Request portal!")
+        return {"ok": True}
+        
+    if text.startswith("/qr"):
+        background_tasks.add_task(process_qr_request, chat_id)
         return {"ok": True}
 
     # Pass to internal message pipeline asynchronously to prevent Telegram timeouts
