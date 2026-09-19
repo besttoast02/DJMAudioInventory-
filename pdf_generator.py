@@ -173,4 +173,4 @@ def generate_ai_estimate_pdf(
         pdf.set_text_color(180, 180, 190)
         pdf.multi_cell(190, 5, notes)
         
-    return pdf.output(dest='S')
+    return bytes(pdf.output())
