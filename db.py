@@ -229,18 +229,26 @@ def is_connected() -> bool:
 def get_all_items() -> list[dict]:
     if is_offline():
         return _get_offline_items()
-    sb = get_client()
-    res = sb.table("items").select("*").order("barcode").execute()
-    return res.data
+    try:
+        sb = get_client()
+        res = sb.table("items").select("*").order("barcode").execute()
+        return res.data
+    except Exception as e:
+        print(f"Database error in get_all_items: {e}")
+        return _get_offline_items()
 
 
 @st.cache_data(ttl=300)
 def get_items_by_status(status: str) -> list[dict]:
     if is_offline():
         return [i for i in _get_offline_items() if i.get("status") == status]
-    sb = get_client()
-    res = sb.table("items").select("*").eq("status", status).order("barcode").execute()
-    return res.data
+    try:
+        sb = get_client()
+        res = sb.table("items").select("*").eq("status", status).order("barcode").execute()
+        return res.data
+    except Exception as e:
+        print(f"Database error in get_items_by_status: {e}")
+        return [i for i in _get_offline_items() if i.get("status") == status]
 
 
 def get_available_items() -> list[dict]:
@@ -252,9 +260,13 @@ def get_services() -> list[dict]:
     """Get all service items (category = 'Services')."""
     if is_offline():
         return [i for i in _get_offline_items() if i.get("category") == "Services" and i.get("status") == "available"]
-    sb = get_client()
-    res = sb.table("items").select("*").eq("category", "Services").eq("status", "available").order("barcode").execute()
-    return res.data
+    try:
+        sb = get_client()
+        res = sb.table("items").select("*").eq("category", "Services").eq("status", "available").order("barcode").execute()
+        return res.data
+    except Exception as e:
+        print(f"Database error in get_services: {e}")
+        return [i for i in _get_offline_items() if i.get("category") == "Services" and i.get("status") == "available"]
 
 
 def get_item_count() -> dict:
@@ -410,35 +422,39 @@ def get_booked_counts_for_dates(event_date: str, return_date: str) -> dict[str, 
     """
     if is_offline():
         return {}
-    sb = get_client()
-    # Query 1: Get IDs of overlapping approved/pending rentals
-    overlapping = (
-        sb.table("rentals")
-        .select("id")
-        .in_("status", ["approved", "pending"])
-        .lte("event_date", return_date)
-        .gte("return_date", event_date)
-        .execute()
-    )
-    if not overlapping.data:
+    try:
+        sb = get_client()
+        # Query 1: Get IDs of overlapping approved/pending rentals
+        overlapping = (
+            sb.table("rentals")
+            .select("id")
+            .in_("status", ["approved", "pending"])
+            .lte("event_date", return_date)
+            .gte("return_date", event_date)
+            .execute()
+        )
+        if not overlapping.data:
+            return {}
+
+        rental_ids = [r["id"] for r in overlapping.data]
+
+        # Query 2: Batch fetch ALL items for those rentals in ONE call (no loop!)
+        items_res = (
+            sb.table("rental_items")
+            .select("item_id, items(name)")
+            .in_("rental_id", rental_ids)
+            .execute()
+        )
+        booked_counts: dict[str, int] = {}
+        for entry in items_res.data:
+            item = entry.get("items", {})
+            if item:
+                name = item.get("name", "")
+                booked_counts[name] = booked_counts.get(name, 0) + 1
+        return booked_counts
+    except Exception as e:
+        print(f"Database error in get_booked_counts_for_dates: {e}")
         return {}
-
-    rental_ids = [r["id"] for r in overlapping.data]
-
-    # Query 2: Batch fetch ALL items for those rentals in ONE call (no loop!)
-    items_res = (
-        sb.table("rental_items")
-        .select("item_id, items(name)")
-        .in_("rental_id", rental_ids)
-        .execute()
-    )
-    booked_counts: dict[str, int] = {}
-    for entry in items_res.data:
-        item = entry.get("items", {})
-        if item:
-            name = item.get("name", "")
-            booked_counts[name] = booked_counts.get(name, 0) + 1
-    return booked_counts
 
 
 _global_offline_rentals = []
