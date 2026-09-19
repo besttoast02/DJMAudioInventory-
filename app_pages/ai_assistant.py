@@ -25,6 +25,16 @@ if "tts_text" not in st.session_state:
 # This renders the mic button and automatically handles Text-To-Speech if tts_text is set
 voice_res = _voice_component(tts_text=st.session_state.tts_text, key="voice_widget")
 
+if "proposal_pdf_bytes" in st.session_state and st.session_state.proposal_pdf_bytes:
+    st.success("✅ Your Proposal is Ready!")
+    st.download_button(
+        label="Download Estimate PDF",
+        data=st.session_state.proposal_pdf_bytes,
+        file_name=f"DJM_Estimate_{st.session_state.proposal_event_name.replace(' ', '_')}.pdf",
+        mime="application/pdf",
+        type="primary"
+    )
+
 # ── Handle Input ──────────────────────────────────────────────
 user_text = ""
 
@@ -111,6 +121,32 @@ if user_text:
             }
         return f"Successfully added {qty}x {item['name']} to cart."
 
+    def handle_generate_proposal(args):
+        import pdf_generator
+        import urllib.parse
+        
+        pdf_bytes = pdf_generator.generate_ai_estimate_pdf(
+            client_name=args.get("client_name", "TBD"),
+            event_name=args.get("event_name", "TBD"),
+            event_date=args.get("event_date", "TBD"),
+            venue_name=args.get("venue_name", "TBD"),
+            venue_address=args.get("venue_address", "TBD"),
+            audio_items=args.get("audio_items", []),
+            lighting_items=args.get("lighting_items", []),
+            video_items=args.get("video_items", []),
+            notes=args.get("notes", "")
+        )
+        
+        # Store for the UI to display a download button
+        st.session_state.proposal_pdf_bytes = pdf_bytes
+        st.session_state.proposal_event_name = args.get("event_name", "Estimate")
+        
+        prompt_3d = args.get("prompt_3d", "A DJ setup at an event")
+        encoded = urllib.parse.quote(prompt_3d)
+        img_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=768&nologo=true"
+        
+        return f"Successfully generated the invoice. Tell the user you've created it, and show them this 3D render image directly using markdown: ![3D Render]({img_url})"
+
     tools = [
         {
             "type": "function",
@@ -124,6 +160,62 @@ if user_text:
                         "qty": {"type": "integer", "description": "Quantity to add"}
                     },
                     "required": ["barcode", "qty"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "generate_proposal",
+                "description": "Generate an estimate/invoice PDF and a 3D render image for the event. Do this when the user asks for a quote, estimate, or invoice. BEFORE calling this, make sure you ask for the client's name, the event type, the event date, and the venue location. Only call this when you have those details.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "client_name": {"type": "string"},
+                        "event_name": {"type": "string"},
+                        "event_date": {"type": "string"},
+                        "venue_name": {"type": "string"},
+                        "venue_address": {"type": "string"},
+                        "audio_items": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "desc": {"type": "string"},
+                                    "qty": {"type": "integer"},
+                                    "price": {"type": "number"}
+                                }
+                            }
+                        },
+                        "lighting_items": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "desc": {"type": "string"},
+                                    "qty": {"type": "integer"},
+                                    "price": {"type": "number"}
+                                }
+                            }
+                        },
+                        "video_items": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type": "string"},
+                                    "desc": {"type": "string"},
+                                    "qty": {"type": "integer"},
+                                    "price": {"type": "number"}
+                                }
+                            }
+                        },
+                        "notes": {"type": "string", "description": "Detailed notes for the proposal."},
+                        "prompt_3d": {"type": "string", "description": "A detailed, comma-separated image generation prompt to visualize the setup physically."}
+                    },
+                    "required": ["client_name", "event_name", "event_date", "venue_name", "venue_address", "prompt_3d"]
                 }
             }
         }
@@ -155,7 +247,7 @@ if user_text:
                     # Prepend system prompt to the messages sent to LLM (hidden from UI)
                     system_prompt = {
                         "role": "system",
-                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them. {setups_str}"
+                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them. {setups_str}\n\nWhen a user asks for an estimate or invoice, you MUST first ask them for their name, the event date, and the venue name/location. Once you have that, use the `generate_proposal` tool to create the PDF and 3D render."
                     }
                     temp_messages.insert(0, system_prompt)
                     
@@ -175,6 +267,15 @@ if user_text:
                             if tc.function.name == "add_item_to_cart":
                                 args = json.loads(tc.function.arguments)
                                 result = add_item_to_cart(args.get("barcode"), args.get("qty", 1))
+                                temp_messages.append({
+                                    "role": "tool",
+                                    "tool_call_id": tc.id,
+                                    "name": tc.function.name,
+                                    "content": result
+                                })
+                            elif tc.function.name == "generate_proposal":
+                                args = json.loads(tc.function.arguments)
+                                result = handle_generate_proposal(args)
                                 temp_messages.append({
                                     "role": "tool",
                                     "tool_call_id": tc.id,
@@ -211,3 +312,4 @@ if user_text:
                 st.rerun()
             else:
                 st.error(f"Error communicating with AI: {last_error}")
+
