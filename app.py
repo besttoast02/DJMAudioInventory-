@@ -680,6 +680,7 @@ public_pages = [
     st.Page("app_pages/extra_services.py", title="Extras", icon=":material/auto_awesome:"),
     st.Page("app_pages/browse.py", title="Rentals", icon=":material/search:"),
     st.Page("app_pages/request.py", title="Checkout", icon=":material/shopping_cart_checkout:"),
+    st.Page("app_pages/song_request.py", title="Song Request", icon=":material/music_note:"),
     st.Page("app_pages/ai_assistant.py", title="AI Assistant", icon=":material/smart_toy:"),
     st.Page("app_pages/contact.py", title="Contact", icon=":material/mail:"),
 ]
