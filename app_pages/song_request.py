@@ -68,7 +68,7 @@ with st.form("song_request_form", clear_on_submit=True):
                 except Exception as e:
                     st.error(f"Error de conexión: {str(e)}")
             else:
-                st.warning(f"El servicio de notificaciones no está configurado. Token: '{bot_token}', Chat ID: '{chat_id}'")
+                st.warning("El servicio de notificaciones no está configurado (Falta el Token de Telegram).")
 
 st.divider()
 st.markdown("""

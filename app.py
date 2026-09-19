@@ -1,6 +1,13 @@
 import streamlit as st
 import db
 import pyotp
+import os
+import shutil
+
+# ── Render Secret File Workaround ────────────────────────────
+if os.path.exists("/etc/secrets/secrets.toml"):
+    os.makedirs(".streamlit", exist_ok=True)
+    shutil.copy("/etc/secrets/secrets.toml", ".streamlit/secrets.toml")
 
 # ── Page config ──────────────────────────────────────────────
 st.set_page_config(
