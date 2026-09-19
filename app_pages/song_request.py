@@ -23,6 +23,8 @@ with st.form("song_request_form", clear_on_submit=True):
     artist = st.text_input("Artista (Opcional)", placeholder="Ej: Los De Tamaulipas")
     genre = st.selectbox("Género Musical (Opcional)", ["Seleccionar...", "Regional Mexicano", "Cumbia", "Salsa", "Reggaeton", "Pop", "Rock", "Otro"])
     link = st.text_input("Enlace de YouTube/Spotify (Opcional)", placeholder="https://...")
+    requester_name = st.text_input("Tu Nombre (Opcional)", placeholder="Ej: Juan Pérez")
+    req_message = st.text_area("Mensaje al DJ (Opcional)", placeholder="Ej: ¡Es para el cumpleaños de mi hermano!")
     
     st.info("Nota: El nombre del artista y el enlace son opcionales, pero el título de la canción es obligatorio.")
     
@@ -44,12 +46,16 @@ with st.form("song_request_form", clear_on_submit=True):
             if bot_token and chat_id:
                 genre_text = genre if genre != "Seleccionar..." else "No especificado"
                 message = f"🎵 *Nueva Solicitud de Canción*\n\n"
+                if requester_name:
+                    message += f"👤 *De:* {requester_name}\n"
                 message += f"🏷️ *Canción:* {song_name}\n"
                 if artist:
                     message += f"🎤 *Artista:* {artist}\n"
                 message += f"🎼 *Género:* {genre_text}\n"
                 if link:
                     message += f"🔗 *Enlace:* {link}\n"
+                if req_message:
+                    message += f"\n💬 *Mensaje:* {req_message}\n"
                 
                 try:
                     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -73,6 +79,11 @@ with st.form("song_request_form", clear_on_submit=True):
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: #888;'>
+    <h3 style='color: #4CAF50;'>🎉 ¡Apoya al DJ! (Opcional)</h3>
+    <p>Si te está gustando el ambiente, ¡puedes apoyar directamente al DJ!</p>
+    <p>💸 <strong>Zelle:</strong> (626) 763-5959</p>
+    <p>📺 <strong>YouTube:</strong> <a href='https://youtube.com/djmoy0' target='_blank' style='color: #FF0000; text-decoration: none;'>youtube.com/djmoy0</a> (¡Suscríbete!)</p>
+    <br/>
     <p>¿Buscas servicios de DJ profesionales?</p>
     <p>📞 <strong>Llama a DJM Audio Productions: (626) 506-3824</strong><br/>
     Para todo tipo de eventos (Bodas, Quinceañeras, Corporativos)</p>
