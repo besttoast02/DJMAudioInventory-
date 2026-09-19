@@ -33,8 +33,13 @@ with st.form("song_request_form", clear_on_submit=True):
             st.error("⚠️ Por favor, ingresa el título de la canción.")
         else:
             # Enviar a Telegram
-            bot_token = st.secrets.get("TELEGRAM_BOT_TOKEN", "")
-            chat_id = st.secrets.get("TELEGRAM_CHAT_ID", "")
+            import os
+            try:
+                bot_token = st.secrets.get("TELEGRAM_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
+                chat_id = st.secrets.get("TELEGRAM_CHAT_ID", os.environ.get("TELEGRAM_CHAT_ID", ""))
+            except Exception:
+                bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+                chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
             
             if bot_token and chat_id:
                 genre_text = genre if genre != "Seleccionar..." else "No especificado"
