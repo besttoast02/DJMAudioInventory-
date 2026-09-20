@@ -14,7 +14,7 @@ st.set_page_config(
     page_title="DJMAudio Inventory",
     page_icon=":material/speaker:",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ── Branding & Styles ────────────────────────────────────────

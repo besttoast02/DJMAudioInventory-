@@ -1,11 +1,19 @@
+import os
 import streamlit as st
 import requests
+
+# ── Logo at top for mobile / QR visitors ─────────────────────
+if os.path.exists("assets/logo.png"):
+    st.image("assets/logo.png", width=180)
 
 st.title(":material/music_note: Solicitar Canción")
 
 st.markdown("""
 <style>
 .stTextInput > div > div > input {
+    border-radius: 8px;
+}
+.stTextArea > div > div > textarea {
     border-radius: 8px;
 }
 .stButton > button {
@@ -19,23 +27,16 @@ st.markdown("""
 st.write("¿Quieres escuchar algo en especial? ¡Envíanos tu solicitud y la pondremos en cola!")
 
 with st.form("song_request_form", clear_on_submit=True):
-    song_name = st.text_input("Título de la Canción (Obligatorio)*", placeholder="Ej: La Clika")
-    artist = st.text_input("Artista (Opcional)", placeholder="Ej: Los De Tamaulipas")
-    genre = st.selectbox("Género Musical (Opcional)", ["Seleccionar...", "Regional Mexicano", "Cumbia", "Salsa", "Reggaeton", "Pop", "Rock", "Otro"])
-    link = st.text_input("Enlace de YouTube/Spotify (Opcional)", placeholder="https://...")
-    requester_name = st.text_input("Tu Nombre (Opcional)", placeholder="Ej: Juan Pérez")
-    req_message = st.text_area("Mensaje al DJ (Opcional)", placeholder="Ej: ¡Es para el cumpleaños de mi hermano!")
-    
-    st.info("Nota: El nombre del artista y el enlace son opcionales, pero el título de la canción es obligatorio.")
+    song_name = st.text_input("Nombre de la Canción (Obligatorio)*", placeholder="Ej: La Chona")
+    req_message = st.text_area("Mensaje para el DJ (Opcional)", placeholder="Ej: ¡Es para el cumpleañero! Saludos de Carlos")
     
     submitted = st.form_submit_button("Enviar Solicitud", type="primary")
     
     if submitted:
         if not song_name.strip():
-            st.error("⚠️ Por favor, ingresa el título de la canción.")
+            st.error("⚠️ Por favor, ingresa el nombre de la canción.")
         else:
             # Enviar a Telegram
-            import os
             try:
                 bot_token = st.secrets.get("TELEGRAM_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
                 chat_id = st.secrets.get("TELEGRAM_CHAT_ID", os.environ.get("TELEGRAM_CHAT_ID", ""))
@@ -44,18 +45,10 @@ with st.form("song_request_form", clear_on_submit=True):
                 chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
             
             if bot_token and chat_id:
-                genre_text = genre if genre != "Seleccionar..." else "No especificado"
                 message = f"🎵 *Nueva Solicitud de Canción*\n\n"
-                if requester_name:
-                    message += f"👤 *De:* {requester_name}\n"
                 message += f"🏷️ *Canción:* {song_name}\n"
-                if artist:
-                    message += f"🎤 *Artista:* {artist}\n"
-                message += f"🎼 *Género:* {genre_text}\n"
-                if link:
-                    message += f"🔗 *Enlace:* {link}\n"
                 if req_message:
-                    message += f"\n💬 *Mensaje:* {req_message}\n"
+                    message += f"💬 *Mensaje:* {req_message}\n"
                 
                 try:
                     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -64,7 +57,7 @@ with st.form("song_request_form", clear_on_submit=True):
                         "text": message,
                         "parse_mode": "Markdown"
                     }
-                    response = requests.post(url, json=payload)
+                    response = requests.post(url, json=payload, timeout=10)
                     
                     if response.status_code == 200:
                         st.success("✅ ¡Tu solicitud ha sido enviada con éxito! La pondremos pronto.")
