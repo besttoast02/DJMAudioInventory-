@@ -17,13 +17,20 @@ st.markdown("""
     line-height: 1.6 !important;
 }
 
-/* Widget labels (Nombre de la canción, Mensaje, etc.) */
+/* Widget labels (Canción y Artista, Mensaje, etc.) */
 div[data-testid="stWidgetLabel"] p,
 div[data-testid="stWidgetLabel"] label {
     font-size: 22px !important;
     font-weight: 700 !important;
     color: #ffffff !important;
     margin-bottom: 6px !important;
+}
+
+/* Captions / helper text */
+.stCaption, small, div[data-testid="stCaptionContainer"] {
+    font-size: 18px !important;
+    color: #e0e0e0 !important;
+    line-height: 1.4 !important;
 }
 
 /* Large input boxes */
@@ -65,14 +72,19 @@ h1 {
 st.markdown("<p style='font-size: 21px; color: #e0e0e0; margin-bottom: 15px;'>¿Quieres escuchar algo en especial? ¡Envíanos tu solicitud y la pondremos en cola!</p>", unsafe_allow_html=True)
 
 with st.form("song_request_form", clear_on_submit=True):
-    song_name = st.text_input("Nombre de la Canción (Obligatorio)*", placeholder="Ej: La Chona")
+    song_and_artist = st.text_input(
+        "Canción y Artista (Obligatorio - Incluye Ambos)*",
+        placeholder="Ej: La Chona - Los Tucanes de Tijuana"
+    )
+    st.caption("💡 Por favor escribe el título de la canción y el nombre del artista/grupo juntos en esta misma casilla.")
+    
     req_message = st.text_area("Mensaje para el DJ (Opcional)", placeholder="Ej: ¡Es para el cumpleañero! Saludos de Carlos")
     
     submitted = st.form_submit_button("🎵 Enviar Solicitud", type="primary")
     
     if submitted:
-        if not song_name.strip():
-            st.error("⚠️ Por favor, ingresa el nombre de la canción.")
+        if not song_and_artist.strip():
+            st.error("⚠️ Por favor, ingresa el nombre de la canción y el artista.")
         else:
             # Enviar a Telegram
             try:
@@ -84,7 +96,7 @@ with st.form("song_request_form", clear_on_submit=True):
             
             if bot_token and chat_id:
                 message = f"🎵 *Nueva Solicitud de Canción*\n\n"
-                message += f"🏷️ *Canción:* {song_name}\n"
+                message += f"🏷️ *Canción y Artista:* {song_and_artist}\n"
                 if req_message:
                     message += f"💬 *Mensaje:* {req_message}\n"
                 
@@ -104,7 +116,7 @@ with st.form("song_request_form", clear_on_submit=True):
 <div style='background: rgba(76, 175, 80, 0.15); border: 2px solid #4CAF50; border-radius: 14px; padding: 22px; text-align: center; margin: 20px 0;'>
     <h2 style='color: #4CAF50; font-size: 28px; font-weight: 800; margin-bottom: 12px;'>🙏 ¡Muchas Gracias por tu Solicitud!</h2>
     <p style='font-size: 22px; font-weight: 600; color: #ffffff; margin-bottom: 15px;'>
-        Hemos recibido tu canción: <span style='color: #FFD700;'>"{song_name}"</span>.<br/>
+        Hemos recibido tu solicitud: <span style='color: #FFD700;'>"{song_and_artist}"</span>.<br/>
         ¡El DJ la pondrá muy pronto para poner a bailar a todos!
     </p>
     <hr style='border: 0; border-top: 1px solid rgba(255,255,255,0.25); margin: 18px 0;'>
