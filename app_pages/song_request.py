@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import requests
 
-# ── High-Contrast, Night-Friendly CSS (Zero Flashiness, Maximum Clarity) ─────
+# ── High-Contrast, Night-Friendly CSS (Zero Yellow, Crisp White & Green) ─────
 st.markdown("""
 <style>
 /* Clean dark background & crisp contrast for dim night venues */
@@ -18,10 +18,10 @@ st.markdown("""
     color: #ffffff !important;
 }
 
-/* Section step badges */
+/* Section step badges - Crisp white with high contrast dark number */
 .step-number {
     display: inline-block;
-    background: #FFD700;
+    background: #ffffff;
     color: #000000 !important;
     font-weight: 900;
     font-size: 20px !important;
@@ -40,7 +40,7 @@ st.markdown("""
     vertical-align: middle;
 }
 
-/* Extra large, easy-to-tap input boxes (high contrast) */
+/* Extra large, easy-to-tap input boxes (crisp white borders) */
 .stTextInput input {
     font-size: 22px !important;
     font-weight: 600 !important;
@@ -49,7 +49,7 @@ st.markdown("""
     height: 60px !important;
     background-color: #1a2234 !important;
     color: #ffffff !important;
-    border: 2px solid #FFD700 !important;
+    border: 2px solid #ffffff !important;
 }
 
 .stTextInput input::placeholder {
@@ -73,7 +73,7 @@ st.markdown("""
     min-height: 110px !important;
     background-color: #1a2234 !important;
     color: #ffffff !important;
-    border: 2px solid rgba(255, 215, 0, 0.6) !important;
+    border: 2px solid rgba(255, 255, 255, 0.6) !important;
 }
 
 .stTextArea textarea::placeholder {
@@ -118,10 +118,10 @@ st.markdown("""
     color: #000000 !important;
 }
 
-/* Clean, static wedding header (no moving animations) */
+/* Clean, static wedding header (No yellow, clean platinum/white frame) */
 .wedding-card {
     background: #141b2d;
-    border: 2px solid #FFD700;
+    border: 2px solid #ffffff;
     border-radius: 16px;
     padding: 20px 16px;
     text-align: center;
@@ -130,13 +130,14 @@ st.markdown("""
 
 .wedding-pill {
     display: inline-block;
-    background: #FFD700;
+    background: #ffffff;
     color: #000000 !important;
     font-size: 15px !important;
     font-weight: 800;
-    padding: 4px 14px;
+    padding: 4px 16px;
     border-radius: 20px;
     margin-bottom: 8px;
+    letter-spacing: 1px;
 }
 
 .wedding-names {
@@ -144,12 +145,12 @@ st.markdown("""
     font-weight: 900 !important;
     color: #ffffff !important;
     margin: 4px 0 6px 0 !important;
-    line-height: 1.2 !important;
+    line-height: 1.25 !important;
 }
 
 .wedding-decor-bar {
     font-size: 16px;
-    color: #FFD700;
+    color: #ffffff;
     margin: 6px 0 10px 0;
 }
 
@@ -169,10 +170,10 @@ if os.path.exists("assets/logo.png"):
 # ── Clear, Static Wedding Header ─────────────────────────────
 st.markdown("""
 <div class="wedding-card">
-    <div class="wedding-pill">💍 BODA DE SILVESTRE &amp; MARÍA 🥂</div>
-    <div class="wedding-names">Silvestre Ruiz &amp; María Contreras</div>
+    <div class="wedding-pill">💍 BODA DE MARÍA &amp; SILVESTRE 🥂</div>
+    <div class="wedding-names">Maria &amp; Silvestre's Wedding Celebration</div>
     <div class="wedding-decor-bar">✨ 🤍 💍 💐 🥂 🤍 ✨</div>
-    <div class="wedding-sub">🎵 ¡Pide tu canción al DJ y celebremos en la pista!</div>
+    <div class="wedding-sub">🎵 ¡Pide tu canción al DJ y celebremos con María y Silvestre en la pista!</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -203,7 +204,7 @@ with st.form("song_request_form", clear_on_submit=True):
     
     req_message = st.text_area(
         "Mensaje",
-        placeholder="Ej: ¡Felicidades Silvestre y María! Con cariño de la familia.",
+        placeholder="Ej: ¡Muchas felicidades a María y Silvestre! Con cariño de la familia.",
         label_visibility="collapsed"
     )
     st.caption("💌 Mensaje para los novios o dedicatoria para el DJ.")
@@ -224,7 +225,7 @@ with st.form("song_request_form", clear_on_submit=True):
                 chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
             
             if bot_token and chat_id:
-                message = f"💍 *Boda: Silvestre Ruiz & María Contreras*\n"
+                message = f"💍 *Boda: María & Silvestre*\n"
                 message += f"🎵 *Nueva Solicitud de Canción*\n\n"
                 message += f"🏷️ *Canción:* {song_and_artist}\n"
                 if req_message:
@@ -244,16 +245,16 @@ with st.form("song_request_form", clear_on_submit=True):
                         # Confirmation and Thank You
                         st.markdown(f"""
 <div style='background: #142e1d; border: 3px solid #00E676; border-radius: 16px; padding: 24px; text-align: center; margin: 24px 0;'>
-    <div style='font-size: 16px; letter-spacing: 2px; color: #FFD700; font-weight: 800; margin-bottom: 8px;'>💍 BODA DE SILVESTRE &amp; MARÍA 🥂</div>
+    <div style='font-size: 16px; letter-spacing: 2px; color: #ffffff; font-weight: 800; margin-bottom: 8px;'>💍 BODA DE MARÍA &amp; SILVESTRE 🥂</div>
     <h2 style='color: #00E676; font-size: 32px; font-weight: 900; margin-bottom: 12px;'>✅ ¡SOLICITUD ENVIADA!</h2>
     <p style='font-size: 24px; font-weight: 700; color: #ffffff; margin-bottom: 14px;'>
-        Canción recibida: <br/><span style='color: #FFD700; font-size: 26px;'>"{song_and_artist}"</span>
+        Canción recibida: <br/><span style='color: #00E676; font-size: 26px;'>"{song_and_artist}"</span>
     </p>
     <p style='font-size: 21px; color: #e2e8f0;'>
-        ¡El DJ la pondrá muy pronto para que bailemos todos con los novios!
+        ¡El DJ la pondrá muy pronto para que bailemos todos con María y Silvestre!
     </p>
     <hr style='border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;'>
-    <h3 style='color: #FFD700; font-size: 24px; font-weight: 800; margin-bottom: 8px;'>🎉 ¿Quieres apoyar al DJ? (Opcional)</h3>
+    <h3 style='color: #ffffff; font-size: 24px; font-weight: 800; margin-bottom: 8px;'>🎉 ¿Quieres apoyar al DJ? (Opcional)</h3>
     <p style='font-size: 22px; font-weight: 700; color: #ffffff; margin: 10px 0;'>
         💸 <strong>Zelle:</strong> <span style='color: #00E676; font-size: 26px;'>(626) 763-5959</span>
     </p>
@@ -276,7 +277,7 @@ with st.form("song_request_form", clear_on_submit=True):
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: #ffffff; font-size: 20px; padding: 10px 5px;'>
-    <div style='font-size: 14px; color: #FFD700; margin-bottom: 6px; font-weight: 700;'>✨ 💍 SILVESTRE &amp; MARÍA • 2026 🥂 ✨</div>
+    <div style='font-size: 14px; color: #ffffff; margin-bottom: 6px; font-weight: 700;'>✨ 💍 MARÍA &amp; SILVESTRE • 2026 🥂 ✨</div>
     <p style='font-size: 20px; margin-bottom: 8px;'>¿Disfrutando de la música de la boda?</p>
     <p style='font-size: 24px; font-weight: 800; color: #ffffff; margin: 6px 0;'>
         💸 <strong>Zelle al DJ:</strong> <span style='color: #00E676;'>(626) 763-5959</span>
