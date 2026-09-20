@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import requests
 
-# ── High-Contrast, Night-Friendly CSS (Zero Yellow, Crisp White & Green) ─────
+# ── High-Contrast, Night-Friendly CSS (Zero Yellow, High Contrast, Flawless Buttons) ─────
 st.markdown("""
 <style>
 /* Clean dark background & crisp contrast for dim night venues */
@@ -18,19 +18,20 @@ st.markdown("""
     color: #ffffff !important;
 }
 
-/* Section step badges - Crisp white with high contrast dark number */
+/* Section step badges - Crisp white with pitch black number */
 .step-number {
     display: inline-block;
-    background: #ffffff;
+    background: #ffffff !important;
     color: #000000 !important;
-    font-weight: 900;
+    font-weight: 900 !important;
     font-size: 20px !important;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     text-align: center;
-    line-height: 32px;
+    line-height: 34px;
     margin-right: 8px;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 .step-title {
@@ -53,7 +54,7 @@ st.markdown("""
 }
 
 .stTextInput input::placeholder {
-    color: #a0aec0 !important;
+    color: #94a3b8 !important;
     font-size: 19px !important;
     font-weight: 400 !important;
 }
@@ -77,7 +78,7 @@ st.markdown("""
 }
 
 .stTextArea textarea::placeholder {
-    color: #a0aec0 !important;
+    color: #94a3b8 !important;
     font-size: 18px !important;
 }
 
@@ -90,32 +91,61 @@ st.markdown("""
 /* Captions / instructions - clean & legible */
 .stCaption, div[data-testid="stCaptionContainer"] {
     font-size: 18px !important;
-    color: #d1d5db !important;
+    color: #cbd5e1 !important;
     margin-top: 4px !important;
     margin-bottom: 12px !important;
 }
 
-/* Giant, unmissable button */
-.stButton > button {
-    font-size: 26px !important;
-    font-weight: 900 !important;
-    padding: 20px 24px !important;
-    border-radius: 14px !important;
-    width: 100% !important;
-    height: 70px !important;
-    margin-top: 14px !important;
+/* ── SUBMIT BUTTON: Target ALL button variants and force high contrast ── */
+div[data-testid="stFormSubmitButton"] > button,
+div[data-testid="stFormSubmitButton"] button,
+.stButton > button,
+button[kind="primary"],
+button[kind="secondary"],
+button[kind="formSubmit"] {
+    background-color: #00E676 !important;
     background: #00E676 !important;
     color: #000000 !important;
-    border: 2px solid #ffffff !important;
+    font-size: 26px !important;
+    font-weight: 900 !important;
+    padding: 18px 24px !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    height: 72px !important;
+    margin-top: 14px !important;
+    border: 3px solid #ffffff !important;
     box-shadow: 0 6px 20px rgba(0, 230, 118, 0.4) !important;
     cursor: pointer !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
 }
 
-.stButton > button:hover {
-    background: #00c853 !important;
+/* CRITICAL: Force inner text/paragraphs/spans inside the button to be deep solid black */
+div[data-testid="stFormSubmitButton"] button *,
+div[data-testid="stFormSubmitButton"] button p,
+div[data-testid="stFormSubmitButton"] button span,
+div[data-testid="stFormSubmitButton"] button div,
+.stButton button *,
+.stButton button p,
+.stButton button span,
+.stButton button div {
     color: #000000 !important;
+    font-size: 25px !important;
+    font-weight: 900 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+div[data-testid="stFormSubmitButton"] button:hover,
+.stButton button:hover {
+    background-color: #00c853 !important;
+    background: #00c853 !important;
+    border: 3px solid #ffffff !important;
+}
+
+div[data-testid="stFormSubmitButton"] button:hover *,
+.stButton button:hover * {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 /* Clean, static wedding header (No yellow, clean platinum/white frame) */
@@ -130,14 +160,15 @@ st.markdown("""
 
 .wedding-pill {
     display: inline-block;
-    background: #ffffff;
+    background: #ffffff !important;
     color: #000000 !important;
     font-size: 15px !important;
-    font-weight: 800;
+    font-weight: 800 !important;
     padding: 4px 16px;
     border-radius: 20px;
     margin-bottom: 8px;
     letter-spacing: 1px;
+    -webkit-text-fill-color: #000000 !important;
 }
 
 .wedding-names {
@@ -209,8 +240,8 @@ with st.form("song_request_form", clear_on_submit=True):
     )
     st.caption("💌 Mensaje para los novios o dedicatoria para el DJ.")
     
-    # Paso 3: Botón Gigante
-    submitted = st.form_submit_button("👉 ENVIAR CANCIÓN AL DJ 🎵")
+    # Paso 3: Botón Gigante (Explicit primary type)
+    submitted = st.form_submit_button("👉 ENVIAR CANCIÓN AL DJ 🎵", type="primary")
     
     if submitted:
         if not song_and_artist.strip():
