@@ -478,7 +478,7 @@ export default function EditInventoryAssetPage({ params }: { params: Promise<{ i
     const now = new Date();
     
     // Add interval until we are in the future
-    let nextDate = new Date(start);
+    const nextDate = new Date(start);
     while (nextDate <= now) {
       nextDate.setMonth(nextDate.getMonth() + maintenancePlan.interval_value);
     }

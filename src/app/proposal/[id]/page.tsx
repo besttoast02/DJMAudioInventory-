@@ -51,7 +51,7 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
   }
 
   // Flatten the response for the client component
-  // @ts-ignore (ignoring complex Supabase join types for now)
+  // @ts-expect-error (ignoring complex Supabase join types for now)
   const formattedItems = (rentalItems || []).map((ri: any) => ({
     barcode: ri.items.barcode,
     name: ri.items.name,
