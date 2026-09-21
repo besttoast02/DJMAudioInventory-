@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
-import Image from "next/image";
 
 interface DynamicCarouselProps {
   setup: {
@@ -68,6 +67,7 @@ export default function DynamicCarousel({ setup }: DynamicCarouselProps) {
       filtered = MEDIA_CATALOG; // Fallback to all if too specific
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveMedia(filtered);
     setCurrentIndex(0);
   }, [setup]);

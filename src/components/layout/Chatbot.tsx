@@ -4,7 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { MessageCircle, Send, MinusCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
-import { DefaultChatTransport } from 'ai';
+import { DefaultChatTransport, Message } from 'ai';
 
 interface ChatbotProps {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export function Chatbot({ isOpen, onClose }: ChatbotProps) {
               </div>
             )}
             
-            {messages.map((m: any) => (
+            {messages.map((m: Message) => (
               <div
                 key={m.id}
                 className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
@@ -68,6 +68,7 @@ export function Chatbot({ isOpen, onClose }: ChatbotProps) {
                       : "bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-tl-sm shadow-sm"
                   }`}
                 >
+                  {/* @ts-expect-error ai sdk types mismatch */}
                   {m.parts?.map((part: any, i: number) => {
                     if (part.type === 'text') {
                       return <span key={i}>{part.text}</span>;

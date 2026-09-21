@@ -27,7 +27,7 @@ export default function TermsPage() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Acceptance of Terms</h2>
             <p className="leading-relaxed">
-              By accessing and using the website of DJM Audio Productions, LLC (the "Site"), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our Site or request services.
+              By accessing and using the website of DJM Audio Productions, LLC (the &quot;Site&quot;), you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our Site or request services.
             </p>
           </div>
 

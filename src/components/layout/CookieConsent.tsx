@@ -10,6 +10,7 @@ export function CookieConsent() {
     // Check if consent has already been given
     const consent = localStorage.getItem("djm-cookie-consent");
     if (!consent) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowBanner(true);
     }
   }, []);
