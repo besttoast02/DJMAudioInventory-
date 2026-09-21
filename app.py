@@ -11,7 +11,7 @@ if os.path.exists("/etc/secrets/secrets.toml"):
 
 # ── Page config ──────────────────────────────────────────────
 st.set_page_config(
-    page_title="DJMAudio Inventory",
+    page_title="DJM Audio | Pro Audio, DJ & Lighting in LA",
     page_icon=":material/speaker:",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -108,7 +108,7 @@ a.glass-card * {
 }
 
 /* Fix logo cropping */
-img {
+img[data-testid="stLogo"] {
     object-fit: contain !important;
 }
 </style>

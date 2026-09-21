@@ -387,8 +387,8 @@ elif st.session_state.checkout_step == 5:
         st.switch_page("app_pages/browse.py")
     if al2.button("← Add services", use_container_width=True):
         st.switch_page("app_pages/dj_services.py")
-    if al3.button("← Browse packages", use_container_width=True):
-        st.switch_page("app_pages/packages.py")
+    if al3.button("← Browse gear", use_container_width=True):
+        st.switch_page("app_pages/browse.py")
 
     st.divider()
     with st.form("final_submit", border=True):

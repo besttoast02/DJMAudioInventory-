@@ -318,11 +318,11 @@ st.markdown("""
     <p class="glass-desc">PA systems, microphones, mixers, and stage sound for live performances.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=packages">
-    <span class="glass-icon">🎉</span>
-    <p class="glass-title">Packages</p>
-    <p class="glass-desc">Curated bundles for weddings, parties, corporate, and festivals.</p>
-    <span class="glass-arrow">Explore →</span>
+  <a class="glass-card" href="?page=song_request">
+    <span class="glass-icon">🎵</span>
+    <p class="glass-title">Song Request</p>
+    <p class="glass-desc">Submit song requests for your upcoming event so we can prepare your playlist.</p>
+    <span class="glass-arrow">Request →</span>
   </a>
   <a class="glass-card" href="?page=extras">
     <span class="glass-icon">✨</span>
@@ -362,7 +362,7 @@ _qp = st.query_params.get("page", "")
 if _qp == "3d_builder":     st.switch_page("app_pages/3d_builder.py")
 elif _qp == "dj_services":  st.switch_page("app_pages/dj_services.py")
 elif _qp == "live_audio":   st.switch_page("app_pages/live_audio.py")
-elif _qp == "packages":     st.switch_page("app_pages/packages.py")
+elif _qp == "song_request": st.switch_page("app_pages/song_request.py")
 elif _qp == "extras":       st.switch_page("app_pages/extra_services.py")
 elif _qp == "rentals":      st.switch_page("app_pages/browse.py")
 elif _qp == "checkout":     st.switch_page("app_pages/request.py")
@@ -440,8 +440,8 @@ with fc2:
 
 st.markdown("""
 <div style="text-align:center; padding:1rem 0 3rem; color:rgba(255,255,255,0.9);">
-    <p style="font-size:2.2rem; margin-top:0.5rem; font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,0.5);">(626) 506-3824</p>
-    <p style="font-size:1.4rem; color:#b182ff; font-weight:600;">djmaudio.com</p>
+    <p style="font-size:2.2rem; margin-top:0.5rem; font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,0.5);"><a href="tel:+16265063824" style="color:inherit; text-decoration:none;">(626) 506-3824</a></p>
+    <p style="font-size:1.4rem; color:#b182ff; font-weight:600;"><a href="https://djmaudio.com" style="color:inherit; text-decoration:none;">djmaudio.com</a></p>
     <br/>
     <span style="opacity:0.5; font-size:0.9rem;">Los Angeles, CA · © 2026 DJM Audio Productions LLC</span>
 </div>

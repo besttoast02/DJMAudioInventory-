@@ -1,13 +1,11 @@
 import streamlit as st
 import requests
 
-st.title(":material/music_note: Solicitar Canción")
+st.title(":material/music_note: Song Request")
 
 st.info('''
-🎊 **¡El Evento ha Terminado! Felicidades a los Novios** (19 de Septiembre, 2026)  
-Gracias a todos los que nos acompañaron. El sistema de solicitudes de canciones estuvo activo durante el evento—esta es una de las funciones exclusivas que ofrecemos al contratar a **DJM Audio** para servicios de DJ o renta de equipo.  
-
-*Nota: El evento ha concluido, por lo que las solicitudes enviadas ahora ya no serán recibidas por el DJ en vivo.*
+🎶 **Request a Song for Your Event**  
+When you hire **DJM Audio** for DJ services, this live song request system is available to your guests during the event. Submit your requests below and we'll queue them up!
 ''', icon="ℹ️")
 
 st.markdown("""
@@ -23,25 +21,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.write("¿Quieres escuchar algo en especial? ¡Envíanos tu solicitud y la pondremos en cola!")
+st.write("Want to hear something special? Send us your song request and we'll add it to the queue!")
 
 with st.form("song_request_form", clear_on_submit=True):
-    song_name = st.text_input("Título de la Canción (Obligatorio)*", placeholder="Ej: La Clika")
-    artist = st.text_input("Artista (Opcional)", placeholder="Ej: Los De Tamaulipas")
-    genre = st.selectbox("Género Musical (Opcional)", ["Seleccionar...", "Regional Mexicano", "Cumbia", "Salsa", "Reggaeton", "Pop", "Rock", "Otro"])
-    link = st.text_input("Enlace de YouTube/Spotify (Opcional)", placeholder="https://...")
-    requester_name = st.text_input("Tu Nombre (Opcional)", placeholder="Ej: Juan Pérez")
-    req_message = st.text_area("Mensaje al DJ (Opcional)", placeholder="Ej: ¡Es para el cumpleaños de mi hermano!")
+    song_name = st.text_input("Song Title (Required)*", placeholder="e.g. Blinding Lights")
+    artist = st.text_input("Artist (Optional)", placeholder="e.g. The Weeknd")
+    genre = st.selectbox("Genre (Optional)", ["Select...", "Hip-Hop / R&B", "Latin / Reggaeton", "Pop", "Rock", "EDM / Electronic", "Country", "Regional Mexican", "Cumbia / Salsa", "Other"])
+    link = st.text_input("YouTube/Spotify Link (Optional)", placeholder="https://...")
+    requester_name = st.text_input("Your Name (Optional)", placeholder="e.g. John")
+    req_message = st.text_area("Message to the DJ (Optional)", placeholder="e.g. It's my friend's birthday!")
     
-    st.info("Nota: El nombre del artista y el enlace son opcionales, pero el título de la canción es obligatorio.")
+    st.info("Note: The artist and link are optional, but the song title is required.")
     
-    submitted = st.form_submit_button("Enviar Solicitud", type="primary")
+    submitted = st.form_submit_button("Submit Request", type="primary")
     
     if submitted:
         if not song_name.strip():
-            st.error("⚠️ Por favor, ingresa el título de la canción.")
+            st.error("⚠️ Please enter a song title.")
         else:
-            # Enviar a Telegram
+            # Send to Telegram
             import os
             try:
                 bot_token = st.secrets.get("TELEGRAM_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
@@ -51,18 +49,18 @@ with st.form("song_request_form", clear_on_submit=True):
                 chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
             
             if bot_token and chat_id:
-                genre_text = genre if genre != "Seleccionar..." else "No especificado"
-                message = f"🎵 *Nueva Solicitud de Canción*\n\n"
+                genre_text = genre if genre != "Select..." else "Not specified"
+                message = f"🎵 *New Song Request*\n\n"
                 if requester_name:
-                    message += f"👤 *De:* {requester_name}\n"
-                message += f"🏷️ *Canción:* {song_name}\n"
+                    message += f"👤 *From:* {requester_name}\n"
+                message += f"🏷️ *Song:* {song_name}\n"
                 if artist:
-                    message += f"🎤 *Artista:* {artist}\n"
-                message += f"🎼 *Género:* {genre_text}\n"
+                    message += f"🎤 *Artist:* {artist}\n"
+                message += f"🎼 *Genre:* {genre_text}\n"
                 if link:
-                    message += f"🔗 *Enlace:* {link}\n"
+                    message += f"🔗 *Link:* {link}\n"
                 if req_message:
-                    message += f"\n💬 *Mensaje:* {req_message}\n"
+                    message += f"\n💬 *Message:* {req_message}\n"
                 
                 try:
                     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -74,27 +72,27 @@ with st.form("song_request_form", clear_on_submit=True):
                     response = requests.post(url, json=payload)
                     
                     if response.status_code == 200:
-                        st.success("✅ ¡Tu solicitud ha sido enviada con éxito! La pondremos pronto.")
+                        st.success("✅ Your song request has been submitted! We'll queue it up soon.")
                         st.balloons()
                     else:
-                        st.error(f"Hubo un problema enviando tu solicitud. Código: {response.status_code}")
+                        st.error(f"There was a problem sending your request. Code: {response.status_code}")
                 except Exception as e:
-                    st.error(f"Error de conexión: {str(e)}")
+                    st.error(f"Connection error: {str(e)}")
             else:
-                st.warning("El servicio de notificaciones no está configurado (Falta el Token de Telegram).")
+                st.warning("The notification service is not configured (Telegram token missing).")
 
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: #888;'>
-    <h3 style='color: #4CAF50;'>🎉 ¡Apoya al DJ! (Opcional)</h3>
-    <p>Si te está gustando el ambiente, ¡puedes apoyar directamente al DJ!</p>
+    <h3 style='color: #4CAF50;'>🎉 Tip the DJ! (Optional)</h3>
+    <p>If you're enjoying the vibes, you can support the DJ directly!</p>
     <p>💸 <strong>Zelle:</strong> (626) 763-5959</p>
-    <p>📺 <strong>YouTube:</strong> <a href='https://youtube.com/djmoy0' target='_blank' style='color: #FF0000; text-decoration: none;'>youtube.com/djmoy0</a> (¡Suscríbete!)</p>
+    <p>📺 <strong>YouTube:</strong> <a href='https://youtube.com/djmoy0' target='_blank' style='color: #FF0000; text-decoration: none;'>youtube.com/djmoy0</a> (Subscribe!)</p>
     <br/>
-    <p>¿Buscas servicios de DJ profesionales?</p>
-    <p>📞 <strong>Llama a DJM Audio Productions: (626) 506-3824</strong><br/>
-    Para todo tipo de eventos (Bodas, Quinceañeras, Corporativos)</p>
+    <p>Looking for professional DJ services?</p>
+    <p>📞 <strong>Call DJM Audio Productions: <a href="tel:+16265063824" style="color:inherit;">(626) 506-3824</a></strong><br/>
+    For all types of events (Weddings, Quinceañeras, Corporate)</p>
     <br/>
-    <small>© 2026 DJMAudioProductions. Todos los derechos reservados.</small>
+    <small>© 2026 DJM Audio Productions LLC. All rights reserved.</small>
 </div>
 """, unsafe_allow_html=True)
