@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  djm-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: djm-web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    networks:
+      - nexus-network
+
+networks:
+  nexus-network:
+    external: true

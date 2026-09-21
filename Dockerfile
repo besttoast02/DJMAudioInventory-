@@ -1,4 +1,4 @@
-FROM node:18-alpine AS base
+FROM node:22-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -20,7 +20,9 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # If using more environment variables during build, they must be included here.
-# ENV OPENAI_API_KEY=""
+ENV NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co"
+ENV SUPABASE_SERVICE_ROLE_KEY="dummy_key"
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy_key"
 
 RUN npm run build
 
