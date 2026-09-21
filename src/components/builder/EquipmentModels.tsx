@@ -140,11 +140,78 @@ export function RentalMixerTable({ position }: { position: [number, number, numb
 
 export function StageModel({ position }: { position: [number, number, number] }) {
   // 4x4 ft = 1.22m x 1.22m. Height 1.5ft = 0.45m.
+  // Render deck surface + clean black skirting concealing silver legs
   return (
     <group position={position}>
-      <Box args={[1.22, 0.45, 1.22]} position={[0, 0.225, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color="#1a1a1a" roughness={1.0} />
+      {/* Top Deck Surface */}
+      <Box args={[1.22, 0.05, 1.22]} position={[0, 0.425, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#2a2a2a" roughness={0.7} />
       </Box>
+      {/* Black Stage Skirt around legs */}
+      <Box args={[1.20, 0.40, 1.20]} position={[0, 0.20, 0]} receiveShadow>
+        <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+      </Box>
+    </group>
+  );
+}
+
+export function StageStepsModel({ position }: { position: [number, number, number] }) {
+  // 2-tier modular stage access stairs
+  return (
+    <group position={position}>
+      {/* Step 1 (Lower) */}
+      <Box args={[0.9, 0.225, 0.45]} position={[0, 0.1125, 0.225]} castShadow receiveShadow>
+        <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
+      </Box>
+      {/* Step 2 (Upper) */}
+      <Box args={[0.9, 0.45, 0.45]} position={[0, 0.225, -0.225]} castShadow receiveShadow>
+        <meshStandardMaterial color="#1f1f1f" roughness={0.8} />
+      </Box>
+    </group>
+  );
+}
+
+export function OverheadStageTrussArch({ width, position }: { width: number, position: [number, number, number] }) {
+  // Maximum width closed at 32 ft (9.75m)
+  const clampedWidth = Math.min(width, 9.75);
+  const archHeight = 3.6; // ~12 ft clearance
+
+  return (
+    <group position={position}>
+      {/* Left Heavy Baseplate */}
+      <Box args={[0.8, 0.04, 0.8]} position={[-clampedWidth / 2 - 0.2, 0.02, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.7} roughness={0.4} />
+      </Box>
+      {/* Left Upright Truss Column */}
+      <Box args={[0.3, archHeight, 0.3]} position={[-clampedWidth / 2 - 0.2, archHeight / 2, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
+      </Box>
+
+      {/* Right Heavy Baseplate */}
+      <Box args={[0.8, 0.04, 0.8]} position={[clampedWidth / 2 + 0.2, 0.02, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.7} roughness={0.4} />
+      </Box>
+      {/* Right Upright Truss Column */}
+      <Box args={[0.3, archHeight, 0.3]} position={[clampedWidth / 2 + 0.2, archHeight / 2, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
+      </Box>
+
+      {/* Top Continuous Horizontal Truss Crossbeam (Spans Length of Stage, Max 32') */}
+      <Box args={[clampedWidth + 0.7, 0.3, 0.3]} position={[0, archHeight + 0.15, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
+      </Box>
+
+      {/* Rigged Stage Lights along the Arch */}
+      {[-0.35, -0.15, 0.15, 0.35].map((fraction, idx) => (
+        <group key={`arch-light-${idx}`} position={[clampedWidth * fraction, archHeight, 0]}>
+          <Box args={[0.18, 0.15, 0.18]} position={[0, -0.1, 0]} castShadow>
+            <meshStandardMaterial color="#111" />
+          </Box>
+          <Sphere args={[0.08, 12, 12]} position={[0, -0.18, 0]}>
+            <meshStandardMaterial color="#222" emissive={LIGHT_COLOR} emissiveIntensity={0.6} />
+          </Sphere>
+        </group>
+      ))}
     </group>
   );
 }
