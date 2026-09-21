@@ -359,15 +359,17 @@ st.markdown("""
 
 # Hidden Streamlit buttons — triggered by query param from glass cards
 _qp = st.query_params.get("page", "")
-if _qp == "3d_builder":     st.switch_page("app_pages/3d_builder.py")
-elif _qp == "dj_services":  st.switch_page("app_pages/dj_services.py")
-elif _qp == "live_audio":   st.switch_page("app_pages/live_audio.py")
-elif _qp == "song_request": st.switch_page("app_pages/song_request.py")
-elif _qp == "extras":       st.switch_page("app_pages/extra_services.py")
-elif _qp == "rentals":      st.switch_page("app_pages/browse.py")
-elif _qp == "checkout":     st.switch_page("app_pages/request.py")
-elif _qp == "ai":           st.switch_page("app_pages/ai_assistant.py")
-elif _qp == "contact":      st.switch_page("app_pages/contact.py")
+if _qp:
+    st.query_params.pop("page", None)
+    if _qp == "3d_builder":     st.switch_page("app_pages/3d_builder.py")
+    elif _qp == "dj_services":  st.switch_page("app_pages/dj_services.py")
+    elif _qp == "live_audio":   st.switch_page("app_pages/live_audio.py")
+    elif _qp == "song_request": st.switch_page("app_pages/song_request.py")
+    elif _qp == "extras":       st.switch_page("app_pages/extra_services.py")
+    elif _qp == "rentals":      st.switch_page("app_pages/browse.py")
+    elif _qp == "checkout":     st.switch_page("app_pages/request.py")
+    elif _qp == "ai":           st.switch_page("app_pages/ai_assistant.py")
+    elif _qp == "contact":      st.switch_page("app_pages/contact.py")
 
 st.divider()
 

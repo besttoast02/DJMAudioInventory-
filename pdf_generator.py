@@ -17,7 +17,7 @@ class DJMEstimatePDF(FPDF):
         self.set_xy(100, 15)
         self.cell(100, 5, "701 S. Raymond Avenue, Alhambra, CA 91803", new_x="LMARGIN", new_y="NEXT", align="R")
         self.set_x(100)
-        self.cell(100, 5, "djmaudiopro@gmail.com", new_x="LMARGIN", new_y="NEXT", align="R")
+        self.cell(100, 5, "rentals@djmaudio.com", new_x="LMARGIN", new_y="NEXT", align="R")
         self.set_x(100)
         self.cell(100, 5, "+1 (626) 506-3824  |  djmaudio.com", new_x="LMARGIN", new_y="NEXT", align="R")
         
@@ -47,30 +47,31 @@ def generate_ai_estimate_pdf(
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
     
-    # ── BILL TO / SHIP TO ──
+    # ── BILL TO / EVENT LOCATION ──
     pdf.set_y(45)
     pdf.set_font("Helvetica", "B", 8)
     pdf.set_text_color(140, 140, 150)
     pdf.cell(70, 5, "BILL TO", new_x="RIGHT", new_y="TOP")
-    pdf.cell(70, 5, "SHIP TO", new_x="RIGHT", new_y="TOP")
+    pdf.cell(70, 5, "EVENT LOCATION", new_x="RIGHT", new_y="TOP")
     pdf.cell(50, 5, "ESTIMATE DETAILS", new_x="LMARGIN", new_y="NEXT")
     
     pdf.set_font("Helvetica", "B", 10)
     pdf.set_text_color(255, 255, 255)
     
-    # Row 1
-    pdf.cell(70, 5, event_name[:35], new_x="RIGHT", new_y="TOP")
+    # Row 1 (Client Name & Venue)
+    pdf.cell(70, 5, client_name[:35], new_x="RIGHT", new_y="TOP")
     pdf.cell(70, 5, venue_name[:35], new_x="RIGHT", new_y="TOP")
     
     pdf.set_font("Helvetica", "", 9)
     pdf.set_text_color(140, 140, 150)
     pdf.cell(20, 5, "Estimate no.", new_x="RIGHT", new_y="TOP")
     pdf.set_text_color(255, 255, 255)
-    pdf.cell(30, 5, "AI-QUOTE", new_x="LMARGIN", new_y="NEXT", align="R")
+    est_num = f"EST-{datetime.now().strftime('%y%m%d')}-{abs(hash(client_name + event_name)) % 9000 + 1000}"
+    pdf.cell(30, 5, est_num, new_x="LMARGIN", new_y="NEXT", align="R")
     
-    # Row 2
+    # Row 2 (Event Name & Address)
     pdf.set_text_color(220, 220, 230)
-    pdf.cell(70, 5, client_name[:35], new_x="RIGHT", new_y="TOP")
+    pdf.cell(70, 5, event_name[:35], new_x="RIGHT", new_y="TOP")
     pdf.cell(70, 5, venue_address[:35], new_x="RIGHT", new_y="TOP")
     
     pdf.set_text_color(140, 140, 150)
@@ -94,8 +95,8 @@ def generate_ai_estimate_pdf(
     pdf.set_font("Helvetica", "B", 8)
     pdf.set_text_color(140, 140, 150)
     pdf.cell(10, 6, "#", new_x="RIGHT", new_y="TOP")
-    pdf.cell(40, 6, "INCLUDED", new_x="RIGHT", new_y="TOP")
-    pdf.cell(120, 6, "DESCRIPTION", new_x="RIGHT", new_y="TOP")
+    pdf.cell(45, 6, "ITEM / SERVICE", new_x="RIGHT", new_y="TOP")
+    pdf.cell(115, 6, "DESCRIPTION", new_x="RIGHT", new_y="TOP")
     pdf.cell(20, 6, "QTY", new_x="LMARGIN", new_y="NEXT", align="R")
     pdf.set_draw_color(50, 50, 65)
     pdf.line(10, pdf.get_y(), 200, pdf.get_y())

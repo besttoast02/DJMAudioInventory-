@@ -48,6 +48,7 @@
         const componentValue = { text: "", timestamp: 0 }
         
         function setComponentValue(value) {
+            sendMessageToStreamlitClient("streamlit:setComponentValue", { value: value })
             sendMessageToStreamlitClient("setComponentValue", { value: value })
         }
 

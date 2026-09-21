@@ -13,9 +13,7 @@ from custom_widgets import _voice_component
 
 # ── Initialize State ──────────────────────────────────────────
 if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": "You are the DJM Audio AI Assistant. Help customers build rental carts by answering questions about AV gear. Keep your answers concise, conversational, and friendly."}
-    ]
+    st.session_state.messages = []
 
 # ── TTS State ────────────────────────────────────────────────
 if "tts_text" not in st.session_state:
@@ -88,11 +86,13 @@ if user_text:
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
         api_key=openrouter_key,
+        timeout=20.0,
     )
     
     MODELS_TO_TRY = [
         "google/gemini-2.5-flash",
-        "google/gemini-2.5-flash-lite",
+        "openai/gpt-4o-mini",
+        "meta-llama/llama-3.3-70b-instruct",
     ]
     
     def add_item_to_cart(barcode: str, qty: int = 1):
@@ -125,18 +125,51 @@ if user_text:
         import pdf_generator
         import urllib.parse
         
+        c_name = args.get("client_name", "TBD")
+        c_email = args.get("client_email", "")
+        c_phone = args.get("client_phone", "")
+        e_name = args.get("event_name", "TBD")
+        e_date = args.get("event_date", "TBD")
+        v_name = args.get("venue_name", "TBD")
+        v_addr = args.get("venue_address", "TBD")
+        notes = args.get("notes", "")
+
         pdf_bytes = pdf_generator.generate_ai_estimate_pdf(
-            client_name=args.get("client_name", "TBD"),
-            event_name=args.get("event_name", "TBD"),
-            event_date=args.get("event_date", "TBD"),
-            venue_name=args.get("venue_name", "TBD"),
-            venue_address=args.get("venue_address", "TBD"),
+            client_name=c_name,
+            event_name=e_name,
+            event_date=e_date,
+            venue_name=v_name,
+            venue_address=v_addr,
             audio_items=args.get("audio_items", []),
             lighting_items=args.get("lighting_items", []),
             video_items=args.get("video_items", []),
-            notes=args.get("notes", "")
+            notes=notes
         )
         
+        # Log to Database
+        combined_notes = f"AI Generated Proposal\nEmail: {c_email}\nPhone: {c_phone}\n\n{notes}"
+        try:
+            db.create_rental(
+                event_name=e_name,
+                client_name=c_name,
+                client_phone=c_phone,
+                event_date=e_date,
+                return_date=e_date,
+                venue=v_name,
+                notes=combined_notes
+            )
+        except Exception as e:
+            print(f"Failed to log AI rental: {e}")
+
+        # Send Email
+        c_email = c_email.strip()
+        if c_email and "@" in c_email:
+            safe_event = "".join(c if c.isalnum() or c in (' ', '_', '-') else '_' for c in e_name).strip().replace(' ', '_')
+            filename = f"DJM_Estimate_{safe_event or 'Estimate'}.pdf"
+            subject = f"Your DJM Audio Estimate: {e_name}"
+            body = f"Hi {c_name},\n\nThank you for choosing DJM Audio! Attached is your requested estimate for {e_name}.\n\nPlease let us know if you have any questions.\n\nBest,\nDJM Audio Team"
+            db.send_client_email_with_pdf(c_email, subject, body, pdf_bytes, filename)
+
         # Store for the UI to display a download button
         st.session_state.proposal_pdf_bytes = pdf_bytes
         st.session_state.proposal_event_name = args.get("event_name", "Estimate")
@@ -145,7 +178,7 @@ if user_text:
         encoded = urllib.parse.quote(prompt_3d)
         img_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=768&nologo=true"
         
-        return f"Successfully generated the invoice. Tell the user you've created it, and show them this 3D render image directly using markdown: ![3D Render]({img_url})"
+        return f"Successfully generated the invoice and emailed it to {c_email}. Tell the user you've emailed it to them, and show them this 3D render image directly using markdown: ![3D Render]({img_url})"
 
     tools = [
         {
@@ -167,11 +200,13 @@ if user_text:
             "type": "function",
             "function": {
                 "name": "generate_proposal",
-                "description": "Generate an estimate/invoice PDF and a 3D render image for the event. Do this when the user asks for a quote, estimate, or invoice. BEFORE calling this, make sure you ask for the client's name, the event type, the event date, and the venue location. Only call this when you have those details.",
+                "description": "Generate an estimate/invoice PDF and a 3D render image for the event. Do this when the user asks for a quote, estimate, or invoice. BEFORE calling this, make sure you ask for the client's name, email, phone number, the event type, the event date, and the venue location. Only call this when you have those details.",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "client_name": {"type": "string"},
+                        "client_email": {"type": "string"},
+                        "client_phone": {"type": "string"},
                         "event_name": {"type": "string"},
                         "event_date": {"type": "string"},
                         "venue_name": {"type": "string"},
@@ -215,7 +250,7 @@ if user_text:
                         "notes": {"type": "string", "description": "Detailed notes for the proposal."},
                         "prompt_3d": {"type": "string", "description": "A detailed, comma-separated image generation prompt to visualize the setup physically."}
                     },
-                    "required": ["client_name", "event_name", "event_date", "venue_name", "venue_address", "prompt_3d"]
+                    "required": ["client_name", "client_email", "client_phone", "event_name", "event_date", "venue_name", "venue_address", "prompt_3d"]
                 }
             }
         }
@@ -247,7 +282,7 @@ if user_text:
                     # Prepend system prompt to the messages sent to LLM (hidden from UI)
                     system_prompt = {
                         "role": "system",
-                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Always be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them. {setups_str}\n\nWhen a user asks for an estimate or invoice, you MUST first ask them for their name, the event date, and the venue name/location. Once you have that, use the `generate_proposal` tool to create the PDF and 3D render."
+                        "content": f"You are the DJMAudio AI assistant. Help customers build AV rental packages. Act as a consultative salesperson—most customers do NOT know what audio equipment they need. Ask guiding questions like 'What kind of event is it?', 'How many guests are you expecting?', and 'Is it indoor or outdoor?' to recommend the right setup for them.\n\nAlways be polite. Here is the LIVE equipment inventory and prices: {inv_str}. Only suggest items from this list. You can add items to their cart for them. {setups_str}\n\nWhen a user asks for an estimate or quote, you MUST first ask them for their:\n1. Name\n2. Email Address\n3. Phone Number\n4. Event Date\n5. Venue Name & Address\n\nOnce you have gathered ALL of those details, use the `generate_proposal` tool to log the lead, email the PDF, and generate a 3D render."
                     }
                     temp_messages.insert(0, system_prompt)
                     
@@ -294,6 +329,9 @@ if user_text:
                         for m in temp_messages:
                             if m.get("role") == "tool":
                                 st.session_state.messages.append(m)
+
+                    if not ai_reply and not msg.tool_calls:
+                        ai_reply = "I'm here to help with all your DJ and pro audio rental needs! What kind of event are you planning?"
 
                     if ai_reply:
                         st.markdown(ai_reply)

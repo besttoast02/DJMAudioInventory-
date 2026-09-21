@@ -9,6 +9,8 @@ services:
     container_name: djm-web
     restart: unless-stopped
     command: ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.baseUrlPath=/djm-web"]
+    volumes:
+      - ./.streamlit/secrets.toml:/app/.streamlit/secrets.toml:ro
     networks:
       - nexus-network
 
@@ -23,6 +25,7 @@ services:
       DATABASE_PATH: "/app/data/bot_memory.db"
     volumes:
       - djm_bot_data:/app/data
+      - ./.streamlit/secrets.toml:/app/.streamlit/secrets.toml:ro
     networks:
       - nexus-network
 

@@ -35,6 +35,8 @@ def get_display_category(item: dict) -> str:
     name = item.get("name", "").lower()
     if "truss" in name and "clamp" not in name:
         return "Truss"
+    if "stage" in name:
+        return "Stage & Rigging"
     if cat == "Wireless":
         return "Microphones" if "system" in name else "_hidden"
     mapping = {
@@ -45,7 +47,7 @@ def get_display_category(item: dict) -> str:
     }
     return mapping.get(cat, "_hidden")
 
-DISPLAY_ORDER = ["Speakers", "Mic Kits", "Mixers", "Microphones", "Lighting / DMX", "Truss", "Services"]
+DISPLAY_ORDER = ["Speakers", "Mic Kits", "Mixers", "Microphones", "Lighting / DMX", "Truss", "Stage & Rigging", "Services"]
 POPULARITY = {
     "evolve 50": 1, "column pa": 1,
     "xdj-xz": 2, "sq-5": 3, "ddj": 4, "djm": 4,
@@ -112,6 +114,11 @@ for key, info in grouped.items():
 # ── Render catalog cards ─────────────────────────────────────
 for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
     st.subheader(cat)
+    if cat == "Truss":
+        st.info("💡 **Truss Policy:** We focus on renting matching **7' and 10' truss totems in pairs** with heavy steel baseplates and clean white/black scrim covers. Single 5' and 12' segments are also available.", icon=":material/view_column:")
+    elif cat == "Stage & Rigging":
+        st.info("🎭 **Stage Policy:** Modular 4x4 stage decks. **Stage Steps are $50/event**. A sleek **black stage skirt is included FREE** with all stage rentals to cover silver legs. Safety railings and ADA ramps are available upon request based on municipal code requirements.", icon=":material/layers:")
+
     cols = st.columns(3)
     sorted_items = sorted(by_cat[cat], key=lambda x: get_popularity(x[1]["name"]))
 

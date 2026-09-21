@@ -1234,27 +1234,72 @@ def send_email_notification(subject: str, body: str):
 
         # HTML version
         html = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px 12px 0 0;">
-                <h2 style="color: white; margin: 0;">🎵 DJM Audio</h2>
-            </div>
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 0 0 12px 12px; border: 1px solid #e9ecef;">
-                <h3>{subject}</h3>
-                <div style="white-space: pre-wrap; line-height: 1.6;">{body}</div>
-                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 16px 0;">
-                <p style="color: #6c757d; font-size: 12px;">Sent from DJM Audio Inventory System</p>
-            </div>
-        </div>
+        <html>
+          <body style="font-family: sans-serif;">
+            <h3>{subject}</h3>
+            <pre style="white-space: pre-wrap; font-family: inherit;">{body}</pre>
+          </body>
+        </html>
         """
         msg.attach(MIMEText(html, "html"))
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(smtp_user, smtp_pass)
-            server.sendmail(smtp_user, notify_to, msg.as_string())
-
+            server.send_message(msg)
     except Exception as e:
-        # Log but don't crash
-        print(f"Email notification failed: {e}")
+        print(f"Failed to send email notification: {e}")
+
+def send_client_email_with_pdf(client_email: str, subject: str, body: str, pdf_bytes: bytes, filename: str):
+    """Send an email with a PDF attachment to the client and BCC the admin."""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.application import MIMEApplication
+
+    try:
+        smtp_user = get_secret("SMTP_USER")
+        smtp_pass = get_secret("SMTP_APP_PASSWORD")
+        notify_to = get_secret("NOTIFY_EMAIL")
+
+        if not all([smtp_user, smtp_pass]):
+            print("Missing SMTP credentials, skipping client email.")
+            return
+
+        msg = MIMEMultipart("mixed")
+        msg["Subject"] = subject
+        msg["From"] = f"DJM Audio <{smtp_user}>"
+        msg["To"] = client_email
+        
+        # HTML body
+        html = f"""
+        <html>
+          <body style="font-family: sans-serif; color: #333; line-height: 1.6;">
+            <p>{body.replace(chr(10), '<br>')}</p>
+          </body>
+        </html>
+        """
+        alt_body = MIMEMultipart("alternative")
+        alt_body.attach(MIMEText(body, "plain"))
+        alt_body.attach(MIMEText(html, "html"))
+        msg.attach(alt_body)
+
+        # Attach PDF
+        if pdf_bytes:
+            part = MIMEApplication(pdf_bytes, Name=filename)
+            part['Content-Disposition'] = f'attachment; filename="{filename}"'
+            msg.attach(part)
+
+        dest_addrs = [client_email]
+        if notify_to:
+            dest_addrs.append(notify_to)
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(smtp_user, smtp_pass)
+            server.send_message(msg, from_addr=smtp_user, to_addrs=dest_addrs)
+            
+    except Exception as e:
+        print(f"Failed to send client email with PDF: {e}")
+
 
 
 def send_sms_notification(message: str):
@@ -1278,8 +1323,23 @@ def send_sms_notification(message: str):
 
 
 def notify(subject: str, body: str):
-    """Send both email and SMS notifications."""
+    """Send email, Telegram, and SMS notifications."""
     send_email_notification(subject, body)
+    
+    # Telegram alert to the DJ
+    try:
+        import httpx
+        bot_token = get_secret("TELEGRAM_BOT_TOKEN")
+        chat_id = get_secret("TELEGRAM_CHAT_ID")
+        if bot_token and chat_id:
+            tg_text = f"🔔 *{subject}*\n\n{body}"
+            if len(tg_text) > 4000:
+                tg_text = tg_text[:3990] + "\n..."
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            httpx.post(url, json={"chat_id": chat_id, "text": tg_text}, timeout=5.0)
+    except Exception as e:
+        print(f"Telegram notify failed: {e}")
+
     # SMS gets a shortened version
     sms_text = f"DJM Audio: {subject}"
     send_sms_notification(sms_text)

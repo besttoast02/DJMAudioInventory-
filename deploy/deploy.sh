@@ -73,6 +73,8 @@ ssh "${VPS_USER}@${VPS_HOST}" "
 echo -e "${YELLOW}[4/4] Starting services...${NC}"
 ssh "${VPS_USER}@${VPS_HOST}" "
     cd ${REMOTE_DIR}
+    docker compose down || true
+    docker rm -f djm-web djm-bot || true
     docker compose up -d
 "
 

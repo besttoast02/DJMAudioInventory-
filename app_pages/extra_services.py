@@ -139,6 +139,72 @@ with col4:
             st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
+# ── Custom Event Mixes ────────────────────────────────────────
+st.divider()
+st.subheader(":material/album: Custom Event Mixes (Vals & Baile Sorpresa)")
+
+with st.container(border=True):
+    st.markdown("### 🎵 Custom Choreography & Vals Audio Editing")
+    st.markdown("""
+    Need a seamless, studio-grade music edit for your Quinceañera surprise dance or wedding vals? 
+    We produce professional custom mixes with clean transitions, tempo adjustments, sound effects, and clean radio edits.
+    
+    - **Standalone Price:** **$50 per mix** (purchase individually).
+    - **Special Event Bonus:** **Up to 2 Custom Mixes FREE ($100 value)** included complimentary whenever you hire DJM Audio for an event or DJ package!
+    """)
+    m1, m2 = st.columns(2)
+    with m1:
+        if st.button("Add Baile Sorpresa Mix ($50 / Free w/ Event)", key="ex_baile", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            eff_price = pkg.get_effective_price(pkg.SVC_BAILE, st.session_state.cart)
+            rate = eff_price["rate_daily"] if eff_price is not None else 50
+            st.session_state.cart[pkg.SVC_BAILE] = {
+                "name": "Baile Sorpresa Custom Mix", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_BAILE, "qty": 1,
+                "rate_half_day": 0, "rate_daily": rate, "rate_weekend": rate,
+                "max_qty": 2, "is_service": True,
+            }
+            st.toast("🛒 Added Baile Sorpresa mix to cart!", icon="✅")
+            st.rerun()
+    with m2:
+        if st.button("Add Vals Custom Mix ($50 / Free w/ Event)", key="ex_vals", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            eff_price = pkg.get_effective_price(pkg.SVC_VALS, st.session_state.cart)
+            rate = eff_price["rate_daily"] if eff_price is not None else 50
+            st.session_state.cart[pkg.SVC_VALS] = {
+                "name": "Vals Custom Mix", "brand": "DJM Audio",
+                "category": "Services", "barcode": pkg.SVC_VALS, "qty": 1,
+                "rate_half_day": 0, "rate_daily": rate, "rate_weekend": rate,
+                "max_qty": 2, "is_service": True,
+            }
+            st.toast("🛒 Added Vals custom mix to cart!", icon="✅")
+            st.rerun()
+
+# ── Stage Accessories ─────────────────────────────────────────
+st.divider()
+st.subheader("🎭 Modular Stage Accessories")
+
+with st.container(border=True):
+    st.markdown("### 🪜 Stage Steps & Deck Skirting")
+    st.markdown("""
+    Complete your stage setup with safety and sleek aesthetics:
+    
+    - **Stage Access Steps:** **$50 per event** — Heavy-duty modular access steps with non-slip grip treads.
+    - **Black Stage Skirting:** **FREE / Complimentary** included with all stage rentals to elegantly conceal the silver stage legs and under-deck equipment.
+    - **Safety Railing & ADA Ramps:** Available upon request as specialized add-ons based on municipal venue codes and accessibility standards.
+    """)
+    st1, st2 = st.columns(2)
+    with st1:
+        if st.button("Add Stage Steps ($50)", key="ex_stage_steps", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
+            st.session_state.cart["STAGE-STEPS-01"] = {
+                "name": "Stage Steps (Modular Access Stairs)", "brand": "DJM Audio",
+                "category": "Services", "barcode": "STAGE-STEPS-01", "qty": 1,
+                "rate_half_day": 35, "rate_daily": 50, "rate_weekend": 75,
+                "max_qty": 4, "is_service": True,
+            }
+            st.toast("🛒 Added Stage Steps to cart!", icon="✅")
+            st.rerun()
+    with st2:
+        st.markdown("**Black Skirt:** Automatically added *Free* with any stage rental!")
+
 # ── MC & Event Planning ──────────────────────────────────────
 st.divider()
 st.subheader(":material/event_note: MC & Event Planning")

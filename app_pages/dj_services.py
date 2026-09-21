@@ -29,6 +29,7 @@ with col1:
           - 1x Wash Light (ADJ Dotz Flood or PAR)
         - **Effects:** Smoke Machine
         - All lights are intelligently controlled via computer for a synced light show!
+        - **Bonus:** Up to 2 Custom Mixes (Vals / Baile Sorpresa) **FREE** ($100 value)!
         
         **Starting at $800**
         """)
@@ -60,6 +61,7 @@ with col2:
           - 1x Wash Light (ADJ Dotz Flood or PAR)
         - **Effects:** Smoke Machine
         - All lights are intelligently controlled via computer for a synced light show!
+        - **Bonus:** Up to 2 Custom Mixes (Vals / Baile Sorpresa) **FREE** ($100 value)!
         
         **Starting at $1,000**
         """)
@@ -70,13 +72,6 @@ with col2:
                 "rate_half_day": 500, "rate_daily": 1000, "rate_weekend": 1000,
                 "max_qty": 1, "is_service": True,
             }
-            # Auto-add free mixes
-            for bc, name in [(pkg.SVC_VALS, "Vals Custom Mix"), (pkg.SVC_BAILE, "Baile Sorpresa Custom Mix")]:
-                st.session_state.cart[bc] = {
-                    "name": name, "brand": "DJM Audio", "category": "Services",
-                    "barcode": bc, "qty": 1, "rate_half_day": 0, "rate_daily": 0,
-                    "rate_weekend": 0, "max_qty": 1, "is_service": True, "included_free": True,
-                }
             st.toast("🛒 Added to cart!", icon="✅")
             st.rerun()
 
@@ -85,7 +80,7 @@ with col3:
         st.markdown("### 👑 All-Inclusive (Live Band + DJ)")
         st.image("https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800", use_container_width=True)
         st.markdown("""
-        The ultimate wedding package! Save money by combining your DJ setup with full audio engineering for your live band. We share the PA, and our team handles the band's technical rider prior to the event.
+        The ultimate live entertainment package! Combine your DJ setup with full live audio engineering for your band. We share the PA and manage all technical logistics.
         
         **5-hour package includes:**
         - **Professional DJ & Live Audio Engineer**
@@ -96,6 +91,7 @@ with col3:
           - 3x ADJ Dotz Floodz
           - 4x ADJ Inno Pocket Small Moving Heads
           - Full stage uplighting
+        - **Bonus:** Up to 2 Custom Mixes (Vals / Baile Sorpresa) **FREE** ($100 value)!
         
         **Starting at $2,000**
         """)

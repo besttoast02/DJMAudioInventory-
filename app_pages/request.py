@@ -17,6 +17,52 @@ def check_rate_limit() -> bool:
     ]
     return len(st.session_state.submit_timestamps) < MAX_SUBMISSIONS_PER_HOUR
 
+import pdf_generator
+
+# ── Submitted Order Confirmation Screen ─────────────────────
+submitted_order = st.session_state.get("submitted_order")
+if submitted_order:
+    st.balloons()
+    st.title("🎉 Thank You for Your Quote Request!")
+    st.markdown(f"### Hi **{submitted_order['client_name']}**, we've received your request for **{submitted_order['event_name']}**.")
+    
+    st.success(f"An itemized estimate PDF has been emailed to **{submitted_order['client_email']}**.", icon=":material/mark_email_read:")
+    
+    with st.container(border=True):
+        st.markdown("#### Event Summary & Estimate Details")
+        sc1, sc2 = st.columns(2)
+        with sc1:
+            st.markdown(f"**Event Type:** {submitted_order.get('event_type', 'Event')}")
+            st.markdown(f"**Event Date:** {submitted_order.get('event_date', 'TBD')}")
+            st.markdown(f"**Venue:** {submitted_order.get('venue', 'TBD')}")
+        with sc2:
+            st.markdown(f"**Phone:** {submitted_order.get('client_phone', '')}")
+            st.markdown(f"**Review Status:** :green[Received — Under Review (within 24 hrs)]")
+            st.markdown(f"### Estimated Total: :green[${submitted_order.get('total', 0):,.2f}]")
+        
+        st.info("💡 **What Happens Next?** Our production team verifies all gear availability, electrical requirements, and transportation logistics. We will reach out within 24 hours to confirm your booking.", icon=":material/info:")
+        
+        if submitted_order.get("pdf_bytes"):
+            st.download_button(
+                label="📄 Download Estimate PDF",
+                data=submitted_order["pdf_bytes"],
+                file_name=submitted_order.get("filename", "DJM_Estimate.pdf"),
+                mime="application/pdf",
+                type="primary",
+                use_container_width=True
+            )
+            
+    st.markdown("---")
+    oc1, oc2 = st.columns(2)
+    if oc1.button("← Return to Home", use_container_width=True):
+        st.session_state.submitted_order = None
+        st.switch_page("app_pages/home.py")
+    if oc2.button("Start New Rental Quote", use_container_width=True):
+        st.session_state.submitted_order = None
+        st.session_state.checkout_step = 1
+        st.rerun()
+    st.stop()
+
 # ── Page setup ───────────────────────────────────────────────
 cart = st.session_state.get("cart", {})
 selected_addons = st.session_state.get("selected_addons", [])
@@ -133,9 +179,9 @@ elif st.session_state.checkout_step == 2:
             elif guests <= 400:
                 req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
             elif guests <= 1000:
-                req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
+                req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote recommended)", "alert"
             else:
-                req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
+                req, status = "Custom concert-scale PA system (Contact us for custom production quote)", "alert"
         else:
             if guests <= 100:
                 req, status = "2x EV Evolve 50s (Included in base package)", "ok"
@@ -146,9 +192,9 @@ elif st.session_state.checkout_step == 2:
             elif guests <= 400:
                 req, status = "2x dBTech Ingenias + 2x 18\" Subwoofers (Upgrade required)", "warn"
             elif guests <= 800:
-                req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote required)", "alert"
+                req, status = "4x dBTech Ingenias + 4x 18\" Subwoofers (Custom quote recommended)", "alert"
             else:
-                req, status = "Custom concert-scale PA system (Internal note: Extra gear needed)", "alert"
+                req, status = "Custom concert-scale PA system (Contact us for custom production quote)", "alert"
                 
         if status == "ok":
             st.info(f"**Based on {guests} guests ({st.session_state.chk_placement}):**\n{req}")
@@ -202,17 +248,38 @@ elif st.session_state.checkout_step == 3:
     show_addons = False
     
     if has_services or not has_equipment:
-        if event_type == "Quinceañera":
-            show_addons = True
-            st.markdown("### 💃 Baile Sorpresa / Surprise Dance")
-            st.markdown("Would you like us to create a custom mix for your surprise dance? ($50/mix)")
-            st.session_state.chk_add_baile = st.checkbox("Yes, add Baile Sorpresa mix", value=st.session_state.get("chk_add_baile", False))
-            
-        elif event_type == "Wedding":
-            show_addons = True
-            st.markdown("### 👑 Vals Mix")
-            st.markdown("Would you like us to create a custom vals arrangement? ($50/mix)")
-            st.session_state.chk_add_vals = st.checkbox("Yes, add Vals mix", value=st.session_state.get("chk_add_vals", False))
+        show_addons = True
+        st.markdown("### 🎵 Custom Choreography & Vals Mixes")
+        st.markdown(
+            "🎁 **Included FREE with your event booking!** (Up to 2 custom mixes included complimentary, a **$100 value**). "
+            "Need a custom edit for your surprise dance, vals, or grand entrance? Select below:"
+        )
+        c_m1, c_m2 = st.columns(2)
+        with c_m1:
+            st.session_state.chk_add_baile = st.checkbox(
+                "💃 Baile Sorpresa / Surprise Dance Mix (FREE with booking)", 
+                value=st.session_state.get("chk_add_baile", False)
+            )
+        with c_m2:
+            st.session_state.chk_add_vals = st.checkbox(
+                "👑 Vals Custom Mix (FREE with booking)", 
+                value=st.session_state.get("chk_add_vals", False)
+            )
+    elif not has_services and has_equipment:
+        show_addons = True
+        st.markdown("### 🎵 Custom Audio Mixes")
+        st.markdown("Need a custom choreography or vals mix produced? ($50 per mix standalone, or free when booking any DJ package)")
+        c_m1, c_m2 = st.columns(2)
+        with c_m1:
+            st.session_state.chk_add_baile = st.checkbox(
+                "💃 Baile Sorpresa Mix ($50)", 
+                value=st.session_state.get("chk_add_baile", False)
+            )
+        with c_m2:
+            st.session_state.chk_add_vals = st.checkbox(
+                "👑 Vals Custom Mix ($50)", 
+                value=st.session_state.get("chk_add_vals", False)
+            )
 
     if has_equipment:
         show_addons = True
@@ -276,7 +343,7 @@ elif st.session_state.checkout_step == 5:
     # Add optional services if selected
     temp_cart = dict(cart)
     
-    # Mixes are free as long as the client is hiring us for any other event item/package
+    # Mixes are free (up to 2) as long as the client is hiring us for an event
     has_event_items = any(
         item.get("barcode") not in [pkg.SVC_BAILE, pkg.SVC_VALS]
         for item in temp_cart.values()
@@ -385,25 +452,26 @@ elif st.session_state.checkout_step == 5:
     al1, al2, al3 = st.columns(3)
     if al1.button("← Add more gear", use_container_width=True):
         st.switch_page("app_pages/browse.py")
-    if al2.button("← Add services", use_container_width=True):
+    if al2.button("← Add DJ services", use_container_width=True):
         st.switch_page("app_pages/dj_services.py")
-    if al3.button("← Browse gear", use_container_width=True):
-        st.switch_page("app_pages/browse.py")
+    if al3.button("← Add extra services", use_container_width=True):
+        st.switch_page("app_pages/extra_services.py")
 
     st.divider()
     with st.form("final_submit", border=True):
         st.markdown("#### Contact Details")
-        rc1, rc2 = st.columns(2)
+        rc1, rc2, rc3 = st.columns(3)
         client_name = rc1.text_input("Your name *", placeholder="John Doe")
-        client_phone = rc2.text_input("Phone number *", placeholder="(555) 123-4567")
+        client_email = rc2.text_input("Email address *", placeholder="john@example.com")
+        client_phone = rc3.text_input("Phone number *", placeholder="(555) 123-4567")
         
         notes = st.text_area("Additional notes (Optional)", placeholder="Any special requests, setup requirements...", max_chars=1000)
         
         submitted = st.form_submit_button("Submit Rental Request", icon=":material/send:", type="primary", use_container_width=True)
         
         if submitted:
-            if not client_name or not client_phone:
-                st.error("Please fill in your contact details.")
+            if not client_name or not client_phone or not client_email:
+                st.error("Please fill in your contact details (Name, Email, and Phone).")
                 st.stop()
                 
             if not check_rate_limit():
@@ -420,6 +488,9 @@ elif st.session_state.checkout_step == 5:
                 full_notes += f"• {v['qty']}x {v['brand']} {v['name']}\n"
                 
             full_notes += f"\n=== EVENT DETAILS ===\n"
+            full_notes += f"Client: {client_name}\n"
+            full_notes += f"Email: {client_email}\n"
+            full_notes += f"Phone: {client_phone}\n"
             full_notes += f"Event: {st.session_state.chk_event_name} ({st.session_state.chk_event_type})\n"
             full_notes += f"Guests: {st.session_state.chk_guests}\n"
             full_notes += f"Hours: {hours} hrs\n"
@@ -439,18 +510,92 @@ elif st.session_state.checkout_step == 5:
                 estimated_cost=float(total)
             )
             
+            # Send notifications (Email, Telegram, SMS)
             db.notify(f"📋 New Request: {st.session_state.chk_event_name}", full_notes)
             
+            # Generate professional estimate PDF
+            audio_items = []
+            lighting_items = []
+            video_items = []
+            for k, v in temp_cart.items():
+                cat = v.get("category", "")
+                item_dict = {
+                    "name": f"{v.get('brand', '')} {v.get('name', '')}".strip(),
+                    "desc": v.get("category", "Equipment Rental"),
+                    "qty": v.get("qty", 1),
+                    "price": float(v.get("rate_daily", 0.0))
+                }
+                if any(c in cat.lower() for c in ["light", "dmx", "laser", "uplight", "spark"]):
+                    lighting_items.append(item_dict)
+                elif any(c in cat.lower() for c in ["screen", "video", "projector", "panel"]):
+                    video_items.append(item_dict)
+                else:
+                    audio_items.append(item_dict)
+
+            pdf_bytes = pdf_generator.generate_ai_estimate_pdf(
+                client_name=client_name,
+                event_name=st.session_state.chk_event_name,
+                event_date=str(st.session_state.chk_event_date),
+                venue_name=st.session_state.chk_venue,
+                venue_address=st.session_state.chk_venue,
+                audio_items=audio_items,
+                lighting_items=lighting_items,
+                video_items=video_items,
+                notes=full_notes
+            )
+            
+            safe_event = "".join(c if c.isalnum() or c in (' ', '_', '-') else '_' for c in st.session_state.chk_event_name).strip().replace(' ', '_')
+            filename = f"DJM_Estimate_{safe_event or 'Quote'}.pdf"
+            subject = f"DJM Audio Quote Confirmation: {st.session_state.chk_event_name}"
+            email_body = f"""Hi {client_name},
+
+Thank you for choosing DJM Audio Productions!
+
+We have successfully received your rental quote request for {st.session_state.chk_event_name}.
+Attached is your official itemized estimate PDF.
+
+EVENT DETAILS:
+• Event: {st.session_state.chk_event_name} ({st.session_state.chk_event_type})
+• Event Date: {st.session_state.chk_event_date}
+• Venue: {st.session_state.chk_venue}
+• Estimated Total: ${total:,.2f}
+
+NEXT STEPS:
+Our production team verifies gear availability, power requirements, and transportation routes for all bookings. We will reach out to you within 24 hours to finalize details.
+
+If you have any urgent questions, feel free to reply directly to this email or call us at +1 (626) 506-3824.
+
+Best regards,
+DJM Audio Productions Team
+https://djmaudio.com
+"""
+            try:
+                db.send_client_email_with_pdf(client_email, subject, email_body, pdf_bytes, filename)
+            except Exception as e:
+                print(f"Failed to email client PDF: {e}")
+
             # Track submission for rate limiting
             st.session_state.submit_timestamps.append(datetime.now().timestamp())
             
-            # Reset
+            # Save submitted order state for the Thank You screen
+            st.session_state.submitted_order = {
+                "client_name": client_name,
+                "client_email": client_email,
+                "client_phone": client_phone,
+                "event_name": st.session_state.chk_event_name,
+                "event_type": st.session_state.chk_event_type,
+                "event_date": str(st.session_state.chk_event_date),
+                "return_date": str(st.session_state.chk_return_date),
+                "venue": st.session_state.chk_venue,
+                "total": float(total),
+                "pdf_bytes": pdf_bytes,
+                "filename": filename
+            }
+            
+            # Reset cart and redirect to Thank You screen
             st.session_state.cart = {}
             st.session_state.checkout_step = 1
-            
-            st.success("Rental request submitted! We'll review and get back to you within 24 hours.", icon=":material/check_circle:")
-            st.balloons()
-            st.stop()
+            st.rerun()
             
     if st.button("← Back to Scheduling"):
         prev_step()
