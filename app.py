@@ -684,7 +684,6 @@ public_pages = [
     st.Page("app_pages/3d_builder.py", title="Build 3D Setup", icon=":material/view_in_ar:"),
     st.Page("app_pages/dj_services.py", title="DJ Services", icon=":material/headphones:"),
     st.Page("app_pages/live_audio.py", title="Live Audio", icon=":material/graphic_eq:"),
-    st.Page("app_pages/packages.py", title="Packages", icon=":material/celebration:"),
     st.Page("app_pages/extra_services.py", title="Extras", icon=":material/auto_awesome:"),
     st.Page("app_pages/browse.py", title="Rentals", icon=":material/search:"),
     st.Page("app_pages/request.py", title="Checkout", icon=":material/shopping_cart_checkout:"),

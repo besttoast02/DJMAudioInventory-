@@ -136,8 +136,10 @@ for cat in [c for c in DISPLAY_ORDER if c in by_cat]:
                         ext = None
 
                     if ext:
+                        # Escape quotes in the HTML attribute
+                        escaped_name = safe_name.replace('"', '&quot;')
                         st.markdown(
-                            f'<div style="text-align: center;"><img src="/app/static/inventory_images/{safe_name}{ext}" style="max-width:100%; height:auto; max-height:200px; border-radius:8px;" loading="lazy"></div>',
+                            f'<div style="text-align: center;"><img src="/app/static/inventory_images/{escaped_name}{ext}" style="max-width:100%; height:auto; max-height:200px; border-radius:8px;" loading="lazy"></div>',
                             unsafe_allow_html=True
                         )
 
