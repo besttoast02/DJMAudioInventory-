@@ -38,6 +38,7 @@ export default function AdminLayout({
   const navigation = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Rentals & Events", href: "/admin/rentals", icon: CalendarDays },
+    { name: "Create Proposal", href: "/admin/proposals/new", icon: CalendarDays },
     { name: "Categories", href: "/admin/categories", icon: FolderTree },
     { name: "Product Models", href: "/admin/models", icon: PackageSearch },
     { name: "Inventory Assets", href: "/admin/inventory", icon: PackageSearch },
