@@ -70,23 +70,24 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
     );
   };
 
+  // Calculate stage front Z for sparks and subs
+  let stageFrontZ = 0.5; // Default front Z if no stage
+  let stageWidth = 3.0; // Default stage width
+  if (setup.stagePieces >= 4) {
+    const cols = Math.max(2, Math.ceil(Math.sqrt(setup.stagePieces * 2)));
+    const rows = Math.ceil(setup.stagePieces / cols);
+    stageWidth = cols * 1.22;
+    const startZ = -(rows * 1.22) / 2 + 0.61 - 0.5;
+    stageFrontZ = startZ + (rows - 1) * 1.22 + 0.8; // Front edge of the stage + a little buffer
+  }
+
   const renderSparks = () => {
     if (setup.sparkMachines < 1) return null;
     const sparks = [];
-    // Place them at the front edge of the stage or setup
-    // Calculate stage front Z if there's a stage
-    let frontZ = 1.0;
-    if (setup.stagePieces >= 4) {
-      const cols = Math.max(2, Math.ceil(Math.sqrt(setup.stagePieces * 2)));
-      const rows = Math.ceil(setup.stagePieces / cols);
-      const startZ = -(rows * 1.22) / 2 + 0.61 - 0.5;
-      frontZ = startZ + (rows - 1) * 1.22 + 0.5; // Near the front edge
-    }
-
     const startX = -(setup.sparkMachines * 1.0) / 2 + 0.5;
     for (let i = 0; i < setup.sparkMachines; i++) {
       sparks.push(
-        <SparkMachineModel key={`spark-${i}`} position={[startX + i * 1.0, baseElevation, frontZ]} />
+        <SparkMachineModel key={`spark-${i}`} position={[startX + i * 1.0, baseElevation, stageFrontZ - 0.3]} />
       );
     }
     return sparks;
@@ -94,49 +95,55 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
 
   const renderSubs = () => {
     const subs = [];
-    if (setup.subs === 1) subs.push(<Subwoofer key="sub-1" position={[0, baseElevation, 0]} />);
+    // All subs sit on the ground (Y=0) in front of the stage
+    const subZ = stageFrontZ; 
+    
+    if (setup.subs === 1) subs.push(<Subwoofer key="sub-1" position={[0, 0, subZ]} />);
     if (setup.subs === 2) {
-      subs.push(<Subwoofer key="sub-1" position={[-1.5, baseElevation, 0]} />);
-      subs.push(<Subwoofer key="sub-2" position={[1.5, baseElevation, 0]} />);
+      subs.push(<Subwoofer key="sub-1" position={[-0.8, 0, subZ]} />);
+      subs.push(<Subwoofer key="sub-2" position={[0.8, 0, subZ]} />);
     }
     if (setup.subs === 3) {
-      subs.push(<Subwoofer key="sub-1" position={[-2, baseElevation, 0]} />);
-      subs.push(<Subwoofer key="sub-2" position={[0, baseElevation, 0]} />);
-      subs.push(<Subwoofer key="sub-3" position={[2, baseElevation, 0]} />);
+      subs.push(<Subwoofer key="sub-1" position={[-1.6, 0, subZ]} />);
+      subs.push(<Subwoofer key="sub-2" position={[0, 0, subZ]} />);
+      subs.push(<Subwoofer key="sub-3" position={[1.6, 0, subZ]} />);
     }
     if (setup.subs >= 4) {
-      subs.push(<Subwoofer key="sub-1" position={[-2.5, baseElevation, 0]} />);
-      subs.push(<Subwoofer key="sub-2" position={[-0.8, baseElevation, 0]} />);
-      subs.push(<Subwoofer key="sub-3" position={[0.8, baseElevation, 0]} />);
-      subs.push(<Subwoofer key="sub-4" position={[2.5, baseElevation, 0]} />);
+      subs.push(<Subwoofer key="sub-1" position={[-2.4, 0, subZ]} />);
+      subs.push(<Subwoofer key="sub-2" position={[-0.8, 0, subZ]} />);
+      subs.push(<Subwoofer key="sub-3" position={[0.8, 0, subZ]} />);
+      subs.push(<Subwoofer key="sub-4" position={[2.4, 0, subZ]} />);
     }
     return subs;
   };
 
   const renderTops = () => {
     const tops = [];
-    const yOffset = setup.subs > 0 ? 0.3 : 0; // Slightly higher if there are subs
+    // Tops always sit on the ground on stands (Y=0)
+    // We place them flanking the sides of the stage
+    const sideX = Math.max(1.5, (stageWidth / 2) + 0.3);
+    const topZ = stageFrontZ - 0.5; // Slightly behind the subs line
     
     if (setup.tops === 1) {
       // Place it to the side, never block the DJ at [0,0,0]
-      tops.push(<TopSpeaker key="top-1" position={[-1.5, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-1" position={[-sideX, 0, topZ]} />);
     }
     if (setup.tops === 2) {
-      tops.push(<TopSpeaker key="top-1" position={[-1.5, baseElevation + yOffset, 0]} />);
-      tops.push(<TopSpeaker key="top-2" position={[1.5, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-1" position={[-sideX, 0, topZ]} />);
+      tops.push(<TopSpeaker key="top-2" position={[sideX, 0, topZ]} />);
     }
     if (setup.tops === 3) {
-      tops.push(<TopSpeaker key="top-1" position={[-2, baseElevation + yOffset, 0]} />);
-      tops.push(<TopSpeaker key="top-2" position={[-1.5, baseElevation + yOffset, 0]} />);
-      tops.push(<TopSpeaker key="top-3" position={[1.5, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-1" position={[-sideX - 0.8, 0, topZ]} />);
+      tops.push(<TopSpeaker key="top-2" position={[-sideX, 0, topZ]} />);
+      tops.push(<TopSpeaker key="top-3" position={[sideX, 0, topZ]} />);
     }
     if (setup.tops >= 4) {
       // Stack two on the left, two on the right
       const stackOffset = 0.8; // height difference for stacked speaker
-      tops.push(<TopSpeaker key="top-1" position={[-1.5, baseElevation + yOffset, 0]} />);
-      tops.push(<TopSpeaker key="top-2" position={[-1.5, baseElevation + yOffset + stackOffset, 0]} />);
-      tops.push(<TopSpeaker key="top-3" position={[1.5, baseElevation + yOffset, 0]} />);
-      tops.push(<TopSpeaker key="top-4" position={[1.5, baseElevation + yOffset + stackOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-1" position={[-sideX, 0, topZ]} />);
+      tops.push(<TopSpeaker key="top-2" position={[-sideX, stackOffset, topZ]} />);
+      tops.push(<TopSpeaker key="top-3" position={[sideX, 0, topZ]} />);
+      tops.push(<TopSpeaker key="top-4" position={[sideX, stackOffset, topZ]} />);
     }
     return tops;
   };
