@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, Sky } from "@react-three/drei";
-import { Subwoofer, TopSpeaker, TrussTower, DJTable, StageModel, ScreenPanelModel, SparkMachineModel } from "./EquipmentModels";
+import { Subwoofer, TopSpeaker, TrussTower, DJTable, StageModel, ScreenPanelModel, SparkMachineModel, RentalMixerTable, ScreenTrussArch } from "./EquipmentModels";
 import { Suspense } from "react";
 
 interface BuilderCanvasProps {
@@ -10,7 +10,8 @@ interface BuilderCanvasProps {
     subs: number;
     tops: number;
     towers: number;
-    dj: boolean;
+    serviceType: "dj" | "rental";
+    mixer: number;
     stagePieces: number;
     screenPanels: number;
     sparkMachines: number;
@@ -50,7 +51,8 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
     if (setup.screenPanels < 1) return null;
     const screens = [];
     const panelWidth = 0.5;
-    const startX = -(setup.screenPanels * panelWidth) / 2 + (panelWidth / 2);
+    const totalWidth = setup.screenPanels * panelWidth;
+    const startX = -totalWidth / 2 + (panelWidth / 2);
     // Screens go behind the DJ
     const zPos = -1.5; 
     for (let i = 0; i < setup.screenPanels; i++) {
@@ -58,7 +60,14 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
         <ScreenPanelModel key={`screen-${i}`} position={[startX + i * panelWidth, baseElevation, zPos]} />
       );
     }
-    return screens;
+    
+    // Wrap them in a truss arch
+    return (
+      <group key="screens-group">
+        {screens}
+        <ScreenTrussArch width={totalWidth} position={[0, baseElevation, zPos]} />
+      </group>
+    );
   };
 
   const renderSparks = () => {
@@ -106,22 +115,28 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
 
   const renderTops = () => {
     const tops = [];
-    if (setup.tops === 1) tops.push(<TopSpeaker key="top-1" position={[0, baseElevation, 0]} />);
+    const yOffset = setup.subs > 0 ? 0.3 : 0; // Slightly higher if there are subs
+    
+    if (setup.tops === 1) {
+      // Place it to the side, never block the DJ at [0,0,0]
+      tops.push(<TopSpeaker key="top-1" position={[-1.5, baseElevation + yOffset, 0]} />);
+    }
     if (setup.tops === 2) {
-      const yOffset = setup.subs > 0 ? 0.3 : 0; 
       tops.push(<TopSpeaker key="top-1" position={[-1.5, baseElevation + yOffset, 0]} />);
       tops.push(<TopSpeaker key="top-2" position={[1.5, baseElevation + yOffset, 0]} />);
     }
     if (setup.tops === 3) {
-      tops.push(<TopSpeaker key="top-1" position={[-2, baseElevation, 0]} />);
-      tops.push(<TopSpeaker key="top-2" position={[0, baseElevation, 0]} />);
-      tops.push(<TopSpeaker key="top-3" position={[2, baseElevation, 0]} />);
+      tops.push(<TopSpeaker key="top-1" position={[-2, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-2" position={[-1.5, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-3" position={[1.5, baseElevation + yOffset, 0]} />);
     }
     if (setup.tops >= 4) {
-      tops.push(<TopSpeaker key="top-1" position={[-2.5, baseElevation, 0]} />);
-      tops.push(<TopSpeaker key="top-2" position={[-1.5, baseElevation, 0]} />);
-      tops.push(<TopSpeaker key="top-3" position={[1.5, baseElevation, 0]} />);
-      tops.push(<TopSpeaker key="top-4" position={[2.5, baseElevation, 0]} />);
+      // Stack two on the left, two on the right
+      const stackOffset = 0.8; // height difference for stacked speaker
+      tops.push(<TopSpeaker key="top-1" position={[-1.5, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-2" position={[-1.5, baseElevation + yOffset + stackOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-3" position={[1.5, baseElevation + yOffset, 0]} />);
+      tops.push(<TopSpeaker key="top-4" position={[1.5, baseElevation + yOffset + stackOffset, 0]} />);
     }
     return tops;
   };
@@ -191,7 +206,8 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
             {renderSubs()}
             {renderTops()}
             {renderTowers()}
-            {setup.dj && <DJTable position={[0, baseElevation, -0.5]} />}
+            {setup.serviceType === "dj" && <DJTable position={[0, baseElevation, -0.5]} />}
+            {setup.serviceType === "rental" && setup.mixer > 0 && <RentalMixerTable position={[0, baseElevation, -0.5]} />}
             
             <ContactShadows position={[0, 0.01, 0]} opacity={0.4} scale={15} blur={2} far={4} />
           </group>

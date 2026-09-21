@@ -7,13 +7,21 @@ interface BuilderControlsProps {
     subs: number;
     tops: number;
     towers: number;
-    dj: boolean;
+    serviceType: "dj" | "rental";
+    mixer: number;
+    stagePieces: number;
+    screenPanels: number;
+    sparkMachines: number;
   };
   setSetup: React.Dispatch<React.SetStateAction<{
     subs: number;
     tops: number;
     towers: number;
-    dj: boolean;
+    serviceType: "dj" | "rental";
+    mixer: number;
+    stagePieces: number;
+    screenPanels: number;
+    sparkMachines: number;
   }>>;
 }
 
@@ -23,22 +31,34 @@ const MAX_LIMITS = {
   towers: 4,
   stagePieces: 32,
   screenPanels: 32,
-  sparkMachines: 16
+  sparkMachines: 16,
+  mixer: 1
 };
 
 export default function BuilderControls({ setup, setSetup }: BuilderControlsProps) {
   
   const updateQuantity = (key: keyof typeof setup, delta: number) => {
+    if (key === 'serviceType') return;
+    
     setSetup(prev => {
       const current = prev[key] as number;
-      const max = key !== 'dj' ? MAX_LIMITS[key as keyof typeof MAX_LIMITS] : 1;
-      const next = Math.max(0, Math.min(current + delta, max));
+      const max = MAX_LIMITS[key as keyof typeof MAX_LIMITS] || 1;
+      
+      let next = current + delta;
+      
+      // Special logic for Stage and Screens (Jump 0 <-> 4)
+      if ((key === 'stagePieces' || key === 'screenPanels')) {
+        if (current === 0 && delta > 0) next = 4;
+        else if (current === 4 && delta < 0) next = 0;
+      }
+      
+      next = Math.max(0, Math.min(next, max));
       return { ...prev, [key]: next };
     });
   };
 
-  const toggleDJ = () => {
-    setSetup(prev => ({ ...prev, dj: !prev.dj }));
+  const setServiceType = (type: "dj" | "rental") => {
+    setSetup(prev => ({ ...prev, serviceType: type }));
   };
 
   return (
@@ -49,6 +69,22 @@ export default function BuilderControls({ setup, setSetup }: BuilderControlsProp
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Add or remove items to visualize your stage. The 3D render and media examples will update automatically.
         </p>
+      </div>
+
+      {/* Service Type Toggle */}
+      <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-xl">
+        <button
+          onClick={() => setServiceType("dj")}
+          className={`flex-1 py-2 px-4 text-sm font-semibold rounded-lg transition-all ${setup.serviceType === "dj" ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+        >
+          🎧 Hire DJ/Audio Engineer
+        </button>
+        <button
+          onClick={() => setServiceType("rental")}
+          className={`flex-1 py-2 px-4 text-sm font-semibold rounded-lg transition-all ${setup.serviceType === "rental" ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"}`}
+        >
+          📦 Equipment Rental Only
+        </button>
       </div>
 
       <div className="space-y-4">
@@ -143,24 +179,50 @@ export default function BuilderControls({ setup, setSetup }: BuilderControlsProp
           </div>
         </div>
 
-        {/* DJ Station */}
-        <label className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl cursor-pointer">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-xl">
-              <Music className="w-5 h-5" />
+        {/* DJ Station or Rental Mixer */}
+        {setup.serviceType === "dj" ? (
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-green-100 dark:border-green-900/30">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-xl">
+                <Music className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">DJ / Audio Engineer Setup</p>
+                <p className="text-xs text-gray-500">Included with your service</p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-gray-900 dark:text-white">DJ Setup</p>
-              <p className="text-xs text-gray-500">DJ Booth and Mixer</p>
+            <div className="text-sm font-bold text-green-600 dark:text-green-400">Included</div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-xl">
+                <Music className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Pioneer XDJ-XZ Mixer</p>
+                <p className="text-xs text-gray-500">Standalone rental mixer</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => updateQuantity('mixer', -1)}
+                disabled={setup.mixer <= 0}
+                className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <Minus className="w-5 h-5" />
+              </button>
+              <span className="w-4 text-center font-bold text-gray-900 dark:text-white">{setup.mixer}</span>
+              <button 
+                onClick={() => updateQuantity('mixer', 1)}
+                disabled={setup.mixer >= MAX_LIMITS.mixer}
+                className="p-1 text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
           </div>
-          <input 
-            type="checkbox" 
-            checked={setup.dj}
-            onChange={toggleDJ}
-            className="w-5 h-5 text-blue-600 rounded bg-transparent border-gray-300 dark:border-slate-600 focus:ring-blue-500" 
-          />
-        </label>
+        )}
 
         {/* Stage Pieces */}
         <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl">

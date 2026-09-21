@@ -102,6 +102,42 @@ export function DJTable({ position }: { position: [number, number, number] }) {
   );
 }
 
+export function RentalMixerTable({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Folding Table top */}
+      <Box args={[1.2, 0.05, 0.6]} position={[0, 0.8, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#444" />
+      </Box>
+      {/* X-Stand Legs */}
+      <Box args={[0.04, 1.0, 0.04]} position={[-0.4, 0.4, 0]} rotation={[0, 0, Math.PI / 6]} castShadow>
+        <meshStandardMaterial color="#222" metalness={0.5} />
+      </Box>
+      <Box args={[0.04, 1.0, 0.04]} position={[-0.4, 0.4, 0]} rotation={[0, 0, -Math.PI / 6]} castShadow>
+        <meshStandardMaterial color="#222" metalness={0.5} />
+      </Box>
+      <Box args={[0.04, 1.0, 0.04]} position={[0.4, 0.4, 0]} rotation={[0, 0, Math.PI / 6]} castShadow>
+        <meshStandardMaterial color="#222" metalness={0.5} />
+      </Box>
+      <Box args={[0.04, 1.0, 0.04]} position={[0.4, 0.4, 0]} rotation={[0, 0, -Math.PI / 6]} castShadow>
+        <meshStandardMaterial color="#222" metalness={0.5} />
+      </Box>
+      
+      {/* Pioneer XDJ-XZ Mixer representation */}
+      <Box args={[0.9, 0.08, 0.45]} position={[0, 0.865, 0]} castShadow>
+        <meshStandardMaterial color="#1a1a1a" />
+      </Box>
+      {/* Platters */}
+      <Cylinder args={[0.15, 0.15, 0.02]} position={[-0.3, 0.91, 0]} castShadow>
+        <meshStandardMaterial color="#333" metalness={0.8} />
+      </Cylinder>
+      <Cylinder args={[0.15, 0.15, 0.02]} position={[0.3, 0.91, 0]} castShadow>
+        <meshStandardMaterial color="#333" metalness={0.8} />
+      </Cylinder>
+    </group>
+  );
+}
+
 export function StageModel({ position }: { position: [number, number, number] }) {
   // 4x4 ft = 1.22m x 1.22m. Height 1.5ft = 0.45m.
   return (
@@ -120,6 +156,26 @@ export function ScreenPanelModel({ position }: { position: [number, number, numb
       <Box args={[0.5, 1.0, 0.1]} position={[0, 0.5, 0]} castShadow receiveShadow>
         {/* Glowy screen front */}
         <meshStandardMaterial color="#0a0a0a" emissive="#002244" emissiveIntensity={0.8} />
+      </Box>
+    </group>
+  );
+}
+
+export function ScreenTrussArch({ width, position }: { width: number, position: [number, number, number] }) {
+  // A goal-post truss that frames the screen panels perfectly
+  return (
+    <group position={position}>
+      {/* Left Vertical Truss */}
+      <Box args={[0.3, 3, 0.3]} position={[-width / 2 - 0.2, 1.5, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
+      </Box>
+      {/* Right Vertical Truss */}
+      <Box args={[0.3, 3, 0.3]} position={[width / 2 + 0.2, 1.5, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
+      </Box>
+      {/* Top Horizontal Truss */}
+      <Box args={[width + 0.7, 0.3, 0.3]} position={[0, 3.15, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
       </Box>
     </group>
   );

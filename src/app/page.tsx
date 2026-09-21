@@ -13,7 +13,8 @@ export default function BuildYourOwnPage() {
     subs: 0,
     tops: 2,
     towers: 0,
-    dj: true,
+    serviceType: "dj" as "dj" | "rental", // "dj" or "rental"
+    mixer: 0,
     stagePieces: 0,
     screenPanels: 0,
     sparkMachines: 0,
@@ -46,7 +47,8 @@ export default function BuildYourOwnPage() {
     total += setup.tops * 100;
     total += setup.subs * 125;
     total += setup.towers * 75;
-    if (setup.dj) total += 300;
+    if (setup.serviceType === "dj") total += 300;
+    if (setup.serviceType === "rental") total += setup.mixer * 150; // $150 for mixer rental
     total += setup.stagePieces * 65;
     total += setup.screenPanels * 150;
     total += setup.sparkMachines * 150;
@@ -68,7 +70,8 @@ export default function BuildYourOwnPage() {
     if (setup.stagePieces > 0) cartItems.push({ name: "4x4 Stage Platforms", qty: setup.stagePieces, rate_cents: 6500 });
     if (setup.screenPanels > 0) cartItems.push({ name: "LED Video Screen Panels", qty: setup.screenPanels, rate_cents: 15000 });
     if (setup.sparkMachines > 0) cartItems.push({ name: "Cold Spark Machines", qty: setup.sparkMachines, rate_cents: 15000 });
-    if (setup.dj) cartItems.push({ name: "DJ Performance Station", qty: 1, rate_cents: 30000 });
+    if (setup.serviceType === "dj") cartItems.push({ name: "DJ/Audio Engineer Services", qty: 1, rate_cents: 30000 });
+    if (setup.serviceType === "rental" && setup.mixer > 0) cartItems.push({ name: "Pioneer XDJ-XZ Mixer", qty: setup.mixer, rate_cents: 15000 });
 
     try {
       const res = await fetch("/api/checkout", {
