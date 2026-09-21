@@ -65,30 +65,30 @@ st.markdown("""
 /* ── HERO ── */
 .hero-wrapper {
     text-align: center;
-    padding: 3rem 2rem 2rem;
+    padding: 1.5rem 1rem 1rem;
     background: rgba(10,10,15,0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-radius: 24px;
+    border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.08);
     max-width: 860px;
-    margin: 2rem auto 2.5rem;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(217,70,239,0.15);
+    margin: 1rem auto 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(217,70,239,0.15);
 }
 .hero-title {
-    font-size: 3.2rem;
+    font-size: 2.4rem;
     font-weight: 800;
     line-height: 1.15;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     color: #ffffff;
     text-shadow: 0 4px 15px rgba(0,0,0,1);
 }
 .hero-sub {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: rgba(255,255,255,0.9);
     max-width: 620px;
-    margin: 0 auto 0.5rem;
-    line-height: 1.6;
+    margin: 0 auto 0.2rem;
+    line-height: 1.5;
     text-shadow: 0 2px 10px rgba(0,0,0,1);
 }
 
@@ -174,21 +174,13 @@ st.markdown("""
 </script>
 
 <div class="hero-wrapper">
-    <h1 class="hero-title">Pro Audio & Lighting Rental<br>for Live Events in LA.</h1>
+    <h1 class="hero-title">Pro Audio, DJ & Lighting in LA.</h1>
     <p class="hero-sub">
-        Quality gear, reliable delivery, and on-site engineering — wherever your event takes you.
+        Quality gear, reliable delivery, and expert entertainment.
     </p>
 </div>
 """, unsafe_allow_html=True)
 
-# ── Primary CTA ─────────────────────────────────────────────
-hc1, hc2, hc3 = st.columns([1, 1, 1])
-with hc2:
-    if st.button("Browse Gear →", type="primary", use_container_width=True, key="hero_browse_btn"):
-        st.switch_page("app_pages/browse.py")
-
-st.markdown("<div style='height:2rem'></div>", unsafe_allow_html=True)
-st.divider()
 
 # ── Navigation Grid ─────────────────────────────────────────
 st.markdown("""
@@ -204,10 +196,10 @@ st.markdown("""
     gap: 1.4rem;
     margin-bottom: 1.4rem;
   }
-  @media (max-width: 900px) {
+  @media (max-width: 1024px) {
     .glass-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   }
-  @media (max-width: 500px) {
+  @media (max-width: 600px) {
     .glass-grid { grid-template-columns: 1fr; }
   }
   .glass-card {
@@ -218,18 +210,32 @@ st.markdown("""
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: 22px;
-    padding: 2rem 1.8rem 1.7rem;
+    padding: 2.2rem 1.8rem 2rem;
     cursor: pointer;
     transition: transform 0.22s ease, box-shadow 0.22s ease,
                 background 0.22s ease, border-color 0.22s ease;
-    box-shadow: 0 4px 28px rgba(0,0,0,0.28),
+    box-shadow: 0 6px 30px rgba(0,0,0,0.35),
                 inset 0 1px 0 rgba(255,255,255,0.18);
     text-decoration: none !important;
     color: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     position: relative;
     overflow: hidden;
   }
+  
+  /* Highlighted cards for DJ and Live Audio */
+  .glass-card.highlight {
+    background: linear-gradient(135deg,
+      rgba(130,60,255,0.15) 0%,
+      rgba(255,255,255,0.08) 100%);
+    border: 1px solid rgba(160,100,255,0.4);
+    box-shadow: 0 8px 35px rgba(130,60,255,0.25),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+
   .glass-card,
   .glass-card:link,
   .glass-card:visited,
@@ -251,54 +257,56 @@ st.markdown("""
   .glass-card:hover {
     transform: translateY(-5px) scale(1.02);
     background: linear-gradient(135deg,
-      rgba(160,100,255,0.22) 0%,
-      rgba(255,255,255,0.08) 100%);
-    border-color: rgba(160,100,255,0.55);
-    box-shadow: 0 12px 40px rgba(130,60,255,0.30),
-                0 0 0 1px rgba(160,100,255,0.3),
-                inset 0 1px 0 rgba(255,255,255,0.22);
+      rgba(160,100,255,0.25) 0%,
+      rgba(255,255,255,0.12) 100%);
+    border-color: rgba(160,100,255,0.65);
+    box-shadow: 0 12px 40px rgba(130,60,255,0.40),
+                0 0 0 1px rgba(160,100,255,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
   }
   .glass-card:active {
     transform: translateY(-2px) scale(1.005);
   }
   .glass-icon {
-    font-size: 2.4rem;
-    margin-bottom: 0.8rem;
+    font-size: 3rem;
+    margin-bottom: 1rem;
     display: block;
   }
   .glass-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.97);
-    margin: 0 0 0.6rem;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: rgba(255,255,255,1);
+    margin: 0 0 0.8rem;
     letter-spacing: -0.01em;
     text-decoration: none !important;
   }
   .glass-desc {
-    font-size: 0.88rem;
-    color: rgba(200,200,220,0.72);
-    line-height: 1.65;
+    font-size: 1.05rem;
+    color: rgba(220,220,235,0.9);
+    line-height: 1.6;
     margin: 0;
+    font-weight: 500;
     text-decoration: none !important;
   }
   .glass-arrow {
     display: inline-block;
-    margin-top: 1.1rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: rgba(180,140,255,0.90);
-    letter-spacing: 0.02em;
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c09fff;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
   }
 </style>
 
 <div class="glass-grid">
-  <a class="glass-card" href="?page=dj_services">
+  <a class="glass-card highlight" href="?page=dj_services">
     <span class="glass-icon">🎧</span>
     <p class="glass-title">DJ Services</p>
     <p class="glass-desc">Full DJ packages, MC services, and sound production for any event.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=live_audio">
+  <a class="glass-card highlight" href="?page=live_audio">
     <span class="glass-icon">🎙️</span>
     <p class="glass-title">Live Audio</p>
     <p class="glass-desc">PA systems, microphones, mixers, and stage sound for live performances.</p>

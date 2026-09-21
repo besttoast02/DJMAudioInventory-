@@ -15,6 +15,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     with st.container(border=True):
         st.markdown("### 🎉 Party DJ")
+        st.image("https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800", use_column_width=True)
         st.markdown("""
         Perfect for birthdays, house parties, and casual events.
         
@@ -41,6 +42,7 @@ with col2:
     with st.container(border=True):
         st.markdown("### 💍 Wedding DJ")
         st.badge("Most Popular", color="violet")
+        st.image("https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=800", use_column_width=True)
         st.markdown("""
         Your dream wedding deserves the perfect soundtrack.
         
@@ -50,7 +52,6 @@ with col2:
         - Premium PA & subwoofer system
         - Dance floor lighting package
         - Wireless microphone for speeches
-        - Detailed timeline planning
         - MC services for full event
         
         **Starting at $1,200**
@@ -75,6 +76,7 @@ with col2:
 with col3:
     with st.container(border=True):
         st.markdown("### 🏢 Corporate Event")
+        st.image("https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800", use_column_width=True)
         st.markdown("""
         Elevate your corporate functions with premium sound.
         
@@ -110,7 +112,5 @@ st.markdown("""
 - ✅ Fully licensed and insured (LLC)
 - ✅ Bilingual MC services (English & Spanish)
 - ✅ Professional-grade equipment (Allen & Heath, DbTech, Shure)
-- ✅ Backup equipment always on hand
-- ✅ Detailed event timeline and planning
 - ✅ Serving the greater Los Angeles area
 """)
