@@ -1,7 +1,6 @@
 "use client";
 
 import { Box, Cylinder, Sphere } from "@react-three/drei";
-import * as THREE from "three";
 
 // Colors for our placeholders to look somewhat professional
 const SPEAKER_COLOR = "#111111";
@@ -99,6 +98,44 @@ export function DJTable({ position }: { position: [number, number, number] }) {
       <Box args={[1.2, 0.1, 0.5]} position={[0, 0.975, 0]} castShadow>
         <meshStandardMaterial color="#222" />
       </Box>
+    </group>
+  );
+}
+
+export function StageModel({ position }: { position: [number, number, number] }) {
+  // 4x4 ft = 1.22m x 1.22m. Height 1.5ft = 0.45m.
+  return (
+    <group position={position}>
+      <Box args={[1.22, 0.45, 1.22]} position={[0, 0.225, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#1a1a1a" roughness={1.0} />
+      </Box>
+    </group>
+  );
+}
+
+export function ScreenPanelModel({ position }: { position: [number, number, number] }) {
+  // 20" x 40" = ~0.5m x 1m. Depth 0.1m
+  return (
+    <group position={position}>
+      <Box args={[0.5, 1.0, 0.1]} position={[0, 0.5, 0]} castShadow receiveShadow>
+        {/* Glowy screen front */}
+        <meshStandardMaterial color="#0a0a0a" emissive="#002244" emissiveIntensity={0.8} />
+      </Box>
+    </group>
+  );
+}
+
+export function SparkMachineModel({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Base */}
+      <Box args={[0.2, 0.25, 0.2]} position={[0, 0.125, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#222" />
+      </Box>
+      {/* Spark effect (yellow glowing cone) */}
+      <Cylinder args={[0.01, 0.1, 1.5]} position={[0, 1.0, 0]} castShadow={false}>
+        <meshBasicMaterial color="#ffaa00" transparent opacity={0.6} />
+      </Cylinder>
     </group>
   );
 }

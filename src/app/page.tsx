@@ -13,7 +13,10 @@ export default function BuildYourOwnPage() {
     subs: 0,
     tops: 2,
     towers: 0,
-    dj: true
+    dj: true,
+    stagePieces: 0,
+    screenPanels: 0,
+    sparkMachines: 0,
   });
 
   const [formData, setFormData] = useState({
@@ -44,6 +47,9 @@ export default function BuildYourOwnPage() {
     total += setup.subs * 125;
     total += setup.towers * 75;
     if (setup.dj) total += 300;
+    total += setup.stagePieces * 65;
+    total += setup.screenPanels * 150;
+    total += setup.sparkMachines * 150;
     return total;
   };
 
@@ -59,6 +65,9 @@ export default function BuildYourOwnPage() {
     if (setup.tops > 0) cartItems.push({ name: "Main Audio PA Speakers", qty: setup.tops, rate_cents: 10000 });
     if (setup.subs > 0) cartItems.push({ name: "Subwoofers (Bass Reinforcement)", qty: setup.subs, rate_cents: 12500 });
     if (setup.towers > 0) cartItems.push({ name: "Lighting Towers (Moving Heads/Wash)", qty: setup.towers, rate_cents: 7500 });
+    if (setup.stagePieces > 0) cartItems.push({ name: "4x4 Stage Platforms", qty: setup.stagePieces, rate_cents: 6500 });
+    if (setup.screenPanels > 0) cartItems.push({ name: "LED Video Screen Panels", qty: setup.screenPanels, rate_cents: 15000 });
+    if (setup.sparkMachines > 0) cartItems.push({ name: "Cold Spark Machines", qty: setup.sparkMachines, rate_cents: 15000 });
     if (setup.dj) cartItems.push({ name: "DJ Performance Station", qty: 1, rate_cents: 30000 });
 
     try {
