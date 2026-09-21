@@ -45,7 +45,7 @@ export function HeaderClient({ navLinks }: HeaderClientProps) {
           href="/quote"
           className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-medium transition-all shadow-sm shadow-blue-500/20"
         >
-          Get My Event Quote
+          Build 3D Setup
         </Link>
       </div>
 
@@ -94,7 +94,7 @@ export function HeaderClient({ navLinks }: HeaderClientProps) {
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center justify-center bg-blue-700 text-white py-3 rounded-xl font-bold text-lg shadow-md"
             >
-              Get My Event Quote
+              Build 3D Setup
             </Link>
           </div>
         </div>

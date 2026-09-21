@@ -3,6 +3,7 @@ import { HeaderClient } from "./HeaderClient";
 
 const NAV_LINKS = [
   { name: "Services", href: "/#services" },
+  { name: "3D Builder", href: "/quote" },
   { name: "Rentals", href: "/equipment-rentals" },
   { name: "Reviews", href: "/reviews" },
   { name: "About", href: "/about" },
