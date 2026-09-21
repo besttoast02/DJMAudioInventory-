@@ -18,34 +18,88 @@ interface ProposalSceneProps {
   items: SceneItem[];
 }
 
-const ItemMesh = ({ item }: { item: SceneItem }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+const SpeakerModel = ({ color }: { color: string }) => {
+  return (
+    <group>
+      {/* Main Cabinet */}
+      <mesh castShadow receiveShadow position={[0, 0, 0]}>
+        <boxGeometry args={[1, 1.8, 1]} />
+        <meshStandardMaterial color={color} roughness={0.9} metalness={0.1} />
+      </mesh>
+      {/* Woofer (Bottom) */}
+      <mesh position={[0, -0.4, 0.51]}>
+        <cylinderGeometry args={[0.35, 0.35, 0.05, 32]} />
+        <meshStandardMaterial color="#111" roughness={0.7} />
+      </mesh>
+      <mesh position={[0, -0.4, 0.53]}>
+        <cylinderGeometry args={[0.1, 0.1, 0.02, 32]} />
+        <meshStandardMaterial color="#222" roughness={0.5} />
+      </mesh>
+      {/* Tweeter (Top) */}
+      <mesh position={[0, 0.4, 0.51]}>
+        <cylinderGeometry args={[0.15, 0.15, 0.05, 32]} />
+        <meshStandardMaterial color="#111" roughness={0.7} />
+      </mesh>
+      {/* Grill texture placeholder or details */}
+      <mesh position={[0, 0, 0.505]}>
+        <boxGeometry args={[0.9, 1.7, 0.01]} />
+        <meshStandardMaterial color="#1a1a1a" roughness={0.8} transparent opacity={0.6} />
+      </mesh>
+    </group>
+  );
+};
 
-  // Use a cylinder for lighting fixtures to make them distinct from speakers (boxes)
+const LightModel = ({ color }: { color: string }) => {
+  return (
+    <group>
+      {/* Base */}
+      <mesh castShadow receiveShadow position={[0, -0.4, 0]}>
+        <boxGeometry args={[0.6, 0.2, 0.6]} />
+        <meshStandardMaterial color="#111" roughness={0.8} />
+      </mesh>
+      {/* Yoke (Arms) */}
+      <mesh castShadow position={[-0.25, 0, 0]}>
+        <boxGeometry args={[0.1, 0.8, 0.2]} />
+        <meshStandardMaterial color="#222" roughness={0.7} />
+      </mesh>
+      <mesh castShadow position={[0.25, 0, 0]}>
+        <boxGeometry args={[0.1, 0.8, 0.2]} />
+        <meshStandardMaterial color="#222" roughness={0.7} />
+      </mesh>
+      {/* Head */}
+      <mesh castShadow position={[0, 0.2, 0]} rotation={[Math.PI / 4, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.25, 0.4, 32]} />
+        <meshStandardMaterial color="#111" roughness={0.6} />
+      </mesh>
+      {/* Lens */}
+      <mesh castShadow position={[0, 0.2, 0.21]} rotation={[Math.PI / 4, 0, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 0.42, 32]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.2} metalness={0.8} />
+      </mesh>
+    </group>
+  );
+};
+
+const ItemMesh = ({ item }: { item: SceneItem }) => {
+  const groupRef = useRef<THREE.Group>(null);
   const isLighting = item.category.toLowerCase().includes('light');
 
+  // Calculate scaling based on item size compared to our base model sizes (which are roughly 1x1.8x1 for speakers)
+  const scaleX = item.size[0] / (isLighting ? 0.6 : 1);
+  const scaleY = item.size[1] / (isLighting ? 1.0 : 1.8);
+  const scaleZ = item.size[2] / (isLighting ? 0.6 : 1);
+
   return (
-    <mesh 
-      ref={meshRef} 
+    <group 
+      ref={groupRef} 
       position={item.position} 
-      castShadow
-      receiveShadow
+      scale={[scaleX, scaleY, scaleZ]}
       onClick={(e) => {
         e.stopPropagation();
-        // Future: Highlight item or show tooltip
       }}
     >
-      {isLighting ? (
-        <cylinderGeometry args={[item.size[0]/2, item.size[0]/2, item.size[1], 16]} />
-      ) : (
-        <boxGeometry args={item.size} />
-      )}
-      <meshStandardMaterial 
-        color={item.color} 
-        roughness={0.6}
-        metalness={0.2}
-      />
-    </mesh>
+      {isLighting ? <LightModel color={item.color} /> : <SpeakerModel color={item.color} />}
+    </group>
   );
 };
 
