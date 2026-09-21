@@ -4,6 +4,8 @@ import package_config as pkg
 st.title(":material/celebration: Packages & Event Planning")
 st.markdown("Complete event packages with DJ, sound, lighting, and special effects — all in one booking.")
 
+st.info("💡 **Looking for a custom setup?** Try our new [Interactive 3D Quote Builder](/?page=3d_builder) to visually design your own package!")
+
 # ── Initialize cart ──────────────────────────────────────────
 if "cart" not in st.session_state:
     st.session_state.cart = {}

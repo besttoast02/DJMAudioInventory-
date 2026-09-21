@@ -300,6 +300,12 @@ st.markdown("""
 </style>
 
 <div class="glass-grid">
+  <a class="glass-card highlight" style="background: linear-gradient(135deg, rgba(99,102,241,0.25) 0%, rgba(217,70,239,0.15) 100%); border-color: rgba(217,70,239,0.5);" href="?page=3d_builder">
+    <span class="glass-icon">🧊</span>
+    <p class="glass-title">Interactive 3D Builder</p>
+    <p class="glass-desc">Visually design your audio and lighting setup in 3D and get an instant quote.</p>
+    <span class="glass-arrow">Build Now →</span>
+  </a>
   <a class="glass-card highlight" href="?page=dj_services">
     <span class="glass-icon">🎧</span>
     <p class="glass-title">DJ Services</p>
@@ -353,7 +359,8 @@ st.markdown("""
 
 # Hidden Streamlit buttons — triggered by query param from glass cards
 _qp = st.query_params.get("page", "")
-if _qp == "dj_services":    st.switch_page("app_pages/dj_services.py")
+if _qp == "3d_builder":     st.switch_page("app_pages/3d_builder.py")
+elif _qp == "dj_services":  st.switch_page("app_pages/dj_services.py")
 elif _qp == "live_audio":   st.switch_page("app_pages/live_audio.py")
 elif _qp == "packages":     st.switch_page("app_pages/packages.py")
 elif _qp == "extras":       st.switch_page("app_pages/extra_services.py")

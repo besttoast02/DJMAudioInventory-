@@ -85,7 +85,7 @@ with col3:
         st.markdown("### 👑 All-Inclusive (Live Band + DJ)")
         st.image("https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800", use_container_width=True)
         st.markdown("""
-        The ultimate wedding package! Save money by combining your DJ setup with full audio engineering for your live band. We share the PA, and I handle the band's technical rider prior to the event.
+        The ultimate wedding package! Save money by combining your DJ setup with full audio engineering for your live band. We share the PA, and our team handles the band's technical rider prior to the event.
         
         **5-hour package includes:**
         - **Professional DJ & Live Audio Engineer**
