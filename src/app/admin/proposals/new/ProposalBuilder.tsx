@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 interface InventoryItem {
@@ -63,7 +63,6 @@ const PRESET_PACKAGES = [
 
 export default function ProposalBuilder({ inventory }: ProposalBuilderProps) {
   const router = useRouter();
-  const supabase = createClientComponentClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
 
