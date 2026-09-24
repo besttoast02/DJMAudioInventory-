@@ -43,29 +43,94 @@ export function TopSpeaker({ position }: { position: [number, number, number] })
 }
 
 export function TrussTower({ position, hasLight = true }: { position: [number, number, number], hasLight?: boolean }) {
+  // Global Truss F34 is 290mm (0.29m) square
+  const offset = 0.13;
+  const height = 2.0;
+
   return (
     <group position={position}>
-      {/* Base Plate */}
-      <Box args={[0.8, 0.05, 0.8]} position={[0, 0.025, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.6} roughness={0.4} />
+      {/* Heavy Steel Base Plate */}
+      <Box args={[0.8, 0.03, 0.8]} position={[0, 0.015, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#1a1a1a" metalness={0.7} roughness={0.3} />
       </Box>
-      {/* Truss Structure (simplified as a textured or metallic cylinder/box) */}
-      <Box args={[0.3, 2, 0.3]} position={[0, 1.025, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.8} roughness={0.3} wireframe={true} />
-      </Box>
-      
-      {/* Moving Head Light on top */}
-      {hasLight && (
-        <group position={[0, 2.15, 0]}>
-          <Box args={[0.2, 0.1, 0.2]} castShadow>
-             <meshStandardMaterial color="#1a1a1a" />
+
+      {/* Hex Uplight placed inside the base of the truss */}
+      <group position={[0, 0.08, 0]}>
+        <Box args={[0.18, 0.1, 0.18]} castShadow>
+          <meshStandardMaterial color="#000" roughness={0.9} />
+        </Box>
+        <Sphere args={[0.07, 16, 16]} position={[0, 0.06, 0]}>
+          <meshStandardMaterial color="#222" emissive={LIGHT_COLOR} emissiveIntensity={2.5} />
+        </Sphere>
+        {/* Uplight glow internal to the truss */}
+        <Cylinder args={[0.15, 0.05, height - 0.2]} position={[0, height / 2 - 0.1, 0]}>
+          <meshBasicMaterial color={LIGHT_COLOR} transparent opacity={0.15} depthWrite={false} />
+        </Cylinder>
+      </group>
+
+      {/* 4 Aluminum Chords for Truss */}
+      <Cylinder args={[0.025, 0.025, height]} position={[-offset, height / 2 + 0.03, -offset]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.9} roughness={0.2} />
+      </Cylinder>
+      <Cylinder args={[0.025, 0.025, height]} position={[offset, height / 2 + 0.03, -offset]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.9} roughness={0.2} />
+      </Cylinder>
+      <Cylinder args={[0.025, 0.025, height]} position={[-offset, height / 2 + 0.03, offset]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.9} roughness={0.2} />
+      </Cylinder>
+      <Cylinder args={[0.025, 0.025, height]} position={[offset, height / 2 + 0.03, offset]} castShadow receiveShadow>
+        <meshStandardMaterial color={TRUSS_COLOR} metalness={0.9} roughness={0.2} />
+      </Cylinder>
+
+      {/* Simple horizontal brace representation to imply F34 structure */}
+      {[0.5, 1.0, 1.5, 2.0].map((y, i) => (
+        <group key={`brace-${i}`} position={[0, y, 0]}>
+          <Box args={[0.26, 0.015, 0.26]} castShadow receiveShadow>
+             <meshStandardMaterial color={TRUSS_COLOR} metalness={0.9} roughness={0.2} />
           </Box>
-          <Sphere args={[0.15, 16, 16]} position={[0, 0.15, 0]} castShadow>
-            <meshStandardMaterial color="#222" emissive={LIGHT_COLOR} emissiveIntensity={0.5} />
+        </group>
+      ))}
+
+      {/* Wash Light at 3/4 height facing crowd (z is front) */}
+      <group position={[0, height * 0.75, offset + 0.06]} rotation={[Math.PI / 6, 0, 0]}>
+        <Box args={[0.2, 0.12, 0.1]} castShadow>
+          <meshStandardMaterial color="#111" />
+        </Box>
+        {/* Wash LEDs */}
+        <Box args={[0.18, 0.1, 0.02]} position={[0, 0, 0.05]}>
+          <meshStandardMaterial color="#fff" emissive="#ff0088" emissiveIntensity={1.2} />
+        </Box>
+        {/* Wash beam */}
+        <Cylinder args={[0.8, 0.1, 2.5]} position={[0, -1.2, 1.0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <meshBasicMaterial color="#ff0088" transparent opacity={0.08} depthWrite={false} />
+        </Cylinder>
+      </group>
+
+      {/* Lightjoy Mobile Head on top */}
+      {hasLight && (
+        <group position={[0, height + 0.05, 0]}>
+          {/* Base */}
+          <Box args={[0.22, 0.08, 0.22]} position={[0, 0.04, 0]} castShadow>
+             <meshStandardMaterial color="#1a1a1a" roughness={0.7} />
+          </Box>
+          {/* Yoke Arms */}
+          <Box args={[0.04, 0.2, 0.15]} position={[-0.11, 0.15, 0]} castShadow>
+             <meshStandardMaterial color="#1a1a1a" roughness={0.7} />
+          </Box>
+          <Box args={[0.04, 0.2, 0.15]} position={[0.11, 0.15, 0]} castShadow>
+             <meshStandardMaterial color="#1a1a1a" roughness={0.7} />
+          </Box>
+          {/* Head Sphere */}
+          <Sphere args={[0.12, 16, 16]} position={[0, 0.22, 0]} castShadow>
+             <meshStandardMaterial color="#222" roughness={0.5} />
           </Sphere>
-          {/* Light Beam visualization */}
-          <Cylinder args={[0.01, 1.5, 4]} position={[0, 2, 0]} rotation={[Math.PI/6, 0, 0]}>
-            <meshBasicMaterial color={LIGHT_COLOR} transparent opacity={0.1} depthWrite={false} />
+          {/* Lens */}
+          <Cylinder args={[0.08, 0.08, 0.02]} position={[0, 0.22, 0.11]} rotation={[Math.PI / 2, 0, 0]}>
+             <meshStandardMaterial color="#fff" emissive={LIGHT_COLOR} emissiveIntensity={1.5} />
+          </Cylinder>
+          {/* Moving Head Beam (angled out) */}
+          <Cylinder args={[0.4, 0.05, 5]} position={[0, 2.5, 2.5]} rotation={[-Math.PI / 4, 0, 0]}>
+             <meshBasicMaterial color={LIGHT_COLOR} transparent opacity={0.12} depthWrite={false} />
           </Cylinder>
         </group>
       )}

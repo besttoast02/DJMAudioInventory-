@@ -16,13 +16,32 @@ import {
   ScreenTrussArch 
 } from "./EquipmentModels";
 import { STAGE_CONFIGS, SetupState } from "./BuilderControls";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 
 interface BuilderCanvasProps {
   setup: SetupState;
 }
 
 export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
+  const controlsRef = useRef<any>(null);
+
+  const handleZoomIn = () => {
+    if (controlsRef.current) {
+      const camera = controlsRef.current.object;
+      const target = controlsRef.current.target;
+      camera.position.lerp(target, 0.2); // move 20% closer
+      controlsRef.current.update();
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (controlsRef.current) {
+      const camera = controlsRef.current.object;
+      const target = controlsRef.current.target;
+      camera.position.sub(target).multiplyScalar(1.25).add(target); // move 25% further
+      controlsRef.current.update();
+    }
+  };
   
   // Elevation based on stage presence. 0.45m is standard stage height.
   const baseElevation = setup.stagePieces >= 4 ? 0.45 : 0;
@@ -197,7 +216,7 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
     }
     if (setup.towers === 3) {
       towers.push(<TrussTower key="tower-1" position={[-xSpread, 0, zPos]} />);
-      towers.push(<TrussTower key="tower-2" position={[0, 0, zPos + 1]} />);
+      towers.push(<TrussTower key="tower-2" position={[0, 0, -2.5]} />);
       towers.push(<TrussTower key="tower-3" position={[xSpread, 0, zPos]} />);
     }
     if (setup.towers >= 4) {
@@ -265,6 +284,8 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
           </group>
 
           <OrbitControls 
+            ref={controlsRef}
+            enableZoom={false}
             minPolarAngle={0.05} 
             maxPolarAngle={Math.PI / 2 - 0.05} // Prevent camera going under the floor
             minDistance={2.5}
@@ -290,6 +311,24 @@ export default function BuilderCanvas({ setup }: BuilderCanvasProps) {
           {setup.archTruss && ` + 32' Arch Truss`}
         </div>
       )}
+
+      {/* Bottom Right Zoom Controls */}
+      <div className="absolute bottom-3 right-3 flex flex-col gap-2 pointer-events-auto z-10">
+        <button 
+          onClick={handleZoomIn}
+          className="w-10 h-10 bg-black/65 text-white rounded-full flex items-center justify-center backdrop-blur-md shadow-lg border border-white/10 hover:bg-black/80 transition-colors"
+          title="Zoom In"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </button>
+        <button 
+          onClick={handleZoomOut}
+          className="w-10 h-10 bg-black/65 text-white rounded-full flex items-center justify-center backdrop-blur-md shadow-lg border border-white/10 hover:bg-black/80 transition-colors"
+          title="Zoom Out"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </button>
+      </div>
     </div>
   );
 }
