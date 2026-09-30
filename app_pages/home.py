@@ -300,55 +300,55 @@ st.markdown("""
 </style>
 
 <div class="glass-grid">
-  <a class="glass-card highlight" style="background: linear-gradient(135deg, rgba(99,102,241,0.25) 0%, rgba(217,70,239,0.15) 100%); border-color: rgba(217,70,239,0.5);" href="?page=3d_builder">
+  <a class="glass-card highlight" style="background: linear-gradient(135deg, rgba(99,102,241,0.25) 0%, rgba(217,70,239,0.15) 100%); border-color: rgba(217,70,239,0.5);" href="?page=3d_builder" target="_self">
     <span class="glass-icon">🧊</span>
     <p class="glass-title">Interactive 3D Builder</p>
     <p class="glass-desc">Visually design your audio and lighting setup in 3D and get an instant quote.</p>
     <span class="glass-arrow">Build Now →</span>
   </a>
-  <a class="glass-card highlight" href="?page=dj_services">
+  <a class="glass-card highlight" href="?page=dj_services" target="_self">
     <span class="glass-icon">🎧</span>
     <p class="glass-title">DJ Services</p>
     <p class="glass-desc">Full DJ packages, MC services, and sound production for any event.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card highlight" href="?page=live_audio">
+  <a class="glass-card highlight" href="?page=live_audio" target="_self">
     <span class="glass-icon">🎙️</span>
     <p class="glass-title">Live Audio</p>
     <p class="glass-desc">PA systems, microphones, mixers, and stage sound for live performances.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=song_request">
+  <a class="glass-card" href="?page=song_request" target="_self">
     <span class="glass-icon">🎵</span>
     <p class="glass-title">Song Request</p>
     <p class="glass-desc">Submit song requests for your upcoming event so we can prepare your playlist.</p>
     <span class="glass-arrow">Request →</span>
   </a>
-  <a class="glass-card" href="?page=extras">
+  <a class="glass-card" href="?page=extras" target="_self">
     <span class="glass-icon">✨</span>
     <p class="glass-title">Extras</p>
     <p class="glass-desc">Add-ons: lighting, uplighting, fog, truss, and specialty effects.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=rentals">
+  <a class="glass-card" href="?page=rentals" target="_self">
     <span class="glass-icon">🔍</span>
     <p class="glass-title">Rentals</p>
     <p class="glass-desc">Browse individual gear by category — speakers, mics, lighting, and more.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=checkout">
+  <a class="glass-card" href="?page=checkout" target="_self">
     <span class="glass-icon">🛒</span>
     <p class="glass-title">Checkout</p>
     <p class="glass-desc">Review your cart and submit a rental request with your event details.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=ai">
+  <a class="glass-card" href="?page=ai" target="_self">
     <span class="glass-icon">🤖</span>
     <p class="glass-title">AI Assistant</p>
     <p class="glass-desc">Chat with our AI to get gear recommendations for your event type and budget.</p>
     <span class="glass-arrow">Explore →</span>
   </a>
-  <a class="glass-card" href="?page=contact">
+  <a class="glass-card" href="?page=contact" target="_self">
     <span class="glass-icon">✉️</span>
     <p class="glass-title">Contact</p>
     <p class="glass-desc">Reach out directly with questions, custom requests, or last-minute needs.</p>

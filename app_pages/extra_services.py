@@ -40,8 +40,9 @@ with col1:
         - Digital distribution (Spotify, Apple Music, etc.)
         - Promotion & placement in live events
         
-        *Pricing varies — [contact us](app_pages/contact.py) to discuss your project.*
+        *Pricing varies — contact us to discuss your project.*
         """)
+        st.page_link("app_pages/contact.py", label="Contact Us", icon=":material/mail:")
         r1, r2 = st.columns(2)
         if r1.button("Add EP ($300)", key="live_rec_ep", type="primary", icon=":material/add_shopping_cart:", use_container_width=True):
             st.session_state.cart[pkg.SVC_POST_EP] = {

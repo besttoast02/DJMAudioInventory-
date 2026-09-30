@@ -2009,3 +2009,51 @@ def get_setups() -> list[dict]:
                     print(f"Error loading setup {setup_id}: {e}")
                     
     return setups
+
+# ── Shopping Carts ───────────────────────────────────────────
+
+def get_cart(session_id: str) -> dict:
+    if is_offline():
+        cart_file = "shopping_carts.json"
+        if os.path.exists(cart_file):
+            try:
+                with open(cart_file, "r") as f:
+                    carts = json.load(f)
+                    return carts.get(session_id, {})
+            except Exception:
+                pass
+        return {}
+    try:
+        sb = get_client()
+        res = sb.table("shopping_carts").select("cart_data").eq("session_id", session_id).execute()
+        if res.data:
+            return res.data[0]["cart_data"]
+    except Exception as e:
+        print(f"Error getting cart: {e}")
+    return {}
+
+def save_cart(session_id: str, cart_data: dict):
+    if is_offline():
+        cart_file = "shopping_carts.json"
+        carts = {}
+        if os.path.exists(cart_file):
+            try:
+                with open(cart_file, "r") as f:
+                    carts = json.load(f)
+            except Exception:
+                pass
+        carts[session_id] = cart_data
+        try:
+            with open(cart_file, "w") as f:
+                json.dump(carts, f)
+        except Exception:
+            pass
+        return
+    try:
+        sb = get_client()
+        sb.table("shopping_carts").upsert({
+            "session_id": session_id,
+            "cart_data": cart_data
+        }, on_conflict="session_id").execute()
+    except Exception as e:
+        print(f"Error saving cart: {e}")

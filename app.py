@@ -20,6 +20,23 @@ st.set_page_config(
 # ── Branding & Styles ────────────────────────────────────────
 st.logo("assets/logo.png", link="https://djmaudio.com")
 
+import uuid
+if "cart_id" not in st.session_state:
+    qp_cart = st.query_params.get("cart")
+    if qp_cart:
+        st.session_state.cart_id = qp_cart
+        st.session_state.cart = db.get_cart(qp_cart)
+    else:
+        st.session_state.cart_id = str(uuid.uuid4())
+        st.session_state.cart = {}
+    st.query_params["cart"] = st.session_state.cart_id
+else:
+    if st.query_params.get("cart") != st.session_state.cart_id:
+        st.query_params["cart"] = st.session_state.cart_id
+
+if "cart" not in st.session_state:
+    st.session_state.cart = {}
+
 # ── Font preload via <link> — avoids render-blocking @import inside <style> ──
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -690,7 +707,8 @@ public_pages = [
     st.Page("app_pages/request.py", title="Checkout", icon=":material/shopping_cart_checkout:"),
     st.Page("app_pages/song_request.py", title="Song Request", icon=":material/music_note:"),
     st.Page("app_pages/ai_assistant.py", title="AI Assistant", icon=":material/smart_toy:"),
-    st.Page("app_pages/contact.py", title="Contact", icon=":material/mail:"),
+    st.Page("app_pages/contact.py", title="Contact", icon=":material/mail:", url_path="contact"),
+    st.Page("app_pages/contact.py", title="Contact", url_path="app_pages/contact.py", visibility="hidden"),
 ]
 
 admin_pages = [
@@ -720,3 +738,7 @@ if db.is_offline():
     st.warning("🔌 Running in Offline Demo Mode. Changes will not be saved. (Supabase database unreachable or incorrect URL)", icon="⚠️")
 
 nav.run()
+
+# Save the cart state at the end of the script
+if "cart_id" in st.session_state and "cart" in st.session_state:
+    db.save_cart(st.session_state.cart_id, st.session_state.cart)
