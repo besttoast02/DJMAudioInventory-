@@ -708,7 +708,7 @@ public_pages = [
     st.Page("app_pages/song_request.py", title="Song Request", icon=":material/music_note:"),
     st.Page("app_pages/ai_assistant.py", title="AI Assistant", icon=":material/smart_toy:"),
     st.Page("app_pages/contact.py", title="Contact", icon=":material/mail:", url_path="contact"),
-    st.Page("app_pages/contact.py", title="Contact", url_path="app_pages/contact.py", visibility="hidden"),
+    st.Page("app_pages/contact.py", title="Contact", url_path="contact_hidden", visibility="hidden"),
 ]
 
 admin_pages = [
